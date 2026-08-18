@@ -203,7 +203,27 @@
     filter: brightness(0) opacity(0.84);
   }
   .marquee-card--raw img { filter: none; opacity: 0.92; }
-  @media (max-width: 900px) { .hero-ecosystem { display: none; } }
+  /* Logo wall stays visible at every size; below desktop, each row becomes an
+     infinitely-scrolling marquee (rows are duplicated via JS for a seamless loop). */
+  @media (max-width: 1024px) {
+    .logo-marquee { gap: 12px; }
+    .marquee-row {
+      justify-content: flex-start;
+      gap: 0;
+      width: max-content;
+      animation: marquee-scroll 42s linear infinite;
+    }
+    .marquee-card {
+      flex: 0 0 auto;
+      width: 76px; min-width: 76px; max-width: 76px;
+      height: 54px;
+      margin: 0 5px;
+    }
+  }
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
   .hero-copy { text-align: center; margin-left: auto; margin-right: auto; }
   .hero-sub {
     font-size: 14.5px; line-height: 1.68; color: #4B5563;
@@ -804,6 +824,12 @@
     .cf-video-card.slot-2 { aspect-ratio: 9 / 14; }
     .cf-card-chrome { inset: auto 12px 12px 12px; }
   }
+  @media (max-width: 480px) {
+    /* On phones the expanded card is taller (input stacks vertically), so push
+       the generated results down so the title is never covered by the card. */
+    .create-faster.cf-gen-active .cf-card { top: 12px; }
+    .cf-row-stage { top: 270px; }
+  }
 
   /* ============ SLIDE 09: UNDERSTAND DEEPER DEMO ============ */
   .understand { background: #0E0E3E; position: relative; overflow: hidden; }
@@ -1277,11 +1303,11 @@
     .ud-grid-2,
     .ud-summary-grid { grid-template-columns: 1fr; }
     .ud-generate-btn { width: 100%; }
+    .ud-input-row { flex-direction: column; }
   }
   @media (max-width: 560px) {
     .understand-layout { gap: 22px; }
     .ud-report-stage { width: calc(100vw - 28px); padding-bottom: 74px; }
-    .ud-input-row { flex-direction: column; }
     .ud-kpi-grid,
     .ud-grid-3,
     .ud-signal-grid { grid-template-columns: 1fr; }
@@ -1622,6 +1648,7 @@
   .slide-count {
     font-size: 10px; font-weight: 600; letter-spacing: 1px;
     color: rgba(255,255,255,0.55); min-width: 44px; text-align: center; padding: 0 2px;
+    white-space: nowrap;
   }
 
   /* ============ ANIMATIONS ============ */
@@ -1821,6 +1848,26 @@
     .ready-ops h2 { font-size: clamp(48px, 6vw, 64px); }
     .ready-ops-lede { max-width: 680px; }
     .ready-ops-meta { max-width: 920px; column-gap: 72px; }
+    /* Outcomes — below desktop, cards stay side-by-side and scroll horizontally */
+    .outcomes-layout { grid-template-columns: 1fr; }
+    .outcomes-cards { flex-direction: row; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; padding-bottom: 8px; }
+    .outcomes-col { flex: 0 0 auto; width: clamp(250px, 78vw, 340px); scroll-snap-align: start; }
+    .outcomes-col:nth-child(2),
+    .outcomes-col:nth-child(3) { margin-top: 0; }
+  }
+
+  /* Tall slides (who / data / outcomes) center their content, which clips the
+     title above the viewport on smaller screens — top-align and allow scroll. */
+  @media (max-width: 1180px), (max-height: 820px) {
+    .who section,
+    .data section,
+    .outcomes section {
+      justify-content: flex-start;
+      padding-top: 80px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
   }
 
   /* ============ SLIDE PROGRESS BAR ============ */
@@ -1839,9 +1886,9 @@
     .outcomes-layout { grid-template-columns: 1fr; }
     .outcomes-col:nth-child(2),
     .outcomes-col:nth-child(3) { margin-top: 0; }
-    .slide-controls { opacity: 1; bottom: 16px; }
-    .slide-nav-btn { width: 36px; height: 36px; }
-    .slide-count { font-size: 11px; min-width: 52px; }
+    .slide-controls { opacity: 1; bottom: 16px; height: 44px; padding: 0 8px; }
+    .slide-nav-btn { width: 40px; height: 40px; font-size: 15px; }
+    .slide-count { font-size: 12px; min-width: 76px; padding: 0 10px; white-space: nowrap; }
   }
 
   @media (max-width: 640px) {
@@ -1863,6 +1910,13 @@
     .outcome-grid { grid-template-columns: 1fr; }
     .outcome-col { border-right: none; border-bottom: 1px solid var(--line); }
     .logo-grid { grid-template-columns: repeat(3, 1fr); }
+    /* Data stats — stacked with aligned edges, separated by bottom rules */
+    .data-stats { gap: 24px; padding-top: 28px; }
+    .data-stat { padding: 0 0 24px; border-right: none; border-bottom: 1px solid var(--line); }
+    .data-stat:nth-child(2),
+    .data-stat:nth-child(3) { padding-left: 0; }
+    .data-stat:last-child { border-bottom: none; padding-bottom: 0; }
+    .data-stat-label { max-width: none; }
     .cta-contact { grid-template-columns: 1fr; gap: 16px; }
     .cf-card { width: calc(100vw - 48px); }
     .ud-card { max-width: calc(100vw - 48px); }
@@ -3065,6 +3119,9 @@
   }, { passive: true });
   document.addEventListener('touchend', (e) => {
     if (overviewOpen) return;
+    // Let horizontally scrollable areas (e.g. the outcomes cards) handle the gesture instead of swiping slides.
+    const t = e.target instanceof Element ? e.target : null;
+    if (t && t.closest('.outcomes-cards')) return;
     const dx = e.changedTouches[0].clientX - _touchStartX;
     const dy = e.changedTouches[0].clientY - _touchStartY;
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
@@ -3072,6 +3129,27 @@
       else goToSlide(currentIndex - 1);
     }
   }, { passive: true });
+
+  // ============ HERO LOGO MARQUEE (mobile) ============
+  // Below desktop the logo rows animate infinitely; duplicate the cards so the
+  // translateX(-50%) loop is seamless, and remove the clones back on desktop.
+  function setupLogoMarquee() {
+    const isMobile = window.matchMedia('(max-width: 1024px)').matches;
+    document.querySelectorAll('.logo-marquee .marquee-row').forEach((row) => {
+      const clones = row.querySelectorAll(':scope > .marquee-card--clone');
+      if (isMobile && clones.length === 0) {
+        Array.from(row.children).forEach((card) => {
+          const c = card.cloneNode(true);
+          c.classList.add('marquee-card--clone');
+          row.appendChild(c);
+        });
+      } else if (!isMobile && clones.length) {
+        clones.forEach((c) => c.remove());
+      }
+    });
+  }
+  setupLogoMarquee();
+  window.addEventListener('resize', setupLogoMarquee);
 
   // ============ SLIDE TITLES & NOTES ============
   const slideTitles = [
