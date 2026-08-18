@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mtel × Basicware × BytePlus — Executive AI Partnership</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="globals.css">
+<style>
+  :root {
+    --v2-navy: #171744;
+    --v2-navy-soft: #29295f;
+    --v2-yellow: #f5c518;
+    --v2-ink: #151515;
+    --v2-body: #646976;
+    --v2-muted: #9a9da6;
+    --v2-line: #e8e6df;
+    --v2-paper: #fffefa;
+    --v2-warm: #fff8e8;
+    --v2-white: #ffffff;
+    --v2-bg:
+      radial-gradient(ellipse 45% 55% at 90% 10%, rgba(245,197,24,.18), transparent 70%),
+      radial-gradient(ellipse 35% 50% at 0% 95%, rgba(245,197,24,.10), transparent 72%),
+      linear-gradient(135deg, #fffef9 0%, #ffffff 52%, #fffaf0 100%);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { font-family: var(--font-body); color: var(--v2-ink); background: var(--v2-paper); }
+  button { font: inherit; }
+  img { display: block; max-width: 100%; }
+
+  .v2-logo {
+    position: fixed; top: 24px; left: 36px; z-index: 100;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .v2-logo img { height: 27px; width: auto; }
+  .v2-logo span {
+    padding-left: 12px; border-left: 1px solid var(--v2-line);
+    color: var(--v2-muted); font-size: var(--text-micro); font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+
+  .v2-slides { position: fixed; inset: 0; overflow: hidden; }
+  .v2-slide {
+    position: absolute; inset: 0; display: flex; align-items: center;
+    opacity: 0; pointer-events: none; transform: translateX(32px);
+    transition: opacity .45s ease, transform .55s cubic-bezier(.16,1,.3,1);
+    background: var(--v2-bg);
+  }
+  .v2-slide[data-state="past"] { transform: translateX(-32px); }
+  .v2-slide[data-state="active"] { opacity: 1; pointer-events: auto; transform: translateX(0); }
+  .v2-slide.is-dark {
+    color: var(--v2-white);
+    background:
+      radial-gradient(circle at 80% 10%, rgba(245,197,24,.18), transparent 35%),
+      radial-gradient(circle at 10% 90%, rgba(117,117,220,.15), transparent 40%),
+      var(--v2-navy);
+  }
+  .v2-slide.is-warm { background: linear-gradient(135deg, #fff9e9 0%, #fffef9 52%, #fff3cf 100%); }
+
+  .v2-frame {
+    width: calc(100% - 200px); margin: 0 auto;
+    padding: 80px 0 64px;
+  }
+  .v2-top { align-self: stretch; }
+  .v2-top .v2-frame { padding-top: 90px; }
+
+  .v2-kicker {
+    margin-bottom: 18px; color: var(--v2-muted); font-size: var(--text-micro);
+    font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  }
+  .is-dark .v2-kicker { color: rgba(255,255,255,.46); }
+  .v2-title { max-width: 1000px; margin-bottom: 24px; }
+  .v2-title .accent { color: var(--v2-yellow); }
+  .v2-lede {
+    max-width: 720px; color: var(--v2-body); font-size: var(--text-body-lg);
+    line-height: var(--leading-relaxed);
+  }
+  .is-dark .v2-lede { color: rgba(255,255,255,.66); }
+  .v2-label {
+    color: var(--v2-muted); font-size: var(--text-micro); font-weight: 700;
+    letter-spacing: .13em; text-transform: uppercase;
+  }
+
+  .hero-layout {
+    display: grid; grid-template-columns: 1.15fr .85fr; gap: 90px; align-items: center;
+  }
+  .hero-title { font-size: clamp(3rem, 5.2vw, 5.25rem); line-height: 1.02; letter-spacing: -.055em; }
+  .hero-partners { display: flex; align-items: center; gap: 16px; margin-top: 38px; }
+  .hero-partners img { height: 25px; width: auto; object-fit: contain; }
+  .hero-partners .divider { width: 1px; height: 26px; background: var(--v2-line); }
+  .hero-system {
+    position: relative; min-height: 450px; display: grid; place-items: center;
+  }
+  .hero-system::before, .hero-system::after {
+    content: ""; position: absolute; border: 1px solid rgba(245,197,24,.22); border-radius: 50%;
+  }
+  .hero-system::before { width: 420px; height: 420px; }
+  .hero-system::after { width: 285px; height: 285px; }
+  .system-core {
+    position: relative; z-index: 2; width: 190px; height: 190px; border-radius: 50%;
+    display: grid; place-items: center; text-align: center; padding: 28px;
+    background: var(--v2-navy); color: white; box-shadow: 0 30px 80px rgba(23,23,68,.22);
+  }
+  .system-core strong { font-size: var(--text-h3); line-height: 1.05; }
+  .orbit-chip {
+    position: absolute; z-index: 3; padding: 11px 16px; border: 1px solid var(--v2-line);
+    border-radius: 999px; background: rgba(255,255,255,.94); color: var(--v2-navy);
+    box-shadow: 0 12px 28px rgba(23,23,68,.07); font-size: var(--text-xs); font-weight: 700;
+  }
+  .orbit-chip:nth-child(2) { top: 30px; left: 50%; transform: translateX(-50%); }
+  .orbit-chip:nth-child(3) { top: 50%; right: -8px; transform: translateY(-50%); }
+  .orbit-chip:nth-child(4) { bottom: 30px; left: 50%; transform: translateX(-50%); }
+  .orbit-chip:nth-child(5) { top: 50%; left: -8px; transform: translateY(-50%); }
+
+  .split {
+    display: grid; grid-template-columns: .92fr 1.08fr; gap: 90px; align-items: center;
+  }
+  .slide-one-title { font-size: var(--text-h2); line-height: var(--leading-tight); letter-spacing: -.02em; }
+  .slide-one-partners { margin-top: 32px; }
+  .slide-one-system { gap: 0; }
+  .slide-one-system .problem-row:first-child {
+    padding-top: 0; padding-bottom: 28px; grid-template-columns: 1fr;
+  }
+  .slide-one-system .problem-row:first-child h3 {
+    margin: 0; font-size: var(--text-h3); line-height: var(--leading-tight);
+  }
+  .slide-one-system .problem-row:not(:first-child) {
+    grid-template-columns: 1fr; align-items: center; padding-left: 18px;
+    border-left: 2px solid var(--v2-yellow);
+  }
+  .slide-one-system .problem-row:not(:first-child) h3 { margin: 0; }
+  .problem-stack { display: grid; gap: 14px; }
+  .problem-row {
+    display: grid; grid-template-columns: 42px 1fr; gap: 18px; align-items: start;
+    padding: 22px 0; border-bottom: 1px solid var(--v2-line);
+  }
+  .problem-row:last-child { border-bottom: 0; }
+  .problem-row span { color: var(--v2-yellow); font-size: var(--text-h4); font-weight: 700; }
+  .problem-row h3 { margin-bottom: 6px; font-size: var(--text-h4); color: var(--v2-navy); }
+  .problem-row p { color: var(--v2-body); font-size: var(--text-sm); line-height: var(--leading-relaxed); }
+
+  .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 48px; }
+  .role-card {
+    min-height: 310px; padding: 30px; border: 1px solid var(--v2-line);
+    background: rgba(255,255,255,.72); display: flex; flex-direction: column;
+  }
+  .role-card img { width: 100%; height: 92px; object-fit: contain; margin-bottom: 32px; }
+  .role-card h3 { margin-bottom: 10px; color: var(--v2-navy); }
+  .role-card p { color: var(--v2-body); font-size: var(--text-sm); line-height: var(--leading-relaxed); }
+  .role-card .v2-label { margin-top: auto; padding-top: 24px; color: var(--v2-yellow); }
+
+  .loop {
+    display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; margin-top: 60px;
+  }
+  .loop-step { position: relative; text-align: center; padding: 0 14px; }
+  .loop-step:not(:last-child)::after {
+    content: "→"; position: absolute; top: 34px; right: -10px; color: var(--v2-yellow);
+    font-size: var(--text-h4); font-weight: 700;
+  }
+  .loop-num {
+    width: 72px; height: 72px; margin: 0 auto 20px; border-radius: 50%;
+    display: grid; place-items: center; background: var(--v2-white); border: 1px solid var(--v2-line);
+    color: var(--v2-yellow); font-size: var(--text-h4); font-weight: 700;
+  }
+  .loop-step h3 { margin-bottom: 8px; font-size: var(--text-h4); color: var(--v2-navy); }
+  .loop-step p { color: var(--v2-body); font-size: var(--text-xs); line-height: 1.55; }
+  .loop-caption {
+    margin-top: 54px; padding-top: 24px; border-top: 1px solid var(--v2-line);
+    display: flex; justify-content: space-between; gap: 30px; color: var(--v2-body);
+    font-size: var(--text-sm);
+  }
+  .loop-caption strong { color: var(--v2-navy); }
+
+  .operate-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 52px; }
+  .operate-step { padding: 34px 0; border-top: 2px solid var(--v2-yellow); }
+  .operate-step .num { margin-bottom: 28px; color: var(--v2-yellow); font-size: var(--text-h2); font-weight: 700; }
+  .operate-step h3 { margin-bottom: 12px; color: var(--v2-navy); }
+  .operate-step p { max-width: 340px; color: var(--v2-body); font-size: var(--text-sm); line-height: var(--leading-relaxed); }
+  .operate-result {
+    margin-top: 48px; padding: 24px 28px; display: flex; justify-content: space-between; align-items: center;
+    background: var(--v2-navy); color: white;
+  }
+  .operate-result strong { font-size: var(--text-h4); }
+  .operate-result span { color: rgba(255,255,255,.58); font-size: var(--text-sm); }
+
+  .workflow-map { display: grid; grid-template-columns: 1fr 1.15fr; gap: 60px; align-items: center; }
+  .workflow-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 34px; }
+  .workflow-chip {
+    padding: 16px 18px; background: var(--v2-white); border: 1px solid var(--v2-line);
+    color: var(--v2-navy); font-size: var(--text-sm); font-weight: 600;
+  }
+  .workflow-center { position: relative; min-height: 430px; display: grid; place-items: center; }
+  .workflow-hub {
+    position: relative; z-index: 3; width: 210px; height: 210px; border-radius: 50%;
+    display: grid; place-items: center; text-align: center; padding: 34px;
+    background: var(--v2-yellow); color: var(--v2-navy); box-shadow: 0 28px 70px rgba(245,197,24,.28);
+  }
+  .workflow-hub strong { font-size: var(--text-h3); line-height: 1.05; }
+  .workflow-ring { position: absolute; border: 1px dashed rgba(23,23,68,.18); border-radius: 50%; }
+  .workflow-ring.one { width: 340px; height: 340px; }
+  .workflow-ring.two { width: 440px; height: 440px; }
+
+  .conversion-flow {
+    display: grid; grid-template-columns: 1fr 46px 1fr 46px 1fr; gap: 16px;
+    align-items: stretch; margin-top: 50px;
+  }
+  .conversion-card {
+    min-height: 300px; padding: 30px; background: rgba(255,255,255,.78);
+    border: 1px solid var(--v2-line); display: flex; flex-direction: column;
+  }
+  .conversion-card .v2-label { color: var(--v2-yellow); margin-bottom: 20px; }
+  .conversion-card h3 { margin-bottom: 12px; color: var(--v2-navy); }
+  .conversion-card p { color: var(--v2-body); font-size: var(--text-sm); line-height: var(--leading-relaxed); }
+  .conversion-signal { margin-top: auto; padding-top: 24px; color: var(--v2-navy); font-size: var(--text-xs); font-weight: 700; }
+  .conversion-arrow { display: grid; place-items: center; color: var(--v2-yellow); font-size: var(--text-h3); }
+
+  .preview-shell {
+    display: grid; grid-template-columns: .82fr 1.18fr; gap: 54px; align-items: center;
+  }
+  .preview-panel {
+    padding: 26px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06);
+    box-shadow: 0 28px 80px rgba(0,0,0,.24);
+  }
+  .preview-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .preview-tab {
+    padding: 8px 12px; border: 1px solid rgba(255,255,255,.14); color: rgba(255,255,255,.55);
+    background: transparent; font-size: var(--text-micro); font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  }
+  .preview-tab.active { background: var(--v2-yellow); color: var(--v2-navy); border-color: var(--v2-yellow); }
+  .preview-stage { min-height: 330px; padding: 28px; background: white; color: var(--v2-ink); }
+  .preview-stage h3 { margin-bottom: 18px; color: var(--v2-navy); }
+  .preview-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px; }
+  .preview-metric { padding: 16px; background: #faf9f5; border: 1px solid var(--v2-line); }
+  .preview-metric strong { display: block; color: var(--v2-navy); font-size: var(--text-h4); }
+  .preview-metric span { color: var(--v2-muted); font-size: var(--text-micro); }
+  .preview-action { padding: 18px; border-left: 3px solid var(--v2-yellow); background: var(--v2-warm); }
+  .preview-action strong { color: var(--v2-navy); }
+  .preview-action p { margin-top: 5px; color: var(--v2-body); font-size: var(--text-sm); line-height: 1.5; }
+
+  .proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 46px; }
+  .proof-card { padding: 30px; border-top: 2px solid var(--v2-yellow); background: rgba(255,255,255,.72); }
+  .proof-card .v2-label { margin-bottom: 22px; }
+  .proof-card h3 { margin-bottom: 22px; color: var(--v2-navy); }
+  .proof-list { display: grid; gap: 14px; }
+  .proof-item { padding-top: 14px; border-top: 1px solid var(--v2-line); }
+  .proof-item strong { display: block; color: var(--v2-navy); font-size: var(--text-h4); }
+  .proof-item span { color: var(--v2-body); font-size: var(--text-xs); }
+  .proof-note { margin-top: 34px; color: var(--v2-muted); font-size: var(--text-xs); }
+
+  .scale-path { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 56px; border: 1px solid var(--v2-line); }
+  .scale-stage { min-height: 280px; padding: 34px; background: rgba(255,255,255,.76); border-right: 1px solid var(--v2-line); }
+  .scale-stage:last-child { border-right: 0; }
+  .scale-stage .v2-label { margin-bottom: 24px; color: var(--v2-yellow); }
+  .scale-stage h3 { margin-bottom: 12px; color: var(--v2-navy); }
+  .scale-stage p { color: var(--v2-body); font-size: var(--text-sm); line-height: var(--leading-relaxed); }
+  .scale-stage strong { display: block; margin-top: 28px; color: var(--v2-navy); font-size: var(--text-sm); }
+
+  .pilot-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 80px; align-items: center; }
+  .pilot-card { padding: 34px; background: var(--v2-navy); color: white; }
+  .pilot-row { display: grid; grid-template-columns: 44px 1fr; gap: 18px; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .pilot-row:last-child { border-bottom: 0; }
+  .pilot-row span { color: var(--v2-yellow); font-weight: 700; }
+  .pilot-row strong { display: block; margin-bottom: 5px; font-size: var(--text-h4); }
+  .pilot-row p { color: rgba(255,255,255,.58); font-size: var(--text-sm); line-height: 1.55; }
+
+  .close-layout { max-width: 980px; margin: 0 auto; text-align: center; }
+  .close-title { font-size: clamp(3rem, 5vw, 5rem); line-height: 1.02; letter-spacing: -.05em; }
+  .close-line { width: 80px; height: 3px; margin: 34px auto; background: var(--v2-yellow); }
+  .close-action {
+    display: inline-flex; align-items: center; gap: 14px; margin-top: 36px; padding: 15px 20px 15px 24px;
+    border-radius: 999px; background: var(--v2-yellow); color: var(--v2-navy);
+    font-size: var(--text-xs); font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  }
+  .close-action span { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: var(--v2-navy); color: var(--v2-yellow); }
+
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s cubic-bezier(.16,1,.3,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  .v2-controls {
+    position: fixed; z-index: 200; left: 50%; bottom: 24px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 4px; height: 38px; padding: 0 5px;
+    background: rgba(23,23,68,.94); border: 1px solid rgba(255,255,255,.08); border-radius: 999px;
+    box-shadow: 0 8px 28px rgba(23,23,68,.18);
+  }
+  .v2-controls button {
+    width: 29px; height: 29px; border: 0; border-radius: 50%; background: transparent;
+    color: rgba(255,255,255,.72); cursor: pointer;
+  }
+  .v2-controls button:hover { background: rgba(255,255,255,.1); color: white; }
+  .v2-controls button:disabled { opacity: .25; cursor: default; }
+  .v2-count { min-width: 55px; color: rgba(255,255,255,.52); text-align: center; font-size: var(--text-micro); font-weight: 700; letter-spacing: .08em; }
+  .v2-count strong { color: var(--v2-yellow); }
+  .v2-sep { width: 1px; height: 18px; background: rgba(255,255,255,.12); }
+
+  .v2-overview {
+    position: fixed; inset: 0; z-index: 300; display: none; place-items: center;
+    background: rgba(23,23,68,.96); backdrop-filter: blur(14px);
+  }
+  .v2-overview.open { display: grid; }
+  .v2-overview-box { width: min(780px, calc(100vw - 48px)); max-height: calc(100vh - 80px); overflow: auto; padding: 28px; border: 1px solid rgba(255,255,255,.12); }
+  .v2-overview-head { display: flex; justify-content: space-between; margin-bottom: 20px; color: rgba(255,255,255,.48); font-size: var(--text-xs); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .v2-overview-head button { color: white; border: 0; background: transparent; cursor: pointer; }
+  .v2-overview-list { display: grid; gap: 3px; }
+  .v2-overview-item { display: grid; grid-template-columns: 44px 1fr; padding: 13px 14px; color: rgba(255,255,255,.65); cursor: pointer; }
+  .v2-overview-item:hover, .v2-overview-item.active { background: rgba(255,255,255,.07); color: white; }
+  .v2-overview-item span:first-child { color: var(--v2-yellow); font-size: var(--text-xs); font-weight: 700; }
+
+  .v2-presenter {
+    position: fixed; z-index: 210; left: 50%; bottom: 76px; transform: translateX(-50%);
+    width: min(820px, calc(100vw - 48px)); display: none; grid-template-columns: 90px 1fr 180px; gap: 20px;
+    padding: 18px 22px; background: rgba(23,23,68,.97); color: white; border: 1px solid rgba(255,255,255,.1);
+  }
+  .v2-presenter.open { display: grid; }
+  .v2-presenter .label { margin-bottom: 5px; color: rgba(255,255,255,.35); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .v2-presenter .timer { color: var(--v2-yellow); font-size: var(--text-h4); font-weight: 700; }
+  .v2-presenter .notes, .v2-presenter .next { color: rgba(255,255,255,.68); font-size: var(--text-xs); line-height: 1.5; }
+
+  @media (min-width: 1920px) {
+    .v2-frame { width: calc(100% - 240px); padding-top: 100px; padding-bottom: 72px; }
+  }
+  @media (max-width: 1100px) {
+    .hero-layout, .split, .workflow-map, .preview-shell, .pilot-layout { grid-template-columns: 1fr; gap: 34px; }
+    .role-grid, .proof-grid, .operate-grid, .scale-path { grid-template-columns: 1fr 1fr; }
+    .loop { grid-template-columns: repeat(3, 1fr); gap: 30px 0; }
+    .conversion-flow { grid-template-columns: 1fr; }
+    .conversion-arrow { transform: rotate(90deg); }
+    .hero-system, .workflow-center { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="v2-logo">
+  <img src="mtel logo.png" alt="Mtel">
+  <span>Executive AI Partnership</span>
+</div>
+
+<main class="v2-slides" id="v2Slides">
+  <section class="v2-slide" data-state="active">
+    <div class="v2-frame split">
+      <div>
+        <div class="v2-kicker reveal">Mtel × Basicware × BytePlus</div>
+        <h1 class="v2-title slide-one-title reveal">AI growth systems,<br><span class="accent">operated for Thailand’s leading enterprises.</span></h1>
+        <p class="v2-lede reveal">Mtel × Basicware turns BytePlus AI capabilities into measurable business workflows — built, operated, and continuously improved.</p>
+        <div class="hero-partners slide-one-partners reveal">
+          <img src="mtel logo.png" alt="Mtel">
+          <span class="divider"></span>
+          <img src="assets/byteplus.png" alt="BytePlus">
+        </div>
+      </div>
+      <div class="problem-stack slide-one-system reveal">
+        <div class="problem-row"><div><h3>Operated AI growth system</h3></div></div>
+        <div class="problem-row"><div><h3>Generate</h3></div></div>
+        <div class="problem-row"><div><h3>Understand</h3></div></div>
+        <div class="problem-row"><div><h3>Convert</h3></div></div>
+        <div class="problem-row"><div><h3>Optimize</h3></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="v2-slide" data-state="future">
+    <div class="v2-frame split">
+      <div>
+        <div class="v2-kicker reveal">The business problem</div>
+        <h2 class="v2-title reveal">AI adoption is easy. Turning it into <span class="accent">business performance</span> is not.</h2>
+        <p class="v2-lede reveal">Companies can generate content and collect data, but most do not have a connected system that turns AI output into decisions, actions, and conversion.</p>
+      </div>
+      <div class="problem-stack reveal">
+        <div class="problem-row"><span>01</span><div><h3>Disconnected tools</h3><p>Content, data, CRM, and operations remain separated across teams.</p></div></div>
+        <div class="problem-row"><span>02</span><div><h3>No operating owner</h3><p>AI pilots launch, but nobody continuously improves them in production.</p></div></div>
+        <div class="problem-row"><span>03</span><div><h3>Activity without outcomes</h3><p>More AI output does not automatically create better decisions or conversion.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="v2-slide v2-top" data-state="future">
+    <div class="v2-frame">
+      <div class="v2-kicker reveal">Partnership architecture</div>
+      <h2 class="v2-title reveal">Three roles. <span class="accent">One operating system.</span></h2>
+      <p class="v2-lede reveal">A clear division of responsibility turns enterprise AI capability into a system that works locally, integrates deeply, and improves continuously.</p>
+      <div class="role-grid">
+        <article class="role-card reveal"><img src="assets/byteplus.png" alt="BytePlus"><h3>BytePlus</h3><p>Provides the enterprise AI technology stack, models, data capability, and intelligence infrastructure.</p><div class="v2-label">Technology</div></article>
+        <article class="role-card reveal"><img src="assets/byteplus-partner.png" alt="Basicware"><h3>Basicware</h3><p>Provides AI engine capability, workflow design, solution architecture, and technical enablement.</p><div class="v2-label">AI capability</div></article>
+        <article class="role-card reveal"><img src="assets/software-house.png" alt="Mtel"><h3>Mtel</h3><p>Provides local enterprise delivery, platform integration, operation, adoption, and measurable outcomes.</p><div class="v2-label">Enterprise operation</div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="v2-slide is-warm" data-state="future">
+    <div class="v2-frame">
+      <div class="v2-kicker reveal">The AI growth loop</div>
+      <h2 class="v2-title reveal">From content generation to <span class="accent">conversion learning.</span></h2>
+      <p class="v2-lede reveal">This connected loop turns AI from a production tool into a growth system that learns from every audience response.</p>
+      <div class="loop reveal">
+        <div class="loop-step"><div class="loop-num">01</div><h3>Generate</h3><p>Create production-ready content and experiences.</p></div>
+        <div class="loop-step"><div class="loop-num">02</div><h3>Personalize</h3><p>Adapt creative and journeys for each audience.</p></div>
+        <div class="loop-step"><div class="loop-num">03</div><h3>Measure</h3><p>Capture response, behavior, and market signals.</p></div>
+        <div class="loop-step"><div class="loop-num">04</div><h3>Learn</h3><p>Turn signals into recommendations and decisions.</p></div>
+        <div class="loop-step"><div class="loop-num">05</div><h3>Convert</h3><p>Improve the next action, campaign, and workflow.</p></div>
+      </div>
+      <div class="loop-caption reveal"><span><strong>Every cycle produces value.</strong> Every next cycle performs better.</span><span>Operated continuously by Mtel × Basicware</span></div>
+    </div>
+  </section>
+
+  <section class="v2-slide v2-top" data-state="future">
+    <div class="v2-frame">
+      <div class="v2-kicker reveal">Operating model</div>
+      <h2 class="v2-title reveal">Audit. Automate. <span class="accent">Operate.</span></h2>
+      <p class="v2-lede reveal">We identify high-value workflows, automate them with AI, then operate and improve them continuously in production.</p>
+      <div class="operate-grid">
+        <article class="operate-step reveal"><div class="num">01</div><h3>Audit the value</h3><p>Map workflows, identify friction, and prioritize measurable opportunities.</p></article>
+        <article class="operate-step reveal"><div class="num">02</div><h3>Automate the workflow</h3><p>Integrate AI into the existing stack and launch a production-ready system.</p></article>
+        <article class="operate-step reveal"><div class="num">03</div><h3>Operate the outcome</h3><p>Monitor performance, improve prompts and processes, and scale what works.</p></article>
+      </div>
+      <div class="operate-result reveal"><strong>AI value is not delivered at launch.</strong><span>It is delivered through continuous operation.</span></div>
+    </div>
+  </section>
+
+  <section class="v2-slide" data-state="future">
+    <div class="v2-frame workflow-map">
+      <div>
+        <div class="v2-kicker reveal">Enterprise workflow layer</div>
+        <h2 class="v2-title reveal">Beyond content. Into <span class="accent">business operations.</span></h2>
+        <p class="v2-lede reveal">The same AI operating system can support revenue teams, internal operations, and leadership decisions.</p>
+        <div class="workflow-list reveal">
+          <div class="workflow-chip">Marketing</div><div class="workflow-chip">CRM & sales</div>
+          <div class="workflow-chip">Customer intelligence</div><div class="workflow-chip">Support</div>
+          <div class="workflow-chip">HR & finance</div><div class="workflow-chip">Reporting</div>
+        </div>
+      </div>
+      <div class="workflow-center reveal">
+        <div class="workflow-ring two"></div><div class="workflow-ring one"></div>
+        <div class="workflow-hub"><strong>Connected AI workflow operation</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="v2-slide is-warm v2-top" data-state="future">
+    <div class="v2-frame">
+      <div class="v2-kicker reveal">Content-to-conversion use case</div>
+      <h2 class="v2-title reveal">AI-generated content becomes more valuable <span class="accent">when it learns.</span></h2>
+      <p class="v2-lede reveal">Content, audience intelligence, and conversion decisions become one continuously improving operating flow.</p>
+      <div class="conversion-flow">
+        <article class="conversion-card reveal"><div class="v2-label">Create</div><h3>Generate personalized content</h3><p>Produce campaign variants, landing experiences, video, images, and digital humans for priority audiences.</p><div class="conversion-signal">Output: faster, scalable production</div></article>
+        <div class="conversion-arrow reveal">→</div>
+        <article class="conversion-card reveal"><div class="v2-label">Understand</div><h3>Read audience response</h3><p>Monitor behavior, sentiment, creative response, customer signals, and market movement.</p><div class="conversion-signal">Output: clear intelligence</div></article>
+        <div class="conversion-arrow reveal">→</div>
+        <article class="conversion-card reveal"><div class="v2-label">Activate</div><h3>Improve the next decision</h3><p>Adjust targeting, messaging, offers, workflows, and campaign direction based on live learning.</p><div class="conversion-signal">Output: better conversion</div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="v2-slide is-dark" data-state="future">
+    <div class="v2-frame preview-shell">
+      <div>
+        <div class="v2-kicker reveal">Platform preview</div>
+        <h2 class="v2-title reveal">See the system <span class="accent">in action.</span></h2>
+        <p class="v2-lede reveal">One operating view connects AI content, audience analytics, recommended action, and workflow execution.</p>
+      </div>
+      <div class="preview-panel reveal">
+        <div class="preview-tabs">
+          <button class="preview-tab active" data-preview="content">Content</button>
+          <button class="preview-tab" data-preview="intelligence">Intelligence</button>
+          <button class="preview-tab" data-preview="action">Action</button>
+        </div>
+        <div class="preview-stage" id="previewStage">
+          <h3>Campaign operating view</h3>
+          <div class="preview-metrics"><div class="preview-metric"><strong>24</strong><span>creative variants</span></div><div class="preview-metric"><strong>4.2%</strong><span>engagement</span></div><div class="preview-metric"><strong>+18%</strong><span>positive response</span></div></div>
+          <div class="preview-action"><strong>Recommended next action</strong><p>Scale the top-performing Bangkok creative, adapt its message for CRM follow-up, and reduce spend on low-response segments.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="v2-slide v2-top" data-state="future">
+    <div class="v2-frame">
+      <div class="v2-kicker reveal">Proof and measurable value</div>
+      <h2 class="v2-title reveal">Where AI becomes <span class="accent">measurable.</span></h2>
+      <p class="v2-lede reveal">Selected examples of outcomes the operating system can target and measure. Final targets are validated during the pilot.</p>
+      <div class="proof-grid">
+        <article class="proof-card reveal"><div class="v2-label">Content operation</div><h3>Faster production</h3><div class="proof-list"><div class="proof-item"><strong>Hours → minutes</strong><span>Creative and campaign variant production</span></div><div class="proof-item"><strong>More testing</strong><span>More audience and message combinations</span></div></div></article>
+        <article class="proof-card reveal"><div class="v2-label">Business intelligence</div><h3>Better visibility</h3><div class="proof-list"><div class="proof-item"><strong>Live signals</strong><span>Customer, competitor, and market movement</span></div><div class="proof-item"><strong>Clear action</strong><span>Recommendations tied to business decisions</span></div></div></article>
+        <article class="proof-card reveal"><div class="v2-label">Workflow operation</div><h3>Lower friction</h3><div class="proof-list"><div class="proof-item"><strong>Fewer handoffs</strong><span>Automated repetitive operational work</span></div><div class="proof-item"><strong>Faster response</strong><span>Customer and internal service workflows</span></div></div></article>
+      </div>
+      <p class="proof-note reveal">Target metrics are agreed before launch and monitored through the operating dashboard.</p>
+    </div>
+  </section>
+
+  <section class="v2-slide v2-top" data-state="future">
+    <div class="v2-frame">
+      <div class="v2-kicker reveal">Engagement model</div>
+      <h2 class="v2-title reveal">Start with one workflow. Scale into an <span class="accent">operating system.</span></h2>
+      <p class="v2-lede reveal">Begin with a focused 90-day pilot, prove measurable value, then expand into additional workflows.</p>
+      <div class="scale-path">
+        <article class="scale-stage reveal"><div class="v2-label">Phase 01</div><h3>Pilot</h3><p>Select one priority workflow and launch a measurable production system.</p><strong>Outcome: validated value</strong></article>
+        <article class="scale-stage reveal"><div class="v2-label">Phase 02</div><h3>Expand</h3><p>Connect adjacent workflows, teams, channels, and business data.</p><strong>Outcome: connected operation</strong></article>
+        <article class="scale-stage reveal"><div class="v2-label">Phase 03</div><h3>Operate</h3><p>Continuously improve performance, adoption, and conversion across the system.</p><strong>Outcome: compounding growth</strong></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="v2-slide is-warm" data-state="future">
+    <div class="v2-frame pilot-layout">
+      <div>
+        <div class="v2-kicker reveal">Recommended 90-day pilot</div>
+        <h2 class="v2-title reveal">Recommended next step: <span class="accent">AI growth workflow pilot.</span></h2>
+        <p class="v2-lede reveal">A focused pilot creates evidence quickly while establishing the operating model for future scale.</p>
+      </div>
+      <div class="pilot-card reveal">
+        <div class="pilot-row"><span>01</span><div><strong>One business unit</strong><p>A clear owner, team, and operating context.</p></div></div>
+        <div class="pilot-row"><span>02</span><div><strong>One priority workflow</strong><p>A high-value content, intelligence, conversion, or operations use case.</p></div></div>
+        <div class="pilot-row"><span>03</span><div><strong>One measurable outcome</strong><p>A defined target such as speed, cost, response, visibility, or conversion.</p></div></div>
+        <div class="pilot-row"><span>04</span><div><strong>One operating dashboard</strong><p>A shared view of performance, learning, and next actions.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="v2-slide is-dark" data-state="future">
+    <div class="v2-frame close-layout">
+      <div class="v2-kicker reveal">Decision</div>
+      <h1 class="close-title reveal">Let’s turn AI capability into <span class="accent">operated business performance.</span></h1>
+      <div class="close-line reveal"></div>
+      <p class="v2-lede reveal" style="margin-inline:auto;">The next step is to select one workflow, agree the measurable outcome, and start the 90-day pilot.</p>
+      <div class="close-action reveal">Select the first workflow <span>→</span></div>
+    </div>
+  </section>
+</main>
+
+<div class="v2-controls">
+  <button id="prevBtn" aria-label="Previous slide">←</button>
+  <div class="v2-count"><strong id="currentNum">01</strong> / <span id="totalNum">12</span></div>
+  <button id="nextBtn" aria-label="Next slide">→</button>
+  <div class="v2-sep"></div>
+  <button id="overviewBtn" aria-label="Slide overview">▦</button>
+  <button id="presenterBtn" aria-label="Presenter notes">▶</button>
+</div>
+
+<div class="v2-overview" id="overview">
+  <div class="v2-overview-box">
+    <div class="v2-overview-head"><span>V2 slide overview</span><button id="closeOverview">Close</button></div>
+    <div class="v2-overview-list" id="overviewList"></div>
+  </div>
+</div>
+
+<div class="v2-presenter" id="presenter">
+  <div><div class="label">Elapsed</div><div class="timer" id="timer">00:00</div></div>
+  <div><div class="label" id="presenterTitle">Slide 1</div><div class="notes" id="presenterNotes"></div></div>
+  <div><div class="label">Up next</div><div class="next" id="presenterNext"></div></div>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.v2-slide'));
+  const slideTitles = [
+    'Executive proposition', 'Business problem', 'Partnership architecture', 'AI growth loop',
+    'Operating model', 'Enterprise workflow layer', 'Content-to-conversion use case', 'Platform preview',
+    'Proof and measurable value', 'Engagement model', 'Recommended 90-day pilot', 'Decision'
+  ];
+  const slideNotes = [
+    'Open with the commercial proposition: Mtel × Basicware operates the AI growth system, powered by BytePlus.',
+    'Frame the problem as a missing operating system, not a lack of AI tools.',
+    'Clarify responsibilities. BytePlus provides technology, Basicware provides AI capability, Mtel delivers and operates locally.',
+    'Show the connected loop. The value is not generation alone; it is the learning cycle through conversion.',
+    'Emphasize operation. The system is continuously improved after launch.',
+    'Broaden the conversation beyond marketing into enterprise workflows.',
+    'Connect content, intelligence, action, and conversion in one practical use case.',
+    'Use the tabs to explain how one operating view connects output, signals, and action.',
+    'Keep proof credible. These are measurable outcome categories; pilot targets are agreed with the client.',
+    'Position the pilot as the first controlled step toward a larger operating system.',
+    'Recommend a specific 90-day structure with one owner, workflow, outcome, and dashboard.',
+    'Ask the executive team to select the first workflow and sponsor the pilot.'
+  ];
+  let currentIndex = 0;
+  let presenterOpen = false;
+  let seconds = 0;
+  let timerId = null;
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const currentNum = document.getElementById('currentNum');
+  const totalNum = document.getElementById('totalNum');
+  const overview = document.getElementById('overview');
+  const overviewList = document.getElementById('overviewList');
+  const presenter = document.getElementById('presenter');
+
+  totalNum.textContent = String(slides.length).padStart(2, '0');
+
+  function revealSlide(slide) {
+    slide.querySelectorAll('.reveal').forEach((element, index) => {
+      setTimeout(() => element.classList.add('visible'), index * 65);
+    });
+  }
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length || index === currentIndex) return;
+    slides.forEach((slide, slideIndex) => {
+      slide.dataset.state = slideIndex < index ? 'past' : slideIndex === index ? 'active' : 'future';
+    });
+    currentIndex = index;
+    updateUI();
+    setTimeout(() => revealSlide(slides[currentIndex]), 80);
+  }
+
+  function updateUI() {
+    currentNum.textContent = String(currentIndex + 1).padStart(2, '0');
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === slides.length - 1;
+    document.getElementById('presenterTitle').textContent = `Slide ${currentIndex + 1} · ${slideTitles[currentIndex]}`;
+    document.getElementById('presenterNotes').textContent = slideNotes[currentIndex];
+    document.getElementById('presenterNext').textContent = slideTitles[currentIndex + 1] || 'End';
+  }
+
+  function buildOverview() {
+    overviewList.innerHTML = slideTitles.map((title, index) => `
+      <div class="v2-overview-item${index === currentIndex ? ' active' : ''}" data-index="${index}">
+        <span>${String(index + 1).padStart(2, '0')}</span><strong>${title}</strong>
+      </div>`).join('');
+    overviewList.querySelectorAll('.v2-overview-item').forEach(item => {
+      item.addEventListener('click', () => { goToSlide(Number(item.dataset.index)); overview.classList.remove('open'); });
+    });
+  }
+
+  function togglePresenter() {
+    presenterOpen = !presenterOpen;
+    presenter.classList.toggle('open', presenterOpen);
+    if (presenterOpen && !timerId) {
+      timerId = setInterval(() => {
+        seconds += 1;
+        const minutes = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const remaining = String(seconds % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `${minutes}:${remaining}`;
+      }, 1000);
+    }
+  }
+
+  prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+  nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+  document.getElementById('overviewBtn').addEventListener('click', () => { buildOverview(); overview.classList.add('open'); });
+  document.getElementById('closeOverview').addEventListener('click', () => overview.classList.remove('open'));
+  document.getElementById('presenterBtn').addEventListener('click', togglePresenter);
+  overview.addEventListener('click', event => { if (event.target === overview) overview.classList.remove('open'); });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === ' ') goToSlide(currentIndex + 1);
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') goToSlide(currentIndex - 1);
+    if (event.key.toLowerCase() === 'o') { buildOverview(); overview.classList.toggle('open'); }
+    if (event.key.toLowerCase() === 'p') togglePresenter();
+    if (event.key === 'Escape') overview.classList.remove('open');
+  });
+
+  const previewContent = {
+    content: ['Campaign operating view', '24', 'creative variants', '4.2%', 'engagement', '+18%', 'positive response', 'Scale the top-performing Bangkok creative, adapt its message for CRM follow-up, and reduce spend on low-response segments.'],
+    intelligence: ['Audience intelligence view', '72%', 'positive sentiment', '+11%', 'intent signal', '3', 'priority segments', 'Shift the next content cycle toward high-intent urban audiences and address the most common pricing objection.'],
+    action: ['Workflow action view', '6', 'actions queued', '2', 'teams notified', 'Live', 'dashboard status', 'Launch the approved creative, trigger CRM follow-up, and monitor conversion performance through the shared operating dashboard.']
+  };
+  document.querySelectorAll('.preview-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.preview-tab').forEach(item => item.classList.remove('active'));
+      tab.classList.add('active');
+      const data = previewContent[tab.dataset.preview];
+      document.getElementById('previewStage').innerHTML = `
+        <h3>${data[0]}</h3>
+        <div class="preview-metrics">
+          <div class="preview-metric"><strong>${data[1]}</strong><span>${data[2]}</span></div>
+          <div class="preview-metric"><strong>${data[3]}</strong><span>${data[4]}</span></div>
+          <div class="preview-metric"><strong>${data[5]}</strong><span>${data[6]}</span></div>
+        </div>
+        <div class="preview-action"><strong>Recommended next action</strong><p>${data[7]}</p></div>`;
+    });
+  });
+
+  updateUI();
+  revealSlide(slides[0]);
+</script>
+</body>
+</html>
