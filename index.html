@@ -27,7 +27,23 @@
       radial-gradient(circle at 88% 8%, rgba(245, 197, 24, 0.10), transparent 32%),
       radial-gradient(circle at 78% 92%, rgba(245, 197, 24, 0.04), transparent 38%),
       linear-gradient(135deg, #ffffff 0%, #fffdf7 52%, #fffaf0 100%);
+
+    /* Chapter colours — assigned from the globals.css palette. Yellow stays
+       reserved for headline emphasis + the closing CTA. */
+    --ch-house: #0FA07F;            /* teal-50  — software house   */
+    --ch-house-ink: #0A7160;
+    --ch-house-soft: rgba(15, 160, 127, 0.12);
+    --ch-workflow: #5824C6;         /* purple-60 — AI workflow     */
+    --ch-workflow-ink: #45209C;
+    --ch-workflow-soft: rgba(88, 36, 198, 0.12);
+    --ch-byteplus: #D97706;         /* amber-50 — byteplus partner */
+    --ch-byteplus-ink: #A65C08;
+    --ch-byteplus-soft: rgba(217, 119, 6, 0.12);
   }
+
+  .ch-house    { --ch: var(--ch-house);    --ch-ink: var(--ch-house-ink);    --ch-soft: var(--ch-house-soft); }
+  .ch-workflow { --ch: var(--ch-workflow); --ch-ink: var(--ch-workflow-ink); --ch-soft: var(--ch-workflow-soft); }
+  .ch-byteplus { --ch: var(--ch-byteplus); --ch-ink: var(--ch-byteplus-ink); --ch-soft: var(--ch-byteplus-soft); }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -57,23 +73,53 @@
   }
   .eyebrow::before { content: ''; width: 7px; height: 7px; background: var(--yellow); border-radius: 50%; }
 
-  /* ============ FIXED LOGO ============ */
-  .slide-logo {
-    position: fixed; top: 22px; left: 36px; z-index: 200;
+  /* ============ TOP BAR: LOGO + PERSISTENT CHAPTER TAG ============ */
+  .topbar {
+    position: fixed; top: 22px; left: 36px; z-index: 250;
+    display: flex; align-items: center; gap: 0;
+    background: rgba(255,255,255,0.78);
+    border: 1px solid rgba(26,26,78,0.10);
+    border-radius: 999px;
+    padding: 8px 8px 8px 14px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 3px rgba(26,26,78,0.05), 0 6px 20px rgba(26,26,78,0.08);
   }
-  .logo {
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
+  .topbar .logo {
+    display: inline-flex; align-items: center; cursor: pointer;
   }
-  .logo img {
-    height: clamp(20px, 3vw, 28px);
+  .topbar .logo img {
+    height: clamp(18px, 2.4vw, 24px);
     width: auto;
     transition: filter 0.25s ease;
     filter: none;
   }
   .logo-black img { filter: brightness(0); }
   .logo-inv img { filter: brightness(0) invert(1); }
+  .chapter-tags {
+    display: flex; align-items: center; gap: 9px;
+    padding-left: 14px; margin-left: 14px; height: 24px;
+    border-left: 1px solid rgba(26,26,78,0.10);
+  }
+  .chapter-tag {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase;
+    color: rgba(26,26,78,0.26);
+    opacity: 0.9;
+    transition: color 0.3s ease, opacity 0.3s ease;
+    white-space: nowrap;
+  }
+  .chapter-tag[data-chapter="house"]    { --ch: var(--ch-house); }
+  .chapter-tag[data-chapter="workflow"] { --ch: var(--ch-workflow); }
+  .chapter-tag[data-chapter="byteplus"] { --ch: var(--ch-byteplus); }
+  .chapter-tag.active { color: var(--ch); opacity: 1; }
+  .chapter-tag-sep {
+    width: 3px; height: 3px; border-radius: 50%;
+    background: rgba(26,26,78,0.20);
+  }
+  @media (max-width: 768px) {
+    .topbar { left: 20px; top: 16px; }
+    .chapter-tags { display: none; }
+  }
 
   /* ============ SLIDES SYSTEM ============ */
   .slides-container {
@@ -1527,6 +1573,226 @@
   .cta-contact-item { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; }
   .cta-contact-item strong { display: block; color: rgba(255,255,255,0.85); font-size: 11px; letter-spacing: 1.2px; font-weight: 600; font-family: var(--sans); margin-bottom: 4px; }
 
+  /* ============ V2: CHAPTER OPENERS + NEW SOFTWARE-HOUSE SLIDES ============ */
+  /* Chapter eyebrow — coloured per chapter instead of fixed yellow */
+  .eyebrow.chapter-eyebrow, .chapter-eyebrow.eyebrow { color: var(--ch-ink); }
+  .eyebrow.chapter-eyebrow::before, .chapter-eyebrow.eyebrow::before { background: var(--ch); }
+  .ch-house .case-tag::before, .ch-house .process-step-num, .ch-house .scribe-num { color: var(--ch); }
+  .ch-workflow .case-tag::before, .ch-workflow .process-step-num { color: var(--ch); }
+  .ch-byteplus .pill-num { color: var(--ch); }
+
+  /* ---- Slide 02 map (three capabilities, one line each) ---- */
+  .who-map { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .map-col {
+    border: 1px solid var(--line); border-right-width: 0; background: var(--white);
+    padding: 34px 30px; min-height: 300px;
+    display: flex; flex-direction: column; align-items: flex-start;
+    border-top: 3px solid var(--line);
+  }
+  .map-col:last-child { border-right-width: 1px; }
+  .map-col--house    { border-top-color: var(--ch-house); }
+  .map-col--workflow { border-top-color: var(--ch-workflow); }
+  .map-col--byteplus { border-top-color: var(--ch-byteplus); }
+  .map-num {
+    font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -2px;
+    color: var(--navy); opacity: 0.14; margin-bottom: 16px;
+  }
+  .map-col--house .map-num    { color: var(--ch-house); opacity: 1; }
+  .map-col--workflow .map-num { color: var(--ch-workflow); opacity: 1; }
+  .map-col--byteplus .map-num { color: var(--ch-byteplus); opacity: 1; }
+  .map-img { height: 46px; width: auto; object-fit: contain; margin-bottom: 20px; }
+  .map-tag {
+    font-size: 10px; letter-spacing: 1.4px; font-weight: 700; text-transform: uppercase;
+    margin-bottom: 12px; padding: 4px 10px; border-radius: 999px;
+  }
+  .map-col--house .map-tag    { color: var(--ch-house-ink);    background: var(--ch-house-soft); }
+  .map-col--workflow .map-tag { color: var(--ch-workflow-ink); background: var(--ch-workflow-soft); }
+  .map-col--byteplus .map-tag { color: var(--ch-byteplus-ink); background: var(--ch-byteplus-soft); }
+  .map-col h3 { font-size: var(--text-h3); color: var(--navy); letter-spacing: -0.5px; margin-bottom: 10px; }
+  .map-col p { font-size: 14px; line-height: 1.6; color: var(--body); margin: 0; }
+  .map-link {
+    margin-top: auto; padding-top: 22px; font-size: 10px; font-weight: 600;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--meta);
+  }
+  .map-col--house .map-link    { color: var(--ch-house-ink); }
+  .map-col--workflow .map-link { color: var(--ch-workflow-ink); }
+  .map-col--byteplus .map-link { color: var(--ch-byteplus-ink); }
+
+  /* ---- Slide 03: What we build ---- */
+  .build-layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 72px; align-items: start; }
+  .build-copy h2 { font-size: var(--text-h2); line-height: 1.05; letter-spacing: -1.2px; margin-bottom: 18px; }
+  .cap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 40px; }
+  .cap-chip {
+    position: relative; padding: 18px 20px; background: var(--white);
+    border: 1px solid var(--line); border-left: 3px solid var(--line);
+    font-size: 14px; font-weight: 600; color: var(--navy); border-radius: 4px;
+  }
+  .cap-chip::before { content: '→ '; color: var(--line); font-weight: 700; }
+  .cap-chip--lead {
+    border-left-color: var(--ch-house); background: var(--ch-house-soft);
+    border-color: transparent; display: block;
+  }
+  .cap-chip--lead::before { content: '→ '; color: var(--ch-house); }
+  .cap-chip--lead { grid-column: 1 / -1; }
+  .cap-chip-note { display: block; margin-top: 6px; font-size: 12px; font-weight: 500; color: var(--ch-house-ink); }
+  .build-wall {
+    border: 1px solid var(--line); border-radius: 4px; background: var(--white);
+    padding: 26px 26px 20px; position: relative;
+  }
+  .logo-wall-label {
+    font-size: 10px; letter-spacing: 1.6px; font-weight: 600; color: var(--meta);
+    text-transform: uppercase; margin-bottom: 18px;
+  }
+  .build-wall .logo-marquee .marquee-card { height: 54px; min-width: 66px; max-width: 92px; }
+  .build-wall .marquee-row { justify-content: flex-start; }
+
+  /* ---- Slide 04: No UX without the U ---- */
+  .ux-return { max-width: 1120px; margin: 0 auto; text-align: center; }
+  .ux-return .eyebrow { justify-content: center; }
+  .ux-return h2 { font-size: var(--text-h2); line-height: 1.08; letter-spacing: -1.2px; margin-bottom: 18px; }
+  .ux-return .lede {
+    font-size: 15px; line-height: 1.65; color: var(--body);
+    max-width: 640px; margin: 0 auto 46px;
+  }
+  .ux-return-num {
+    display: flex; align-items: center; justify-content: center; gap: 26px;
+    margin-bottom: 16px;
+  }
+  .ux-return-num .ux-in, .ux-return-num .ux-arrow, .ux-return-num .ux-return-val {
+    font-size: clamp(64px, 9vw, 120px); font-weight: 800; line-height: 1; letter-spacing: -4px;
+  }
+  .ux-in { color: var(--body); }
+  .ux-arrow { color: var(--ch-house); }
+  .ux-return-val { color: var(--navy); font-family: var(--serif); }
+  .ux-return-copy { font-size: var(--text-h4); font-weight: 700; color: var(--navy); letter-spacing: -0.4px; }
+  .ux-return-val::after { content: ' per dollar invested'; }
+  .ux-source { margin-top: 10px; font-size: 12px; color: var(--meta); }
+  .ux-close {
+    margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
+    color: var(--body); font-size: 14px; font-weight: 500;
+  }
+
+  /* ---- Slide 05: Research. Diagnose. Design. Test. ---- */
+  .scribe-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .scribe-step {
+    background: var(--white); border: 1px solid var(--line); border-radius: 4px;
+    border-top: 3px solid var(--ch-house); padding: 30px 26px 24px;
+    display: flex; flex-direction: column;
+  }
+  .scribe-num { font-size: 40px; font-weight: 800; color: var(--ch-house); line-height: 1; letter-spacing: -2px; margin-bottom: 14px; }
+  .scribe-step h3 { font-size: var(--text-h4); color: var(--navy); margin-bottom: 6px; letter-spacing: -0.4px; }
+  .scribe-sub { font-size: 12.5px; color: var(--body); line-height: 1.5; margin-bottom: 16px; }
+  .scribe-step ul { list-style: none; border-top: 1px solid var(--line-soft); padding-top: 14px; margin-bottom: 18px; }
+  .scribe-step li { font-size: 12.5px; line-height: 1.5; color: var(--body); padding: 5px 0; display: flex; gap: 9px; align-items: flex-start; }
+  .scribe-step li::before { content: '→'; color: var(--ch-house); font-weight: 700; font-size: 12px; line-height: 1.5; }
+  .scribe-stat {
+    margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line-soft);
+    font-size: 12px; line-height: 1.55; color: var(--body);
+  }
+  .scribe-stat strong { color: var(--ch-house-ink); font-size: 13px; }
+  .scribe-src { display: block; margin-top: 4px; font-size: 10.5px; color: var(--meta); }
+  .scribe-step--test { border-top-color: var(--ch-house); }
+  .scribe-media { display: grid; gap: 10px; margin-bottom: 18px; }
+  .scribe-photo { margin: 0; }
+  .scribe-photo-frame {
+    height: 108px; border: 1.5px dashed var(--ch-house);
+    border-radius: 4px; background: var(--ch-house-soft);
+    display: grid; place-items: center;
+    font-size: 10px; letter-spacing: 1.2px; font-weight: 700; text-transform: uppercase;
+    color: var(--ch-house-ink);
+  }
+  .scribe-photo figcaption { margin-top: 6px; font-size: 11px; color: var(--body); }
+
+  /* ---- Slide 06: software-house case studies (placeholders) ---- */
+  .cases .case-block--ph p { color: var(--meta); font-style: italic; }
+
+  /* ---- Slide 07: What we automate ---- */
+  .automate-head h2 { font-size: var(--text-h2); line-height: 1.05; letter-spacing: -1.2px; margin-bottom: 18px; }
+  .automate-head .lede { max-width: 640px; }
+  .automate-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+    border: 1px solid var(--line); margin-top: 40px;
+  }
+  .automate-item {
+    padding: 28px 26px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    background: var(--white); border-left: 3px solid transparent;
+  }
+  .automate-item strong { display: block; font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 6px; letter-spacing: -0.3px; }
+  .automate-item p { font-size: 12.5px; line-height: 1.55; color: var(--body); margin: 0; }
+  .automate-note { margin-top: 26px; font-size: 13px; color: var(--body); }
+  .automate-note strong { color: var(--ch-workflow-ink); }
+  .automate-grid .automate-item:nth-child(1),
+  .automate-grid .automate-item:nth-child(2),
+  .automate-grid .automate-item:nth-child(3) { border-top: 3px solid var(--ch-workflow); }
+
+  /* ---- Slide 10: BytePlus stack + exclusivity + models strip ---- */
+  .data h2 { margin-bottom: 16px; }
+  .data-excl {
+    margin: 0 0 34px; padding: 16px 20px;
+    border-left: 3px solid var(--ch-byteplus);
+    background: var(--ch-byteplus-soft);
+    font-size: 14px; line-height: 1.6; color: var(--body); max-width: 700px;
+  }
+  .data-excl strong { color: var(--navy); }
+  .data-excl .excl-name { color: var(--ch-byteplus-ink); }
+  .data .lede-large { margin-bottom: 24px; }
+  .data-partner-badge {
+    display: inline-block; margin-top: 26px; padding: 10px 20px;
+    border: 1.5px solid var(--ch-byteplus); border-radius: 999px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.6px;
+    color: var(--ch-byteplus-ink); background: var(--ch-byteplus-soft);
+  }
+  .model-strip { margin-top: 48px; border-top: 1px solid var(--line); padding-top: 26px; }
+  .model-strip-head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 20px;
+    flex-wrap: wrap; margin-bottom: 18px;
+  }
+  .model-strip-label { font-size: 10px; letter-spacing: 1.6px; font-weight: 700; color: var(--ch-byteplus-ink); text-transform: uppercase; }
+  .model-strip-note { font-size: 12px; color: var(--body); }
+  .model-chips { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .model-chip {
+    padding: 14px 16px; border: 1px solid var(--line); background: var(--white);
+    border-top: 2px solid var(--ch-byteplus); border-radius: 4px;
+  }
+  .model-chip strong { display: block; font-size: 13px; color: var(--navy); margin-bottom: 4px; }
+  .model-chip span { font-size: 11px; line-height: 1.45; color: var(--body); }
+
+  /* ---- Slide 11: Two things every business needs (split halves) ---- */
+  .pillars-section .container { text-align: center; max-width: 1100px; }
+  .pillars-section h2 { font-size: var(--text-h2); margin-bottom: 0; }
+  .two-needs { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 44px; max-width: 1040px; margin-left: auto; margin-right: auto; }
+  .need-card {
+    background: var(--white); border: 1px solid var(--line); border-radius: 4px;
+    border-top: 3px solid var(--ch-byteplus); padding: 34px 32px 26px; text-align: left;
+    display: flex; flex-direction: column;
+  }
+  .need-card .pill-num { font-size: 34px; font-weight: 800; color: var(--ch-byteplus); line-height: 1; letter-spacing: -2px; margin-bottom: 12px; }
+  .need-card h3 { font-size: var(--text-h3); color: var(--navy); letter-spacing: -0.5px; margin-bottom: 10px; }
+  .need-card p { font-size: 14px; line-height: 1.6; color: var(--body); margin: 0 0 22px; }
+  .need-link {
+    margin-top: auto; font-size: 10px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase;
+    color: var(--ch-byteplus-ink); display: inline-flex; align-items: center; gap: 7px;
+  }
+
+  /* ---- Slide 14: partnership hand-over timeline (merged into ways) ---- */
+  .partnership-path {
+    margin-top: 48px; border: 1px solid var(--line); border-radius: 4px;
+    background: var(--white);
+  }
+  .pp-head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 24px;
+    padding: 22px 28px; border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .pp-label { font-size: 10px; letter-spacing: 1.5px; font-weight: 700; color: var(--navy); text-transform: uppercase; }
+  .pp-sub { font-size: 13px; color: var(--body); margin: 0; }
+  .pp-steps { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 0; }
+  .pp-step { padding: 24px 26px; }
+  .pp-step .pp-num { font-size: 11px; letter-spacing: 1.4px; font-weight: 700; color: var(--navy); opacity: 0.45; margin-bottom: 8px; }
+  .pp-step h4 { font-size: 16px; color: var(--navy); margin-bottom: 6px; letter-spacing: -0.3px; }
+  .pp-step p { font-size: 12.5px; line-height: 1.55; color: var(--body); margin: 0; }
+  .pp-arrow { display: grid; place-items: center; color: var(--navy); opacity: 0.35; font-size: 18px; }
+
   /* ============ UNIFIED SLIDE BACKGROUND ============ */
   .problem,
   .who,
@@ -1543,8 +1809,34 @@
   .partnership,
   .ways,
   .pricing,
-  .cta-slide {
+  .cta-slide,
+  .build,
+  .uxcase,
+  .scribe,
+  .automate {
     background: var(--slide-bg);
+  }
+
+  /* Demo slides stay dark — re-assert after the unified light override */
+  .slide.create-faster,
+  .slide.understand {
+    background: #0E0E3E;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide.create-faster .create-faster-left .eyebrow,
+  .slide.understand .understand-left .eyebrow {
+    color: var(--yellow);
+  }
+  .slide.create-faster .create-faster-left h2,
+  .slide.create-faster .create-faster-left h2 .accent,
+  .slide.understand .understand-left h2,
+  .slide.understand .understand-left h2 .accent {
+    color: var(--white);
+  }
+  .slide.create-faster .create-faster-left p,
+  .slide.understand .understand-left p {
+    color: rgba(255, 255, 255, 0.60);
   }
 
   .pillars-section .eyebrow,
@@ -1716,6 +2008,14 @@
   .ov-name {
     font-family: var(--serif); font-weight: bold; font-size: 15px;
   }
+  .ov-tag {
+    margin-left: auto; font-size: 9px; font-weight: 700; letter-spacing: 0.8px;
+    padding: 3px 8px; border-radius: 20px; text-transform: uppercase; white-space: nowrap;
+    background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5);
+  }
+  .ov-tag--house { color: var(--ch-house); }
+  .ov-tag--workflow { color: var(--ch-workflow); }
+  .ov-tag--byteplus { color: var(--ch-byteplus); }
 
   /* ============ PRESENTER BAR ============ */
   .presenter-bar {
@@ -1826,6 +2126,17 @@
     .cta-grid { grid-template-columns: 1fr; gap: 40px; }
     .cta-actions { align-items: flex-start; }
     .who-pillars, .process-steps, .case-grid, .outcomes-grid, .pricing-factors { grid-template-columns: 1fr 1fr; }
+    .who-map { grid-template-columns: 1fr; }
+    .map-col { border-right-width: 1px; border-top-width: 3px; }
+    .build-layout { grid-template-columns: 1fr; gap: 40px; }
+    .scribe-grid { grid-template-columns: 1fr 1fr; }
+    .automate-grid { grid-template-columns: 1fr 1fr; }
+    .model-chips { grid-template-columns: repeat(3, 1fr); }
+    .two-needs { grid-template-columns: 1fr; }
+    .pp-steps { grid-template-columns: 1fr; }
+    .pp-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .pp-step { border-bottom: 1px solid var(--line-soft); }
+    .pp-step:last-child { border-bottom: 0; }
     .data-stats { grid-template-columns: 1fr 1fr 1fr; }
     .data-inner { grid-template-columns: 1fr; gap: 32px; }
     .data-visual { display: none; }
@@ -1901,9 +2212,10 @@
     .slides-container > .slide[data-state="active"] { overflow-y: auto; }
     .slide section.top-align { padding-top: 64px; }
     .container { width: calc(100% - 48px); }
-    .slide-logo { left: 20px; top: 16px; }
     .hero-heading-line--nowrap { white-space: normal; }
     .who-pillars, .process-steps, .case-grid, .data-stats, .outcomes-cards, .pricing-factors { grid-template-columns: 1fr; }
+    .scribe-grid, .automate-grid, .who-map, .cap-grid, .two-needs { grid-template-columns: 1fr; }
+    .model-chips { grid-template-columns: 1fr 1fr; }
     .outcomes-layout { grid-template-columns: 1fr; }
     .outcomes-col:nth-child(2),
     .outcomes-col:nth-child(3) { margin-top: 0; }
@@ -1940,18 +2252,25 @@
 </head>
 <body>
 
-<!-- Fixed logo (top-left on all slides) -->
-<div class="slide-logo">
+<!-- Top bar: logo + persistent chapter tag -->
+<div class="topbar">
   <span class="logo" id="logoEl" onclick="goToSlide(0)">
     <img src="mtel logo.png" alt="mtel logo" />
   </span>
+  <div class="chapter-tags" id="chapterTags">
+    <span class="chapter-tag" data-chapter="house">Software House</span>
+    <span class="chapter-tag-sep"></span>
+    <span class="chapter-tag" data-chapter="workflow">AI Workflow</span>
+    <span class="chapter-tag-sep"></span>
+    <span class="chapter-tag" data-chapter="byteplus">BytePlus</span>
+  </div>
 </div>
 
 <!-- Slides -->
 <div class="slides-container" id="slidesContainer">
 
   <!-- SLIDE 01: HERO -->
-  <div class="slide hero" data-state="active" data-logo="dark">
+  <div class="slide hero" data-state="active" data-logo="dark" data-order="1">
     <section>
       <!-- Cursor-follow warm glow (behind particles + text) -->
       <div class="hero-glow" id="heroGlow"></div>
@@ -1968,51 +2287,17 @@
               One partner. Software house DNA, AI workflow automation, and the ByteDance AI stack converged into a single operating system for modern enterprise.
             </p>
           </div>
-          <!-- Client logo marquee wall -->
+          <!-- Client logo marquee wall (reduced on the cover; full wall on slide 03) -->
           <div class="hero-ecosystem logo-marquee" aria-hidden="true">
-            <!-- Row 1: Real Estate · Electric · Fintech -->
             <div class="marquee-row">
               <div class="marquee-card"><img src="logo/Logo-Realestate-Onebangkok.svg" alt="One Bangkok" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Realestate-Sansiri.svg" alt="Sansiri" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Realestate-Fraser.svg" alt="Frasers" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Realestate-Theparq.svg" alt="The Parq" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Electric-PTT.svg" alt="PTT" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Electric-Evme.svg" alt="EVme" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Electric-Sharge.svg" alt="Sharge" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Electric-Spectrum.svg" alt="Spectrum" loading="lazy"></div>
-              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Electric-Swapngo.svg" alt="Swap &amp; Go" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Fintech-Cryptomind.svg" alt="Cryptomind" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Fintech-Merkle.svg" alt="Merkle" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Fintech-100x.svg" alt="100x" loading="lazy"></div>
-            </div>
-            <!-- Row 2: Fintech · Entertainment · Others -->
-            <div class="marquee-row">
-              <div class="marquee-card"><img src="logo/Logo-Fintech-Imbee.svg" alt="imBee" loading="lazy"></div>
-              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Fintech-Beatsquares.svg" alt="BeatSquares" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Fintech-Elkrem.svg" alt="Elkrem" loading="lazy"></div>
               <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Entertainment-Major.svg" alt="Major Cineplex" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Entertainment-Ticketmelon.svg" alt="Ticketmelon" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Entertainment-Coolism.svg" alt="COOLISM" loading="lazy"></div>
-              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Entertainment-Nickelodeon.svg" alt="Nickelodeon" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Entertainment-RSmall.svg" alt="RS Mall" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Entertainment-Moov.svg" alt="Moov" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Other-Mc.svg" alt="McDonald's" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Other-Anatara.svg" alt="Anantara" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Other-AOT.svg" alt="AOT" loading="lazy"></div>
-            </div>
-            <!-- Row 3: Other sectors -->
-            <div class="marquee-row">
-              <div class="marquee-card"><img src="logo/Logo-Other-Thaipass.svg" alt="Thaipass" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Other-CTFLife.svg" alt="CTF Life" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Other-Rentyl.svg" alt="Rentyl" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Other-BCC.svg" alt="BCC" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Other-dropp.svg" alt="dropp" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Other-Flow.svg" alt="Flow" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Other-Jaga.svg" alt="Jaga" loading="lazy"></div>
-              <div class="marquee-card"><img src="logo/Logo-Other-Sipman.svg" alt="Sipman" loading="lazy"></div>
-              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Police.svg" alt="Police" loading="lazy"></div>
-              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Globalfish.svg" alt="Global Fish" loading="lazy"></div>
-              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Ministryofindustry.svg" alt="Min. Industry" loading="lazy"></div>
             </div>
           </div>
         </div>
@@ -2021,7 +2306,7 @@
   </div>
 
   <!-- SLIDE 02: WHO WE ARE -->
-  <div class="slide who" data-state="future" data-logo="dark">
+  <div class="slide who" data-state="future" data-logo="dark" data-order="2">
     <section>
       <div class="container">
         <div class="section-intro reveal">
@@ -2030,35 +2315,98 @@
           </div>
           <p class="lede">Most agencies do one of these things well. We do all three, and because they live under one roof, they reinforce each other on every engagement.</p>
         </div>
-        <div class="who-pillars">
-          <div class="pillar reveal">
-            <div class="pillar-img">
-              <img src="assets/software-house.png" alt="Software House">
-            </div>
-            <div class="pillar-body">
-              <span class="pillar-tag">FOUNDATION</span>
-              <h3>Software House</h3>
-              <p>15+ years of experience building custom platforms, system integrations, enterprise applications, cloud infrastructure, and the UX layer that drives user adoption. The foundation behind scalable digital products.</p>
+        <div class="who-map">
+          <div class="map-col map-col--house reveal">
+            <div class="map-num">01</div>
+            <img src="assets/software-house.png" alt="Software House" class="map-img">
+            <span class="map-tag">FOUNDATION</span>
+            <h3>Software House</h3>
+            <p>15+ years building the platforms your AI has to run on.</p>
+            <div class="map-link">→ The build layer</div>
+          </div>
+          <div class="map-col map-col--workflow reveal">
+            <div class="map-num">02</div>
+            <img src="assets/ai-workflow.png" alt="AI Workflow Operators" class="map-img">
+            <span class="map-tag">OPERATION</span>
+            <h3>AI Workflow Operators</h3>
+            <p>We don't sell tools. We hand back the hours your team spent on busywork.</p>
+            <div class="map-link">→ The operation layer</div>
+          </div>
+          <div class="map-col map-col--byteplus reveal">
+            <div class="map-num">03</div>
+            <img src="assets/byteplus-partner.png" alt="BytePlus Partner" class="map-img">
+            <span class="map-tag">INTELLIGENCE</span>
+            <h3>BytePlus Partner</h3>
+            <p>The ByteDance AI stack, available in Thailand exclusively through us.</p>
+            <div class="map-link">→ The intelligence layer</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SLIDE 03: WHAT WE BUILD -->
+  <div class="slide build ch-house" data-state="future" data-logo="dark" data-order="3">
+    <section class="top-align">
+      <div class="container">
+        <div class="build-layout">
+          <div class="build-copy">
+            <div class="eyebrow chapter-eyebrow reveal">The software house</div>
+            <h2 class="reveal">What we <span class="accent">build.</span></h2>
+            <p class="lede reveal">15+ years building the platforms other people's AI has to run on.</p>
+            <div class="cap-grid reveal">
+              <div class="cap-chip">Custom Software Development</div>
+              <div class="cap-chip">System Integration</div>
+              <div class="cap-chip">Enterprise Platforms</div>
+              <div class="cap-chip">Cloud &amp; Infrastructure</div>
+              <div class="cap-chip">Testing &amp; QA</div>
+              <div class="cap-chip cap-chip--lead">UX/UI Design<span class="cap-chip-note">And the layer that decides whether any of it gets used — next slide.</span></div>
             </div>
           </div>
-          <div class="pillar reveal">
-            <div class="pillar-img">
-              <img src="assets/ai-workflow.png" alt="AI Workflow Operators">
-            </div>
-            <div class="pillar-body">
-              <span class="pillar-tag">OPERATION</span>
-              <h3>AI Workflow Operators</h3>
-              <p>HR, Finance, Operations, and GEO automation: built, deployed, and operated. We don't sell tools. We hand back the hours your team spent on busywork.</p>
-            </div>
-          </div>
-          <div class="pillar reveal">
-            <div class="pillar-img">
-              <img src="assets/byteplus-partner.png" alt="BytePlus Partner">
-            </div>
-            <div class="pillar-body">
-              <span class="pillar-tag">INTELLIGENCE</span>
-              <h3>BytePlus Partner</h3>
-              <p>The ByteDance AI stack — the engine behind TikTok, CapCut, and Douyin — delivered through us. Content generation, customer intelligence, social signal capture.</p>
+          <div class="build-wall reveal">
+            <div class="logo-wall-label">Platforms delivered for</div>
+            <div class="logo-marquee" aria-hidden="true">
+              <div class="marquee-row">
+                <div class="marquee-card"><img src="logo/Logo-Realestate-Onebangkok.svg" alt="One Bangkok" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Realestate-Sansiri.svg" alt="Sansiri" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Realestate-Fraser.svg" alt="Frasers" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Realestate-Theparq.svg" alt="The Parq" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Electric-PTT.svg" alt="PTT" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Electric-Evme.svg" alt="EVme" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Electric-Sharge.svg" alt="Sharge" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Electric-Spectrum.svg" alt="Spectrum" loading="lazy"></div>
+                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Electric-Swapngo.svg" alt="Swap &amp; Go" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Fintech-Cryptomind.svg" alt="Cryptomind" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Fintech-Merkle.svg" alt="Merkle" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Fintech-100x.svg" alt="100x" loading="lazy"></div>
+              </div>
+              <div class="marquee-row">
+                <div class="marquee-card"><img src="logo/Logo-Fintech-Imbee.svg" alt="imBee" loading="lazy"></div>
+                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Fintech-Beatsquares.svg" alt="BeatSquares" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Fintech-Elkrem.svg" alt="Elkrem" loading="lazy"></div>
+                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Entertainment-Major.svg" alt="Major Cineplex" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Entertainment-Ticketmelon.svg" alt="Ticketmelon" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Entertainment-Coolism.svg" alt="COOLISM" loading="lazy"></div>
+                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Entertainment-Nickelodeon.svg" alt="Nickelodeon" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Entertainment-RSmall.svg" alt="RS Mall" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Entertainment-Moov.svg" alt="Moov" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-Mc.svg" alt="McDonald's" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-Anatara.svg" alt="Anantara" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-AOT.svg" alt="AOT" loading="lazy"></div>
+              </div>
+              <div class="marquee-row">
+                <div class="marquee-card"><img src="logo/Logo-Other-Thaipass.svg" alt="Thaipass" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-CTFLife.svg" alt="CTF Life" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-Rentyl.svg" alt="Rentyl" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-BCC.svg" alt="BCC" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-dropp.svg" alt="dropp" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-Flow.svg" alt="Flow" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-Jaga.svg" alt="Jaga" loading="lazy"></div>
+                <div class="marquee-card"><img src="logo/Logo-Other-Sipman.svg" alt="Sipman" loading="lazy"></div>
+                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Police.svg" alt="Police" loading="lazy"></div>
+                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Globalfish.svg" alt="Global Fish" loading="lazy"></div>
+                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Ministryofindustry.svg" alt="Min. Industry" loading="lazy"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -2066,15 +2414,219 @@
     </section>
   </div>
 
-  <!-- SLIDE 03: THE TECHNOLOGY -->
-  <div class="slide data" data-state="future" data-logo="dark">
+  <!-- SLIDE 04: NO UX WITHOUT THE U -->
+  <div class="slide uxcase ch-house" data-state="future" data-logo="dark" data-order="4">
     <section>
+      <div class="container">
+        <div class="ux-return">
+          <div class="eyebrow chapter-eyebrow reveal">The software house</div>
+          <h2 class="reveal">No UX without <span class="accent">the U.</span></h2>
+          <p class="lede reveal">Good design usually fails for one reason: the real user was never in the process. We build the process around them.</p>
+          <div class="ux-return reveal">
+            <div class="ux-return-num">
+              <span class="ux-in">$1</span>
+              <span class="ux-arrow">→</span>
+              <span class="ux-return-val" data-target="100" data-format="usd">$100</span>
+            </div>
+            <p class="ux-return-copy">Every dollar invested in UX returns up to $100.</p>
+            <p class="ux-source">Source: Forrester Research, <em>The Six Steps For Justifying Better UX</em>.</p>
+          </div>
+          <p class="ux-close reveal">Design is the cheapest place in a project to be wrong.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SLIDE 05: RESEARCH. DIAGNOSE. DESIGN. TEST. -->
+  <div class="slide scribe ch-house" data-state="future" data-logo="dark" data-order="5">
+    <section class="top-align">
+      <div class="container">
+        <div class="section-intro reveal">
+          <div>
+            <div class="eyebrow chapter-eyebrow">The UX scribble process</div>
+            <h2>Research. Diagnose. <span class="accent">Design. Test.</span></h2>
+          </div>
+          <p class="lede">One named method per line of work — ours is user-led from the first interview to the last test session. Each number below is why that step exists.</p>
+        </div>
+        <div class="scribe-grid">
+          <div class="scribe-step reveal">
+            <div class="scribe-num">01</div>
+            <h3>Research</h3>
+            <p class="scribe-sub">Into the customer's and tenant's lived experience.</p>
+            <ul>
+              <li>One-on-one interviews with a representative of every user role</li>
+              <li>Observation: shadowing users in their workplace</li>
+              <li>Contextual inquiry on site, to capture the physical and environmental factors</li>
+              <li>Moderated stakeholder workshops to align the team and force decisions</li>
+            </ul>
+            <div class="scribe-stat"><strong>55%</strong> of all defects originate in the requirements phase.<span class="scribe-src">Basili &amp; Boehm, "Software Defect Reduction Top 10 List"</span></div>
+          </div>
+          <div class="scribe-step reveal">
+            <div class="scribe-num">02</div>
+            <h3>Diagnose</h3>
+            <p class="scribe-sub">Identify the root cause, holistically.</p>
+            <ul>
+              <li>Analyse qualitative and quantitative data together</li>
+              <li>Look for patterns, common themes, and contradictions across user roles</li>
+              <li>Build user journey maps and workflow diagrams to make the pain visible</li>
+            </ul>
+            <div class="scribe-stat"><strong>Up to 70%</strong> of software development effort is spent on rework, especially when requirements are unclear or change mid-project.<span class="scribe-src">Boehm, <em>Software Engineering Economics</em></span></div>
+          </div>
+          <div class="scribe-step reveal">
+            <div class="scribe-num">03</div>
+            <h3>Design</h3>
+            <p class="scribe-sub">Create the solution with multi-disciplinary teams.</p>
+            <ul>
+              <li>Multi-disciplinary team, not a lone designer</li>
+              <li>Several options, not one</li>
+              <li>Decided against evidence, not taste</li>
+            </ul>
+            <div class="scribe-stat"><strong>One option is a guess.</strong> Several options is a decision.</div>
+          </div>
+          <div class="scribe-step scribe-step--test reveal">
+            <div class="scribe-media">
+              <!-- PLACEHOLDER: swap .scribe-photo-frame inner content for the in-person /
+                   remote usability-testing photos (assets to be supplied). -->
+              <figure class="scribe-photo">
+                <div class="scribe-photo-frame">In-person session</div>
+                <figcaption>On-site usability testing</figcaption>
+              </figure>
+              <figure class="scribe-photo">
+                <div class="scribe-photo-frame">Remote session</div>
+                <figcaption>Moderated remote testing</figcaption>
+              </figure>
+            </div>
+            <div class="scribe-num">04</div>
+            <h3>Test &amp; Run</h3>
+            <p class="scribe-sub">We test with real people. Before the build.</p>
+            <ul>
+              <li>Usability testing, in person and remote</li>
+              <li>Iterate before a line of production code is written</li>
+            </ul>
+            <div class="scribe-stat"><strong>100×</strong> more expensive to fix a defect after release than during design.<span class="scribe-src">IBM Systems Science Institute</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SLIDE 06: SOFTWARE HOUSE CASE STUDIES (PLACEHOLDER) -->
+  <div class="slide cases ch-house" data-state="future" data-logo="dark" data-order="6">
+    <section class="top-align">
+      <div class="container">
+        <div class="section-intro reveal">
+          <div>
+            <div class="eyebrow chapter-eyebrow">The software house</div>
+            <h2>Built. Shipped. <span class="accent">Still running.</span></h2>
+          </div>
+          <p class="lede">Three engagements. Different industries. Same process. Metrics here belong to software delivery — systems integrated, users served, uptime.</p>
+        </div>
+        <!-- PLACEHOLDER: fill each card from the supplied case material. Follow the
+             metric guidance in specs_v2.md §5 slide 07 (delivery metrics, not AI metrics). -->
+        <div class="case-grid">
+          <div class="case-card reveal">
+            <div class="case-tag">SECTOR 01</div>
+            <div class="case-body">
+              <div class="case-block case-block--ph">
+                <div class="case-block-label">THE CHALLENGE</div>
+                <p>[Challenge — 1–2 sentences, with a number if possible.]</p>
+              </div>
+              <div class="case-block case-block--ph">
+                <div class="case-block-label">WHAT WE BUILT</div>
+                <p>[The system, named plainly.]</p>
+              </div>
+              <div class="case-block case-block--ph">
+                <div class="case-block-label">RESULTS</div>
+                <div class="case-results">
+                  <div class="case-result"><div class="case-result-num">[Metric]</div><div class="case-result-label">[Label]</div></div>
+                  <div class="case-result"><div class="case-result-num">[Metric]</div><div class="case-result-label">[Label]</div></div>
+                  <div class="case-result"><div class="case-result-num">[Metric]</div><div class="case-result-label">[Label]</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="case-card reveal">
+            <div class="case-tag">SECTOR 02</div>
+            <div class="case-body">
+              <div class="case-block case-block--ph">
+                <div class="case-block-label">THE CHALLENGE</div>
+                <p>[Challenge — 1–2 sentences, with a number if possible.]</p>
+              </div>
+              <div class="case-block case-block--ph">
+                <div class="case-block-label">WHAT WE BUILT</div>
+                <p>[The system, named plainly.]</p>
+              </div>
+              <div class="case-block case-block--ph">
+                <div class="case-block-label">RESULTS</div>
+                <div class="case-results">
+                  <div class="case-result"><div class="case-result-num">[Metric]</div><div class="case-result-label">[Label]</div></div>
+                  <div class="case-result"><div class="case-result-num">[Metric]</div><div class="case-result-label">[Label]</div></div>
+                  <div class="case-result"><div class="case-result-num">[Metric]</div><div class="case-result-label">[Label]</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="case-card reveal">
+            <div class="case-tag">SECTOR 03</div>
+            <div class="case-body">
+              <div class="case-block case-block--ph">
+                <div class="case-block-label">THE CHALLENGE</div>
+                <p>[Challenge — 1–2 sentences, with a number if possible.]</p>
+              </div>
+              <div class="case-block case-block--ph">
+                <div class="case-block-label">WHAT WE BUILT</div>
+                <p>[The system, named plainly.]</p>
+              </div>
+              <div class="case-block case-block--ph">
+                <div class="case-block-label">RESULTS</div>
+                <div class="case-results">
+                  <div class="case-result"><div class="case-result-num">[Metric]</div><div class="case-result-label">[Label]</div></div>
+                  <div class="case-result"><div class="case-result-num">[Metric]</div><div class="case-result-label">[Label]</div></div>
+                  <div class="case-result"><div class="case-result-num">[Metric]</div><div class="case-result-label">[Label]</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SLIDE 07: WHAT WE AUTOMATE -->
+  <div class="slide automate ch-workflow" data-state="future" data-logo="dark" data-order="7">
+    <section class="top-align">
+      <div class="container">
+        <div class="automate-head reveal">
+          <div class="eyebrow chapter-eyebrow">The AI workflow operator</div>
+          <h2>What we <span class="accent">automate.</span></h2>
+          <p class="lede">We don't sell tools. We hand back the hours your team spent on busywork.</p>
+        </div>
+        <div class="automate-grid reveal">
+          <div class="automate-item"><strong>HR Workflow Automation</strong><p>Onboarding, leave, payroll queries — handled without a ticket queue.</p></div>
+          <div class="automate-item"><strong>Finance Operations</strong><p>Invoices, reconciliation, close — compressed from days to hours.</p></div>
+          <div class="automate-item"><strong>Ops &amp; Project Management</strong><p>Status, blockers, reporting — without the status meeting.</p></div>
+          <div class="automate-item"><strong>GEO Optimization</strong><p>Ranking in the answers AI generates, not just search results.</p></div>
+          <div class="automate-item"><strong>Custom AI Agents</strong><p>Built to your workflows, your data, your guardrails.</p></div>
+          <div class="automate-item"><strong>Knowledge Retrieval (RAG)</strong><p>Your documents answer questions instead of your people.</p></div>
+        </div>
+        <p class="automate-note reveal"><strong>Operated, not installed.</strong> Measured by hours back, not features shipped.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- SLIDE 10: THE STACK + EXCLUSIVITY (merged) -->
+  <div class="slide data ch-byteplus" data-state="future" data-logo="dark" data-order="10">
+    <section class="top-align">
       <div class="container">
         <div class="data-inner">
           <div class="data-content">
             <div class="reveal">
-              <h2>Mtel × BASICWARE, powered by<br/><span class="accent">the BytePlus stack.</span></h2>
-              <p class="lede-large">BytePlus is the enterprise AI division of ByteDance, the company that built TikTok, CapCut, and Douyin. Mtel partners with BASICWARE to bring this technology stack to Thai businesses, exclusively.</p>
+              <div class="eyebrow chapter-eyebrow">BytePlus</div>
+              <h2>The stack, and why you can't buy it <span class="accent">elsewhere.</span></h2>
+              <p class="lede-large">BytePlus is the enterprise AI division of ByteDance — the company that built TikTok, CapCut, and Douyin. The same engine their consumer products run on, made available to enterprises.</p>
+              <div class="data-excl">
+                <strong>They choose their partners.</strong> In Thailand, that partner is <strong class="excl-name">mtel × BASICWARE.</strong> No reseller marketplace. No procurement portal.
+              </div>
             </div>
             <div class="data-stats reveal">
               <div class="data-stat">
@@ -2102,162 +2654,54 @@
           </div>
           <div class="data-visual reveal">
             <img src="assets/byteplus-mtel-basicware.png" alt="ByteDance to BytePlus to mtel and basicware stack">
+            <div class="data-partner-badge">Exclusive Thailand partnership &nbsp;|&nbsp; BytePlus Enterprise</div>
+          </div>
+        </div>
+        <div class="model-strip reveal">
+          <div class="model-strip-head">
+            <span class="model-strip-label">The models you get access to</span>
+            <span class="model-strip-note">Available in Thailand exclusively through mtel × BASICWARE</span>
+          </div>
+          <div class="model-chips">
+            <div class="model-chip"><strong>Seedance 1.5 Pro</strong><span>Text &amp; image to cinematic video</span></div>
+            <div class="model-chip"><strong>Seedream 5.0 Lite</strong><span>Image generation at scale</span></div>
+            <div class="model-chip"><strong>OmniHuman 1.5</strong><span>Realistic digital humans</span></div>
+            <div class="model-chip"><strong>Data Agent</strong><span>Agentic data analysis</span></div>
+            <div class="model-chip"><strong>VeCDP / DataFinder</strong><span>Customer data platform &amp; search</span></div>
+            <div class="model-chip"><strong>Global Marketing Platform</strong><span>Campaigns, globally operated</span></div>
           </div>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- SLIDE 04: EXCLUSIVITY -->
-  <div class="slide exclusivity" data-state="future" data-logo="dark">
-    <section>
-      <div class="container">
-        <div class="inner reveal">
-          <div class="excl-illustration">
-            <img src="assets/byteplus-stack-3d.png" alt="BytePlus stack illustration">
-          </div>
-          <div class="excl-brand">
-            <img src="assets/byteplus.png" alt="BytePlus" class="excl-byteplus-logo">
-          </div>
-          <h2>Doesn't sell to <strong>everyone.</strong></h2>
-          <div class="excl-body">
-            <p>They choose their partners. In Thailand, that partner is <strong>Mtel.</strong><br>No reseller marketplace. No procurement portal.</p>
-            <p>You are among the first companies in Thailand with access to this stack.</p>
-          </div>
-          <div class="excl-badge">Exclusive Thailand partnership &nbsp;|&nbsp; BytePlus Enterprise</div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- SLIDE 05: THE STACK -->
-  <div class="slide stack" data-state="future" data-logo="dark">
-    <section class="top-align">
-      <div class="container">
-        <div class="section-intro reveal">
-          <div>
-            <h2>The same stack used by BytePlus, <span class="accent">operated by Mtel.</span></h2>
-          </div>
-          <p class="lede">An integrated operating layer: the platform, the workflows, and the intelligence, built on the same engine that powers ByteDance's consumer products.</p>
-        </div>
-        <div class="stack-cols reveal">
-          <div class="stack-col">
-            <div class="stack-col-num">01</div>
-            <h3>Software House Foundation</h3>
-            <div class="stack-col-tag">FOUNDATION LAYER</div>
-            <p class="stack-col-desc">Custom platforms and integrations engineered for your stack, the production-grade base everything else runs on.</p>
-            <ul>
-              <li>Custom Software Dev</li>
-              <li>System Integration</li>
-              <li>Enterprise Platforms</li>
-              <li>UX/UI Design</li>
-              <li>Cloud & Infrastructure</li>
-              <li>Testing & QA</li>
-            </ul>
-          </div>
-          <div class="stack-col">
-            <div class="stack-col-num">02</div>
-            <h3>AI Workflow Automation</h3>
-            <div class="stack-col-tag">OPERATIONS LAYER</div>
-            <p class="stack-col-desc">Production-ready AI agents that take repetitive operations off your team's plate. Measured by hours back, not features shipped.</p>
-            <ul>
-              <li>HR Workflow Automation</li>
-              <li>Finance Operations</li>
-              <li>Ops & Project Mgmt</li>
-              <li>GEO Optimization</li>
-              <li>Custom AI Agents</li>
-              <li>Knowledge Retrieval (RAG)</li>
-            </ul>
-          </div>
-          <div class="stack-col">
-            <div class="stack-col-num">03</div>
-            <h3>BytePlus AI Stack</h3>
-            <div class="stack-col-tag">INTELLIGENCE LAYER</div>
-            <p class="stack-col-desc">The ByteDance enterprise AI, available in Thailand exclusively through mtel × basicware.</p>
-            <ul>
-              <li>Seedance 1.5 Pro</li>
-              <li>Seedream 5.0 Lite</li>
-              <li>OmniHuman 1.5</li>
-              <li>Data Agent</li>
-              <li>VeCDP / DataFinder</li>
-              <li>Global Marketing Platform</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- SLIDE 06: OUTCOMES -->
-  <div class="slide outcomes" data-state="future" data-logo="dark">
-    <section>
-      <div class="container">
-        <div class="outcomes-layout">
-          <div class="outcomes-left reveal">
-            <h2>What changes when AI <span class="accent">becomes operational.</span></h2>
-          </div>
-          <div class="outcomes-cards">
-            <div class="outcomes-col">
-              <div class="outcome-card reveal">
-                <div class="outcome-card-prefix">Up to</div>
-                <div class="outcome-card-num" data-target="80" data-format="percent">80%</div>
-                <div class="outcome-card-title">Reduction in workload</div>
-                <div class="outcome-card-desc">Hours freed from repetitive, low-value tasks, redirected to strategy.</div>
-              </div>
-              <div class="outcome-card reveal">
-                <div class="outcome-card-prefix">Complete</div>
-                <div class="outcome-card-num" data-target="100" data-format="percent">100%</div>
-                <div class="outcome-card-title">Increased visibility</div>
-                <div class="outcome-card-desc">Real-time dashboards across workflows so leadership sees what's happening, live.</div>
-              </div>
-            </div>
-            <div class="outcomes-col">
-              <div class="outcome-card reveal">
-                <div class="outcome-card-prefix">Up to</div>
-                <div class="outcome-card-num" data-target="68" data-format="percent">68%</div>
-                <div class="outcome-card-title">Lower operational cost</div>
-                <div class="outcome-card-desc">Fewer handoffs, less rework, right-sized AI infrastructure.</div>
-              </div>
-              <div class="outcome-card reveal">
-                <div class="outcome-card-prefix">Under</div>
-                <div class="outcome-card-num" data-target="2" data-format="minutes">&lt;2 min</div>
-                <div class="outcome-card-title">Faster response time</div>
-                <div class="outcome-card-desc">AI-powered support and internal triage eliminate queue times.</div>
-              </div>
-            </div>
-            <div class="outcomes-col">
-              <div class="outcome-card reveal">
-                <div class="outcome-card-prefix">Increase</div>
-                <div class="outcome-card-num" data-target="5" data-format="multiplier-range" data-prefix="3–">3–5×</div>
-                <div class="outcome-card-title">Faster operations</div>
-                <div class="outcome-card-desc">Approvals, reporting, and response cycles that used to take days.</div>
-              </div>
-              <div class="outcome-card reveal">
-                <div class="outcome-card-prefix">Around</div>
-                <div class="outcome-card-num" data-target="3" data-format="months">3 mo.</div>
-                <div class="outcome-card-title">Average payback period</div>
-                <div class="outcome-card-desc">Most enterprise engagements deliver 5–10× first-year ROI.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- SLIDE 07: TWO PILLARS -->
-  <div class="slide pillars-section" data-state="future" data-logo="dark">
+  <!-- SLIDE 11: TWO THINGS EVERY BUSINESS NEEDS -->
+  <div class="slide pillars-section ch-byteplus" data-state="future" data-logo="dark" data-order="11">
     <section>
       <div class="container">
         <div class="reveal">
-          <h2>Two things every business needs.<br><span class="accent">Create faster and understand deeper.</span></h2>
+          <h2>Two things every business needs.</h2>
+        </div>
+        <div class="two-needs">
+          <div class="need-card reveal">
+            <div class="pill-num">01</div>
+            <h3>Create Faster</h3>
+            <p>Turn a brief into production-ready content in minutes.</p>
+            <div class="need-link">See it live →</div>
+          </div>
+          <div class="need-card reveal">
+            <div class="pill-num">02</div>
+            <h3>Understand Deeper</h3>
+            <p>Turn market data into live, clear business intelligence.</p>
+            <div class="need-link">Ask it live →</div>
+          </div>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- SLIDE 08: CREATE FASTER DEMO -->
-  <div class="slide create-faster" data-state="future" data-logo="inv">
+  <!-- SLIDE 12: CREATE FASTER DEMO -->
+  <div class="slide create-faster ch-byteplus" data-state="future" data-logo="inv" data-order="12">
     <section>
       <div class="container">
         <div class="create-faster-layout">
@@ -2330,8 +2774,8 @@
     </div>
   </div>
 
-  <!-- SLIDE 09: UNDERSTAND DEEPER DEMO -->
-  <div class="slide understand" data-state="future" data-logo="inv">
+  <!-- SLIDE 13: UNDERSTAND DEEPER DEMO -->
+  <div class="slide understand ch-byteplus" data-state="future" data-logo="inv" data-order="13">
     <section>
       <div class="container">
         <div class="understand-layout">
@@ -2639,12 +3083,13 @@
 
   </div>
 
-  <!-- SLIDE 10: HOW WE WORK -->
-  <div class="slide process" data-state="future" data-logo="dark">
+  <!-- SLIDE 08: HOW WE WORK -->
+  <div class="slide process ch-workflow" data-state="future" data-logo="dark" data-order="8">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
           <div>
+            <div class="eyebrow chapter-eyebrow">The AI workflow operator</div>
             <h2>Audit. Automate. <span class="accent">Operate.</span></h2>
           </div>
           <p class="lede">We don't sell roadmaps. We run the work and hand it back when your team is ready to own it. Most engagements ship their first production AI workflow in 6 weeks.</p>
@@ -2691,8 +3136,8 @@
   </div>
 
 
-  <!-- SLIDE 11: INDUSTRIES -->
-  <div class="slide industries" data-state="future" data-logo="dark">
+  <!-- SLIDE 14: INDUSTRIES -->
+  <div class="slide industries" data-state="future" data-logo="dark" data-order="14">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
@@ -2731,12 +3176,13 @@
   </div>
 
 
-  <!-- SLIDE 12: CASE STUDIES -->
-  <div class="slide cases" data-state="future" data-logo="dark">
+  <!-- SLIDE 09: CASE STUDIES -->
+  <div class="slide cases ch-workflow" data-state="future" data-logo="dark" data-order="9">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
           <div>
+            <div class="eyebrow chapter-eyebrow">The AI workflow operator</div>
             <h2>Real deployments. <span class="accent">Measured results.</span></h2>
           </div>
           <p class="lede">Three engagements. Different industries. Same playbook: audit, build, operate, hand over.</p>
@@ -2811,42 +3257,8 @@
     </section>
   </div>
 
-  <!-- SLIDE 13: PARTNERSHIP -->
-  <div class="slide partnership" data-state="future" data-logo="dark">
-    <section class="top-align">
-      <div class="container">
-        <div class="section-intro reveal">
-          <div>
-            <h2>Not a license.<br><span class="accent">A partnership.</span></h2>
-          </div>
-          <p class="lede">We start by running it. We end by handing it over. Most clients move from Phase 1 to Phase 3 within 12 months, but only when they're ready.</p>
-        </div>
-        <div class="phases reveal">
-          <div class="phase">
-            <div class="phase-num">PHASE 1</div>
-            <h3>Managed Service</h3>
-            <div class="who-tag">mtel runs everything</div>
-            <p>Prompt engineering, content production, infrastructure, and delivery, all handled by us. You see results without lifting a finger.</p>
-          </div>
-          <div class="phase">
-            <div class="phase-num">PHASE 2</div>
-            <h3>Build & Embed</h3>
-            <div class="who-tag">Joint: we implement, you learn</div>
-            <p>We integrate the stack into your workflows, set up the infrastructure, and train your team to use and direct the system.</p>
-          </div>
-          <div class="phase">
-            <div class="phase-num">PHASE 3</div>
-            <h3>Your Team Owns It</h3>
-            <div class="who-tag">Marketing / ops / retail team</div>
-            <p>Your internal teams take ownership of prompts and content. We stay on support, you drive the output.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- SLIDE 14: GET STARTED -->
-  <div class="slide ways" data-state="future" data-logo="dark">
+  <!-- SLIDE 15: GET STARTED -->
+  <div class="slide ways" data-state="future" data-logo="dark" data-order="15">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
@@ -2872,12 +3284,39 @@
             <p>Within a week, you'll have a written diagnostic: what AI can fix today, what's worth waiting on, and what it'll cost in time and money to operationalize the answer.</p>
           </div>
         </div>
+
+        <!-- Partnership hand-over timeline (merged from v1 slide 13) -->
+        <div class="partnership-path reveal">
+          <div class="pp-head">
+            <span class="pp-label">Not a license. A partnership.</span>
+            <p class="pp-sub">We start by running it. We end by handing it over.</p>
+          </div>
+          <div class="pp-steps">
+            <div class="pp-step">
+              <div class="pp-num">PHASE 01</div>
+              <h4>Managed Service</h4>
+              <p>Prompt engineering, content production, infrastructure, and delivery — all handled by us.</p>
+            </div>
+            <div class="pp-arrow">→</div>
+            <div class="pp-step">
+              <div class="pp-num">PHASE 02</div>
+              <h4>Build &amp; Embed</h4>
+              <p>We integrate the stack into your workflows and train your team to direct it.</p>
+            </div>
+            <div class="pp-arrow">→</div>
+            <div class="pp-step">
+              <div class="pp-num">PHASE 03</div>
+              <h4>Your Team Owns It</h4>
+              <p>Your team drives the output. We stay on support. Most clients arrive here within 12 months.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </div>
 
-  <!-- SLIDE 15: PRICING -->
-  <div class="slide pricing" data-state="future" data-logo="dark">
+  <!-- SLIDE 16: PRICING -->
+  <div class="slide pricing" data-state="future" data-logo="dark" data-order="16">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
@@ -2901,8 +3340,8 @@
     </section>
   </div>
 
-  <!-- SLIDE 16: READY TO BRING AI -->
-  <div class="slide ready-ops" data-state="future" data-logo="dark">
+  <!-- SLIDE 17: READY TO BRING AI -->
+  <div class="slide ready-ops" data-state="future" data-logo="dark" data-order="17">
     <section>
       <div class="container">
         <div class="ready-ops-shell">
@@ -2932,7 +3371,7 @@
 <!-- Bottom navigation pill -->
 <div class="slide-controls" id="slideControls">
   <button class="slide-nav-btn" id="prevBtn" disabled title="Previous slide">←</button>
-  <div class="slide-count" id="slideCount"><span id="currentSlideNum">01</span> / <span id="totalSlideNum">16</span></div>
+  <div class="slide-count" id="slideCount"><span id="currentSlideNum">01</span> / <span id="totalSlideNum">17</span></div>
   <button class="slide-nav-btn" id="nextBtn" title="Next slide">→</button>
   <div class="pill-sep"></div>
   <button class="slide-nav-btn" id="overviewBtn" onclick="openOverview()" title="All slides (O)">
@@ -2989,7 +3428,8 @@
   const channel = new BroadcastChannel('mtel-pitch-sync');
 
   // ============ CORE SLIDE ENGINE ============
-  const slides = Array.from(document.querySelectorAll('.slide'));
+  const slides = Array.from(document.querySelectorAll('.slide'))
+    .sort((a, b) => (parseInt(a.dataset.order, 10) || 0) - (parseInt(b.dataset.order, 10) || 0));
   const totalSlides = slides.length;
   let currentIndex = 0;
 
@@ -3049,6 +3489,8 @@
           el.textContent = '<' + current + ' min';
         } else if (format === 'months') {
           el.textContent = current + ' mo.';
+        } else if (format === 'usd') {
+          el.textContent = '$' + current;
         }
 
         if (progress < 1) {
@@ -3071,6 +3513,9 @@
         if (el.classList.contains('outcome-card') && el.querySelector('[data-target]')) {
           animateStatNumbers(el);
         }
+        if (el.classList.contains('ux-return') && el.querySelector('[data-target]')) {
+          animateStatNumbers(el);
+        }
       }, i * 55);
     });
   }
@@ -3079,9 +3524,14 @@
 
   function updateUI() {
     const activeSlide = slides[currentIndex];
-    const isReadyOps = activeSlide.classList.contains('ready-ops');
-    const logoMode = activeSlide.dataset.logo;
-    logoEl.className = isReadyOps ? 'logo logo-black' : (logoMode === 'inv' ? 'logo logo-inv' : 'logo');
+    // The topbar pill is a constant light surface above every slide, so the
+    // logo keeps a single dark rendition regardless of the slide's own theme.
+    logoEl.className = 'logo';
+
+    const tag = slideTags[currentIndex];
+    document.querySelectorAll('.chapter-tag').forEach((t) => {
+      t.classList.toggle('active', t.dataset.chapter === tag);
+    });
 
     const pct = totalSlides > 1 ? (currentIndex / (totalSlides - 1)) * 100 : 100;
     slideProgressFill.style.width = pct + '%';
@@ -3151,30 +3601,41 @@
   setupLogoMarquee();
   window.addEventListener('resize', setupLogoMarquee);
 
-  // ============ SLIDE TITLES & NOTES ============
+  // ============ SLIDE TITLES, TAGS & NOTES ============
   const slideTitles = [
-    'Cover', 'Who We Are', 'The Technology', 'Exclusivity',
-    'The Stack', 'Business Outcomes', 'Two Things Every Business Needs', 'Create Faster', 'Understand Deeper', 'How We Work',
-    'Industries', 'Case Studies', 'Partnership Model', 'Three Ways to Start', 'Pricing', 'Ready to Bring AI'
+    'Cover', 'Three Capabilities, One Partner', 'What We Build', 'No UX Without the U',
+    'Research. Diagnose. Design. Test.', 'Built. Shipped. Still Running.', 'What We Automate',
+    'Audit. Automate. Operate.', 'Real Deployments. Measured Results.', 'The Stack, Exclusively',
+    'Two Things Every Business Needs', 'Create Faster', 'Understand Deeper', 'Worked Across Sectors',
+    'Three Ways to Start', 'We Don\'t Quote. We Scope.', 'Ready to Bring AI'
+  ];
+
+  const slideTags = [
+    'neutral', 'neutral', 'house', 'house',
+    'house', 'house', 'workflow',
+    'workflow', 'workflow', 'byteplus',
+    'byteplus', 'byteplus', 'byteplus', 'neutral',
+    'neutral', 'neutral', 'neutral'
   ];
 
   const slideNotes = [
     'Open with the partnership. mtel builds and operates; basicware brings the BytePlus stack. Keep it high-level.',
-    'Three capabilities under one roof. Emphasize that they compound: software + automation + intelligence, together.',
-    'BytePlus is the enterprise AI division of ByteDance. TikTok, CapCut, and Douyin are proof points of what the data trains on.',
-    'Exclusivity is real. mtel × basicware is the only route to this stack in Thailand. Not a reseller, a chosen partner.',
-    'Three layers: Foundation (software), Operations (AI workflows), Intelligence (BytePlus models). Ask which layer matters most.',
-    'Lead with the numbers. 30–80% workload reduction, 3–5× faster operations. Let the outcomes do the talking.',
-    'Single highlight message. Frame everything else in the deck as serving these two business needs.',
-    'Live demo moment. Type a prompt or let the typewriter run. Hit Generate, then walk through the featured video and the eight creative directions that appear from one brief.',
-    'Second demo: intelligence. Click a pill (e.g. Competitor moves) and let the report regenerate live. Emphasize real-time signals, no analyst needed.',
-    'Three phases. Audit → Automate → Operate. Most clients get their first production workflow live within 6 weeks.',
-    'Ask which industry they\'re in before this slide, then jump straight to their tab.',
-    'Walk through all three case studies. Ask which resonates most with their situation.',
-    'Three partnership phases: managed → embedded → owned. Most clients reach Phase 3 within 12 months.',
-    'Three entry points. Ask which feels most natural: intelligence report, problem statement, or workflow audit.',
-    'No catalogue price. The scope comes from the conversation. Set up the final close by focusing on the business problem, not procurement.',
-    'Closing CTA. Keep it simple: no form, no brief, just a conversation about what is costing them hours and what it is worth to get those hours back.'
+    'Three capabilities under one roof. Emphasize that they compound: software + automation + intelligence, together. Each maps to a chapter that follows.',
+    'Software House chapter opens. 15+ years of shipped platforms. The logo wall is the proof — name a recognizable client if the audience knows them.',
+    'Why UX comes first. Design determines how many AI mistakes the user never sees. $1 spent on UX fixes what would cost $100 later in dev — Forrester.',
+    'Four-stage method: Research, Diagnose, Design, Test. 55% of defects trace to bad requirements (Basili & Boehm). 70% of rework is avoidable (Boehm). Testing with real people catches problems before the build.',
+    'Software house track record. Walk the cases as delivery stories: shipped, running, measured. Keep to software delivery metrics — this is the foundation chapter.',
+    'AI Workflow chapter opens. We do not sell tools; we return hours. Workflows are the unit of work, not features.',
+    'The three-phase engine. Audit the workflow, automate the repeatable parts, then operate and measure. First production workflow typically live within 6 weeks.',
+    'Real deployments with measured results. Hour counts, cycle-time cuts, cost per task. Ask which workflow pains them most before the slide.',
+    'BytePlus is the enterprise AI division of ByteDance. TikTok, CapCut, Douyin prove what the models train on. Exclusivity is real: mtel × basicware is the only route to this stack in Thailand. The model strip shows what they get access to.',
+    'Everything in the deck serves two needs: create faster, understand deeper. The two demos that follow answer both.',
+    'Live demo moment. Describe it, see it. Type a prompt or let the typewriter run, then walk through the featured video and the creative directions from one brief.',
+    'Second demo: intelligence. Click a pill and let the report regenerate live. Emphasize real-time signals, no analyst needed.',
+    'Ask which industry they are in before this slide, then jump straight to their tab.',
+    'Three entry points — intelligence report, problem statement, or workflow audit. Then the partnership path: we run it, embed it, hand it over. Most clients own it within 12 months.',
+    'No catalogue price. The scope comes from the conversation. Set up the close by focusing on the business problem, not procurement.',
+    'Closing CTA. No form, no brief, just a conversation about what is costing them hours and what it is worth to get those hours back.'
   ];
 
   // ============ SLIDE OVERVIEW ============
@@ -3183,12 +3644,17 @@
   let overviewOpen = false;
 
   function buildOverview() {
-    overviewList.innerHTML = slideTitles.map((title, i) => `
+    overviewList.innerHTML = slideTitles.map((title, i) => {
+      const tag = slideTags[i];
+      const tagLbl = tag === 'neutral' ? '' : `<span class="ov-tag ov-tag--${tag}">${tag === 'house' ? 'Software House' : tag === 'workflow' ? 'AI Workflow' : 'BytePlus'}</span>`;
+      return `
       <div class="overview-item${i === currentIndex ? ' ov-active' : ''}" onclick="goToSlide(${i});closeOverview();">
         <span class="ov-num">${String(i + 1).padStart(2, '0')}</span>
         <span class="ov-name">${title}</span>
+        ${tagLbl}
       </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function openOverview() {
@@ -3220,7 +3686,9 @@
   let presenterWindow = null;
 
   function updatePresenter() {
-    presenterSlideLbl.textContent = `Slide ${currentIndex + 1} · ${slideTitles[currentIndex]}`;
+    const tag = slideTags[currentIndex];
+    const tagLbl = tag === 'neutral' ? '' : ` · ${tag === 'house' ? 'Software House' : tag === 'workflow' ? 'AI Workflow' : 'BytePlus'}`;
+    presenterSlideLbl.textContent = `Slide ${currentIndex + 1} · ${slideTitles[currentIndex]}${tagLbl}`;
     presenterNotes.textContent = slideNotes[currentIndex] || '';
     const nextIdx = currentIndex + 1;
     presenterNextName.textContent = nextIdx < slideTitles.length ? slideTitles[nextIdx] : '';
@@ -3263,7 +3731,7 @@
     document.getElementById('slideControls').style.display = 'none';
     document.getElementById('overviewOverlay').style.display = 'none';
     document.getElementById('presenterBar').style.display = 'none';
-    document.querySelector('.slide-logo').style.display = 'none';
+    document.querySelector('.topbar').style.display = 'none';
     document.body.style.cursor = 'none';
 
     // Sync to current slide from main window
