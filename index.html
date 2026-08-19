@@ -28,22 +28,31 @@
       radial-gradient(circle at 78% 92%, rgba(245, 197, 24, 0.04), transparent 38%),
       linear-gradient(135deg, #ffffff 0%, #fffdf7 52%, #fffaf0 100%);
 
-    /* Chapter colours — assigned from the globals.css palette. Yellow stays
+    /* Chapter colours — three tiers of blue. Yellow stays
        reserved for headline emphasis + the closing CTA. */
-    --ch-house: #0FA07F;            /* teal-50  — software house   */
-    --ch-house-ink: #0A7160;
-    --ch-house-soft: rgba(15, 160, 127, 0.12);
-    --ch-workflow: #5824C6;         /* purple-60 — AI workflow     */
-    --ch-workflow-ink: #45209C;
-    --ch-workflow-soft: rgba(88, 36, 198, 0.12);
-    --ch-byteplus: #D97706;         /* amber-50 — byteplus partner */
-    --ch-byteplus-ink: #A65C08;
-    --ch-byteplus-soft: rgba(217, 119, 6, 0.12);
+    --ch-house: #1D4ED8;            /* blue-700 — software house   */
+    --ch-house-ink: #1E3A8A;
+    --ch-house-soft: rgba(29, 78, 216, 0.12);
+    --ch-workflow: #0369A1;         /* sky-700  — AI workflow      */
+    --ch-workflow-ink: #0C4A6E;
+    --ch-workflow-soft: rgba(3, 105, 161, 0.12);
+    --ch-byteplus: #3B82F6;         /* blue-500 — byteplus partner */
+    --ch-byteplus-ink: #1D4ED8;
+    --ch-byteplus-soft: rgba(59, 130, 246, 0.12);
+    --ch-launch: var(--yellow);     /* yellow    — getting started  */
+    --ch-launch-ink: var(--navy);   /* bg is solid yellow here, so ink is navy, not gold-on-gold */
+    --ch-launch-soft: rgba(26, 26, 78, 0.08);
   }
 
   .ch-house    { --ch: var(--ch-house);    --ch-ink: var(--ch-house-ink);    --ch-soft: var(--ch-house-soft); }
   .ch-workflow { --ch: var(--ch-workflow); --ch-ink: var(--ch-workflow-ink); --ch-soft: var(--ch-workflow-soft); }
   .ch-byteplus { --ch: var(--ch-byteplus); --ch-ink: var(--ch-byteplus-ink); --ch-soft: var(--ch-byteplus-soft); }
+  .ch-launch   { --ch: var(--ch-launch);   --ch-ink: var(--ch-launch-ink);   --ch-soft: var(--ch-launch-soft); }
+  /* Launch chapter sits on a solid yellow field, so its eyebrow dot (normally
+     var(--ch), i.e. bright chapter color) needs the dark ink instead — the
+     bright yellow dot would vanish against the yellow slide background. */
+  .ch-launch .eyebrow.chapter-eyebrow::before,
+  .ch-launch .chapter-eyebrow.eyebrow::before { background: var(--ch-launch-ink); }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -80,7 +89,7 @@
     background: rgba(255,255,255,0.78);
     border: 1px solid rgba(26,26,78,0.10);
     border-radius: 999px;
-    padding: 8px 8px 8px 14px;
+    padding: 14px 24px 14px 28px;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 1px 3px rgba(26,26,78,0.05), 0 6px 20px rgba(26,26,78,0.08);
@@ -97,25 +106,49 @@
   .logo-black img { filter: brightness(0); }
   .logo-inv img { filter: brightness(0) invert(1); }
   .chapter-tags {
-    display: flex; align-items: center; gap: 9px;
-    padding-left: 14px; margin-left: 14px; height: 24px;
+    display: flex; align-items: center; gap: 12px;
+    padding-left: 18px; margin-left: 18px; height: 30px;
     border-left: 1px solid rgba(26,26,78,0.10);
   }
   .chapter-tag {
-    font-size: 9px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase;
+    font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
     color: rgba(26,26,78,0.26);
     opacity: 0.9;
     transition: color 0.3s ease, opacity 0.3s ease;
     white-space: nowrap;
+    cursor: pointer;
   }
   .chapter-tag[data-chapter="house"]    { --ch: var(--ch-house); }
   .chapter-tag[data-chapter="workflow"] { --ch: var(--ch-workflow); }
   .chapter-tag[data-chapter="byteplus"] { --ch: var(--ch-byteplus); }
+  .chapter-tag:hover { color: var(--ch); opacity: 1; }
   .chapter-tag.active { color: var(--ch); opacity: 1; }
   .chapter-tag-sep {
-    width: 3px; height: 3px; border-radius: 50%;
+    width: 4px; height: 4px; border-radius: 50%;
     background: rgba(26,26,78,0.20);
   }
+
+  /* ============ CHAPTER INTRO: title card between themes ============ */
+  .chapter-intro {
+    position: fixed; inset: 0; z-index: 400;
+    background: #0E0E3E;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.45s ease;
+  }
+  .chapter-intro.active { opacity: 1; pointer-events: all; }
+  .chapter-intro-text {
+    font-family: var(--serif); font-weight: 800; font-size: clamp(32px, 5vw, 60px);
+    color: var(--white); letter-spacing: -1px;
+  }
+
+  /* Topbar chapter-tag pulse, synced with the intro card */
+  @keyframes chapterTagPulse {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.22); }
+    100% { transform: scale(1); }
+  }
+  .chapter-tag.pulse { animation: chapterTagPulse 0.6s ease; }
   @media (max-width: 768px) {
     .topbar { left: 20px; top: 16px; }
     .chapter-tags { display: none; }
@@ -272,7 +305,7 @@
   }
   .hero-copy { text-align: center; margin-left: auto; margin-right: auto; }
   .hero-sub {
-    font-size: 14.5px; line-height: 1.68; color: #4B5563;
+    font-size: 16.5px; line-height: 1.68; color: #4B5563;
     margin-bottom: 28px; max-width: 640px; margin-left: auto; margin-right: auto;
   }
 
@@ -1208,7 +1241,7 @@
   .ud-bar-fill { height: 100%; border-radius: 999px; width: 0; transition: width 0.9s cubic-bezier(0.16,1,0.3,1); }
   .ud-bar-fill.brand { background: var(--navy); }
   .ud-bar-fill.compA { background: var(--yellow); }
-  .ud-bar-fill.compB { background: #a894dc; }
+  .ud-bar-fill.compB { background: #4C6FD6; }
   .ud-bar-val { font-size: 9.5px; font-weight: 700; color: var(--navy); width: 28px; text-align: right; flex-shrink: 0; }
 
   .ud-chart-svg { width: 100%; height: 116px; display: block; }
@@ -1363,16 +1396,77 @@
   /* ============ SLIDE 10: HOW WE WORK ============ */
   .process { background: var(--off-white); }
   .process .section-intro { margin-bottom: 32px; }
-  .process-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .process-step { background: var(--white); padding: 32px 28px; border-radius: 4px; border: 1px solid var(--line); position: relative; transition: transform 0.3s; }
-  .process-step:hover { transform: translateY(-3px); }
-  .process-step-num { font-family: var(--serif); font-weight: bold; font-size: 64px; color: var(--yellow); line-height: 1; letter-spacing: -3px; position: absolute; top: 16px; right: 24px; opacity: 0.45; }
-  .process-step-label { font-size: 10px; letter-spacing: 1.4px; font-weight: 600; color: var(--navy); margin-bottom: 12px; }
-  .process-step h3 { font-size: var(--text-h3); margin-bottom: 12px; letter-spacing: -0.5px; }
-  .process-step p { font-size: 13px; line-height: 1.55; color: var(--body); margin-bottom: 18px; }
-  .process-step ul { list-style: none; border-top: 1px solid var(--line-soft); padding-top: 14px; }
-  .process-step li { font-size: 12px; color: var(--body); line-height: 1.45; padding: 4px 0; display: flex; align-items: flex-start; gap: 8px; }
+  .process-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; position: relative; }
+  .process-step { background: var(--white); padding: 40px 34px 36px; border-radius: 14px; border: 1px solid var(--line); position: relative; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 1px 2px rgba(26,26,78,0.04); }
+  .process-step:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(26,26,78,0.08); }
+  .process-step:not(:last-child)::after {
+    content: '→';
+    position: absolute; top: 50%; right: -32px; transform: translateY(-50%);
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--white); border: 1px solid var(--line);
+    color: var(--ch); font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+  }
+  .process-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+  .process-step-badge {
+    width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+    background: var(--ch-soft); color: var(--ch);
+    font-family: var(--serif); font-weight: 800; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .process-step-label { font-size: 10px; letter-spacing: 1.4px; font-weight: 700; color: var(--navy); text-transform: uppercase; }
+  .process-step h3 { font-size: var(--text-h3); margin-bottom: 14px; letter-spacing: -0.5px; }
+  .process-step p { font-size: 13px; line-height: 1.55; color: var(--body); margin-bottom: 22px; }
+  .process-step ul { list-style: none; border-top: 1px solid var(--line-soft); padding-top: 18px; }
+  .process-step li { font-size: 12px; color: var(--body); line-height: 1.45; padding: 5px 0; display: flex; align-items: flex-start; gap: 8px; }
   .process-step li::before { content: '→'; color: var(--yellow); font-weight: bold; font-size: 11px; line-height: 1.5; }
+
+  /* ============ PROCESS MODAL: "How does it work?" detail ============ */
+  .process-modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(14,14,62,0.55);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center;
+    padding: 40px;
+    opacity: 0; transition: opacity 0.25s ease;
+  }
+  .process-modal-overlay.open { display: flex; }
+  .process-modal-overlay.visible { opacity: 1; }
+  .process-modal-box {
+    width: 100%; max-width: 1180px; max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    background: var(--white);
+    border-radius: 22px;
+    padding: 56px 60px 60px;
+    position: relative;
+    box-shadow: 0 30px 90px rgba(14,14,62,0.35);
+    transform: translateY(18px) scale(0.98);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+  }
+  .process-modal-overlay.visible .process-modal-box {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  .process-modal-box .process-steps { margin-top: 8px; }
+  .process-modal-close {
+    position: absolute; top: 22px; right: 22px; z-index: 2;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(26,26,78,0.06); border: none;
+    color: var(--navy); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .process-modal-close:hover { background: rgba(26,26,78,0.12); }
+  .process-modal-box::-webkit-scrollbar { width: 6px; }
+  .process-modal-box::-webkit-scrollbar-thumb { background: rgba(26,26,78,0.15); border-radius: 3px; }
+  @media (max-width: 768px) {
+    .process-modal-overlay { padding: 0; }
+    .process-modal-box { max-width: 100%; max-height: 100%; height: 100%; border-radius: 0; padding: 48px 24px 32px; }
+    .process-modal-box .process-steps { grid-template-columns: 1fr; }
+    .process-modal-box .section-intro { grid-template-columns: 1fr; gap: 16px; }
+  }
 
   /* ============ SLIDE 06: OUTCOMES ============ */
   .outcomes { background: radial-gradient(ellipse 55% 45% at 78% 8%, #f8ff80 0%, transparent 55%), radial-gradient(ellipse 50% 45% at 15% 85%, #fffae0 0%, transparent 50%), radial-gradient(ellipse 45% 42% at 65% 80%, #ffdece 0%, transparent 50%), #ffffff; }
@@ -1414,6 +1508,102 @@
   .industry-cases li:last-child { border-bottom: none; }
   .industry-cases li::before { content: ''; width: 5px; height: 5px; background: var(--yellow); border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
 
+  /* Real deployments strip — condensed results, full case studies live in the modal */
+  .deploy-strip { margin-top: 28px; }
+  .deploy-strip-head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 20px;
+    flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .deploy-strip-label { font-size: 10px; letter-spacing: 1.4px; font-weight: 700; color: var(--ch-workflow-ink); text-transform: uppercase; }
+  .deploy-strip-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 999px; border: 1.5px solid var(--ch-workflow);
+    background: var(--white); color: var(--ch-workflow-ink);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+    cursor: pointer; transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .deploy-strip-btn:hover {
+    background: var(--ch-workflow); color: var(--white);
+    transform: translateY(-1px); box-shadow: 0 10px 22px rgba(88,36,198,0.25);
+  }
+  .deploy-strip-arrow { transition: transform 0.2s; }
+  .deploy-strip-btn:hover .deploy-strip-arrow { transform: translateX(3px); }
+  .deploy-strip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .deploy-chip {
+    padding: 16px 18px; background: var(--white); border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(26,26,78,0.05), 0 8px 18px rgba(26,26,78,0.06);
+  }
+  .deploy-chip strong { display: block; font-size: 12px; color: var(--navy); letter-spacing: 0.2px; margin-bottom: 10px; }
+  .deploy-chip-stats { display: flex; flex-direction: column; gap: 5px; }
+  .deploy-chip-stats span { font-size: 12px; color: var(--body); }
+  .deploy-chip-stats .up { color: #15803d; font-weight: 700; }
+  .deploy-chip-stats .down { color: #b91c1c; font-weight: 700; }
+
+  /* Case studies modal: full detail behind "See full case studies" */
+  .cases-modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(14,14,62,0.55);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center;
+    padding: 40px;
+    opacity: 0; transition: opacity 0.25s ease;
+  }
+  .cases-modal-overlay.open { display: flex; }
+  .cases-modal-overlay.visible { opacity: 1; }
+  .cases-modal-box {
+    width: 100%; max-width: 1180px; max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    background: var(--white);
+    border-radius: 22px;
+    padding: 56px 60px 60px;
+    position: relative;
+    box-shadow: 0 30px 90px rgba(14,14,62,0.35);
+    transform: translateY(18px) scale(0.98);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+  }
+  .cases-modal-overlay.visible .cases-modal-box {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  .cases-modal-close {
+    position: absolute; top: 22px; right: 22px; z-index: 2;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(26,26,78,0.06); border: none;
+    color: var(--navy); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .cases-modal-close:hover { background: rgba(26,26,78,0.12); }
+  .cases-modal-box::-webkit-scrollbar { width: 6px; }
+  .cases-modal-box::-webkit-scrollbar-thumb { background: rgba(26,26,78,0.15); border-radius: 3px; }
+  @media (max-width: 768px) {
+    .deploy-strip-grid { grid-template-columns: 1fr; }
+    .cases-modal-overlay { padding: 0; }
+    .cases-modal-box { max-width: 100%; max-height: 100%; height: 100%; border-radius: 0; padding: 48px 24px 32px; }
+  }
+
+  /* ---- Software House chapter opener ---- */
+  .house-intro .lede { max-width: 480px; }
+  .build-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 44px; }
+  .build-pillar-card {
+    padding: 32px 28px; background: var(--white); border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(26,26,78,0.05), 0 10px 24px rgba(26,26,78,0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .build-pillar-card:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(26,26,78,0.10); }
+  .build-pillar-icon {
+    width: 40px; height: 40px; border-radius: 11px; margin-bottom: 18px;
+    background: var(--ch-house-soft); color: var(--ch-house-ink);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .build-pillar-icon svg { width: 20px; height: 20px; }
+  .build-pillar-card h3 { font-size: var(--text-h3); color: var(--navy); letter-spacing: -0.3px; margin-bottom: 10px; }
+  .build-pillar-card p { font-size: 13.5px; line-height: 1.6; color: var(--body); margin: 0; }
+  @media (max-width: 768px) {
+    .build-pillars { grid-template-columns: 1fr; }
+  }
+
   /* ============ LEGACY / UNUSED: LOGO WALL ============ */
   .logos { background: var(--off-white); }
   .logos section { flex-direction: column; justify-content: center; }
@@ -1431,6 +1621,13 @@
   .case-card { background: var(--white); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
   .case-card:hover { transform: translateY(-3px); box-shadow: var(--card-shadow); }
   .case-tag { padding: 14px 24px; border-bottom: 1px solid var(--line); font-size: 10px; letter-spacing: 1.4px; font-weight: 600; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+  /* Image slot — placeholder box for a case-study photo, drop an asset in later. */
+  .case-image {
+    aspect-ratio: 16 / 9; width: 100%; background: var(--line-soft);
+    display: flex; align-items: center; justify-content: center; color: var(--meta);
+    background-size: cover; background-position: center;
+  }
+  .case-image svg { width: 26px; height: 26px; }
   .case-tag::before { content: ''; width: 5px; height: 5px; background: var(--yellow); border-radius: 50%; }
   .case-body { padding: 22px 24px; }
   .case-block { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line-soft); }
@@ -1455,30 +1652,38 @@
   .phase p { font-size: 13px; line-height: 1.55; color: var(--body); }
 
   /* ============ SLIDE 14: GET STARTED ============ */
-  .ways { background: var(--white); }
+  .ways { background: linear-gradient(180deg, #fcefc0 0%, #fae49a 100%); }
+  .ways .accent { color: var(--navy); }
+  .ways .lede { color: rgba(17, 17, 17, 0.72); }
   .ways .section-intro { margin-bottom: 32px; }
   .ways-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .ways-grid-3 { grid-template-columns: repeat(3, 1fr); }
-  .way { background: var(--off-white); padding: 44px 40px; border-radius: 4px; border: 1px solid var(--line); transition: all 0.3s; }
+  .way { background: var(--white); padding: 44px 40px; border-radius: 4px; box-shadow: 0 10px 24px -10px rgba(26, 26, 78, 0.22); transition: all 0.3s; }
   .way:hover { background: var(--navy); color: var(--white); transform: translateY(-3px); }
   .way:hover h3, .way:hover .way-icon { color: var(--yellow); }
   .way:hover p { color: rgba(255,255,255,0.8); }
   .way:hover .way-cta { color: var(--yellow); border-color: var(--yellow); }
-  .way-icon { font-family: var(--serif); font-weight: bold; font-size: 13px; color: var(--yellow); letter-spacing: 1.4px; margin-bottom: 18px; transition: color 0.3s; }
+  .way-icon { font-family: var(--serif); font-weight: bold; font-size: 13px; color: var(--navy); letter-spacing: 1.4px; margin-bottom: 18px; transition: color 0.3s; }
   .way h3 { font-size: var(--text-h3); margin-bottom: 14px; letter-spacing: -0.8px; transition: color 0.3s; }
   .way p { font-size: 14px; line-height: 1.6; color: var(--body); margin-bottom: 24px; transition: color 0.3s; }
   .way-cta { font-size: 10px; letter-spacing: 1.4px; font-weight: 600; color: var(--navy); padding-bottom: 6px; border-bottom: 1px solid var(--navy); display: inline-flex; align-items: center; gap: 7px; transition: all 0.3s; background: none; border-top: none; border-left: none; border-right: none; }
 
   /* ============ SLIDE 15: PRICING ============ */
-  .pricing { background: var(--off-white); }
+  .pricing { background: linear-gradient(180deg, #fae49a 0%, #f7d875 100%); }
+  .pricing .accent { color: var(--navy); }
+  .pricing .lede { color: rgba(17, 17, 17, 0.72); }
   .pricing .section-intro { margin-bottom: 28px; }
-  .pricing-factors { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-  .pricing-factor { padding: 24px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--white); }
+  .pricing-factors {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    background: var(--white); border-radius: 8px; overflow: hidden;
+    box-shadow: 0 10px 24px -10px rgba(26, 26, 78, 0.22);
+  }
+  .pricing-factor { padding: 24px; border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); background: transparent; }
   .pricing-factor h4 { font-family: var(--font-body); font-weight: var(--weight-bold); font-size: var(--text-h4); color: var(--navy); margin-bottom: 8px; letter-spacing: -0.5px; }
   .pricing-factor p { font-size: 13px; line-height: 1.5; color: var(--body); }
   .pricing-footer { margin-top: 32px; text-align: center; }
   .pricing-footer p { font-family: var(--serif); font-weight: bold; font-size: 24px; color: var(--navy); letter-spacing: -0.8px; max-width: 680px; margin: 0 auto; line-height: 1.3; }
-  .pricing-footer p span { color: var(--yellow); font-style: italic; }
+  .pricing-footer p span { color: var(--navy); font-style: italic; }
 
   /* ============ SLIDE 16: READY TO BRING AI ============ */
   .ready-ops {
@@ -1577,8 +1782,8 @@
   /* Chapter eyebrow — coloured per chapter instead of fixed yellow */
   .eyebrow.chapter-eyebrow, .chapter-eyebrow.eyebrow { color: var(--ch-ink); }
   .eyebrow.chapter-eyebrow::before, .chapter-eyebrow.eyebrow::before { background: var(--ch); }
-  .ch-house .case-tag::before, .ch-house .process-step-num, .ch-house .scribe-num { color: var(--ch); }
-  .ch-workflow .case-tag::before, .ch-workflow .process-step-num { color: var(--ch); }
+  .ch-house .case-tag::before, .ch-house .scribe-num { color: var(--ch); }
+  .ch-workflow .case-tag::before { color: var(--ch); }
   .ch-byteplus .pill-num { color: var(--ch); }
 
   /* ---- Slide 02 map (three capabilities, one line each) ---- */
@@ -1652,25 +1857,38 @@
   .ux-return h2 { font-size: var(--text-h2); line-height: 1.08; letter-spacing: -1.2px; margin-bottom: 18px; }
   .ux-return .lede {
     font-size: 15px; line-height: 1.65; color: var(--body);
-    max-width: 640px; margin: 0 auto 46px;
+    max-width: 640px; margin: 0 auto 40px;
+  }
+  .ux-proof {
+    max-width: 720px; margin: 0 auto;
+    background: var(--white); border-radius: 8px;
+    padding: 40px 48px 32px;
+    box-shadow: 0 12px 28px -18px rgba(15, 26, 46, 0.18);
   }
   .ux-return-num {
     display: flex; align-items: center; justify-content: center; gap: 26px;
-    margin-bottom: 16px;
+    white-space: nowrap;
   }
   .ux-return-num .ux-in, .ux-return-num .ux-arrow, .ux-return-num .ux-return-val {
-    font-size: clamp(64px, 9vw, 120px); font-weight: 800; line-height: 1; letter-spacing: -4px;
+    font-size: clamp(64px, 8vw, 110px); font-weight: 800; line-height: 1; letter-spacing: -3px;
   }
   .ux-in { color: var(--body); }
   .ux-arrow { color: var(--ch-house); }
   .ux-return-val { color: var(--navy); font-family: var(--serif); }
-  .ux-return-copy { font-size: var(--text-h4); font-weight: 700; color: var(--navy); letter-spacing: -0.4px; }
-  .ux-return-val::after { content: ' per dollar invested'; }
-  .ux-source { margin-top: 10px; font-size: 12px; color: var(--meta); }
-  .ux-close {
-    margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
-    color: var(--body); font-size: 14px; font-weight: 500;
+  .ux-return-unit {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase;
+    color: var(--meta); margin-top: 6px; margin-bottom: 22px;
   }
+  .ux-return-copy { font-size: var(--text-h4); font-weight: 700; color: var(--navy); letter-spacing: -0.4px; }
+  .ux-source {
+    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft);
+    font-size: 12px; color: var(--meta);
+  }
+  .ux-source a {
+    color: inherit; text-decoration: underline; text-underline-offset: 2px;
+    transition: color 0.2s ease;
+  }
+  .ux-source a:hover { color: var(--ch-house-ink); }
 
   /* ---- Slide 05: Research. Diagnose. Design. Test. ---- */
   .scribe-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -1710,50 +1928,68 @@
   .automate-head h2 { font-size: var(--text-h2); line-height: 1.05; letter-spacing: -1.2px; margin-bottom: 18px; }
   .automate-head .lede { max-width: 640px; }
   .automate-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
-    border: 1px solid var(--line); margin-top: 40px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px;
   }
   .automate-item {
-    padding: 28px 26px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
-    background: var(--white); border-left: 3px solid transparent;
+    padding: 26px 24px; background: var(--white); border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(26,26,78,0.05), 0 8px 20px rgba(26,26,78,0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
+  .automate-item:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(26,26,78,0.10); }
+  .automate-item-icon {
+    width: 34px; height: 34px; border-radius: 10px; margin-bottom: 14px;
+    background: var(--ch-workflow-soft); color: var(--ch-workflow-ink);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .automate-item-icon svg { width: 18px; height: 18px; }
   .automate-item strong { display: block; font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 6px; letter-spacing: -0.3px; }
   .automate-item p { font-size: 12.5px; line-height: 1.55; color: var(--body); margin: 0; }
-  .automate-note { margin-top: 26px; font-size: 13px; color: var(--body); }
+  .automate-foot {
+    margin-top: 26px; display: flex; align-items: center; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap;
+  }
+  .automate-note { font-size: 13px; color: var(--body); }
   .automate-note strong { color: var(--ch-workflow-ink); }
-  .automate-grid .automate-item:nth-child(1),
-  .automate-grid .automate-item:nth-child(2),
-  .automate-grid .automate-item:nth-child(3) { border-top: 3px solid var(--ch-workflow); }
+  .automate-howto-btn {
+    display: inline-flex; align-items: center; gap: 9px; flex-shrink: 0;
+    padding: 12px 20px; border-radius: 999px; border: 1.5px solid var(--ch-workflow);
+    background: var(--white); color: var(--ch-workflow-ink);
+    font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+    cursor: pointer; transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .automate-howto-btn:hover {
+    background: var(--ch-workflow); color: var(--white);
+    transform: translateY(-1px); box-shadow: 0 10px 22px rgba(88,36,198,0.25);
+  }
+  .automate-howto-arrow { transition: transform 0.2s; }
+  .automate-howto-btn:hover .automate-howto-arrow { transform: translateX(3px); }
 
   /* ---- Slide 10: BytePlus stack + exclusivity + models strip ---- */
   .data h2 { margin-bottom: 16px; }
   .data-excl {
-    margin: 0 0 34px; padding: 16px 20px;
-    border-left: 3px solid var(--ch-byteplus);
+    margin: 0 0 34px; padding: 18px 22px;
+    border-radius: 14px;
     background: var(--ch-byteplus-soft);
     font-size: 14px; line-height: 1.6; color: var(--body); max-width: 700px;
   }
   .data-excl strong { color: var(--navy); }
   .data-excl .excl-name { color: var(--ch-byteplus-ink); }
   .data .lede-large { margin-bottom: 24px; }
-  .data-partner-badge {
-    display: inline-block; margin-top: 26px; padding: 10px 20px;
-    border: 1.5px solid var(--ch-byteplus); border-radius: 999px;
-    font-size: 11px; font-weight: 600; letter-spacing: 0.6px;
-    color: var(--ch-byteplus-ink); background: var(--ch-byteplus-soft);
-  }
-  .model-strip { margin-top: 48px; border-top: 1px solid var(--line); padding-top: 26px; }
-  .model-strip-head {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 20px;
-    flex-wrap: wrap; margin-bottom: 18px;
-  }
-  .model-strip-label { font-size: 10px; letter-spacing: 1.6px; font-weight: 700; color: var(--ch-byteplus-ink); text-transform: uppercase; }
-  .model-strip-note { font-size: 12px; color: var(--body); }
-  .model-chips { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .models .section-intro { margin-bottom: 40px; }
+  .model-chips { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
   .model-chip {
-    padding: 14px 16px; border: 1px solid var(--line); background: var(--white);
-    border-top: 2px solid var(--ch-byteplus); border-radius: 4px;
+    padding: 14px 16px 13px; background: var(--white); border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(26,26,78,0.05), 0 8px 18px rgba(26,26,78,0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
+  .model-chip:hover { transform: translateY(-2px); box-shadow: 0 1px 2px rgba(26,26,78,0.06), 0 14px 26px rgba(26,26,78,0.10); }
+  .model-chip-icon {
+    width: 26px; height: 26px; border-radius: 8px; margin-bottom: 9px;
+    background: var(--ch-byteplus-soft);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .model-chip-icon img { width: 16px; height: 16px; display: block; }
+  .model-chip-icon svg { width: 14px; height: 14px; color: var(--ch-byteplus-ink); }
   .model-chip strong { display: block; font-size: 13px; color: var(--navy); margin-bottom: 4px; }
   .model-chip span { font-size: 11px; line-height: 1.45; color: var(--body); }
 
@@ -1762,8 +1998,9 @@
   .pillars-section h2 { font-size: var(--text-h2); margin-bottom: 0; }
   .two-needs { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 44px; max-width: 1040px; margin-left: auto; margin-right: auto; }
   .need-card {
-    background: var(--white); border: 1px solid var(--line); border-radius: 4px;
-    border-top: 3px solid var(--ch-byteplus); padding: 34px 32px 26px; text-align: left;
+    background: var(--white); border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(26,26,78,0.05), 0 10px 24px rgba(26,26,78,0.06);
+    padding: 34px 32px 26px; text-align: left;
     display: flex; flex-direction: column;
   }
   .need-card .pill-num { font-size: 34px; font-weight: 800; color: var(--ch-byteplus); line-height: 1; letter-spacing: -2px; margin-bottom: 12px; }
@@ -1784,14 +2021,14 @@
     padding: 22px 28px; border-bottom: 1px solid var(--line);
     flex-wrap: wrap;
   }
-  .pp-label { font-size: 10px; letter-spacing: 1.5px; font-weight: 700; color: var(--navy); text-transform: uppercase; }
+  .pp-label { font-size: 10px; letter-spacing: 1.5px; font-weight: 700; color: var(--ch-ink); text-transform: uppercase; }
   .pp-sub { font-size: 13px; color: var(--body); margin: 0; }
   .pp-steps { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 0; }
   .pp-step { padding: 24px 26px; }
-  .pp-step .pp-num { font-size: 11px; letter-spacing: 1.4px; font-weight: 700; color: var(--navy); opacity: 0.45; margin-bottom: 8px; }
+  .pp-step .pp-num { font-size: 11px; letter-spacing: 1.4px; font-weight: 700; color: var(--ch-ink); opacity: 0.7; margin-bottom: 8px; }
   .pp-step h4 { font-size: 16px; color: var(--navy); margin-bottom: 6px; letter-spacing: -0.3px; }
   .pp-step p { font-size: 12.5px; line-height: 1.55; color: var(--body); margin: 0; }
-  .pp-arrow { display: grid; place-items: center; color: var(--navy); opacity: 0.35; font-size: 18px; }
+  .pp-arrow { display: grid; place-items: center; color: var(--ch-ink); opacity: 0.55; font-size: 18px; }
 
   /* ============ UNIFIED SLIDE BACKGROUND ============ */
   .problem,
@@ -1821,8 +2058,6 @@
   .slide.create-faster,
   .slide.understand {
     background: #0E0E3E;
-    position: relative;
-    overflow: hidden;
   }
   .slide.create-faster .create-faster-left .eyebrow,
   .slide.understand .understand-left .eyebrow {
@@ -2016,6 +2251,8 @@
   .ov-tag--house { color: var(--ch-house); }
   .ov-tag--workflow { color: var(--ch-workflow); }
   .ov-tag--byteplus { color: var(--ch-byteplus); }
+  .ov-tag--about { color: rgba(255,255,255,0.55); }
+  .ov-tag--getstarted { color: var(--yellow); }
 
   /* ============ PRESENTER BAR ============ */
   .presenter-bar {
@@ -2126,6 +2363,7 @@
     .cta-grid { grid-template-columns: 1fr; gap: 40px; }
     .cta-actions { align-items: flex-start; }
     .who-pillars, .process-steps, .case-grid, .outcomes-grid, .pricing-factors { grid-template-columns: 1fr 1fr; }
+    .process-step:not(:last-child)::after { display: none; }
     .who-map { grid-template-columns: 1fr; }
     .map-col { border-right-width: 1px; border-top-width: 3px; }
     .build-layout { grid-template-columns: 1fr; gap: 40px; }
@@ -2181,17 +2419,18 @@
     }
   }
 
-  /* ============ SLIDE PROGRESS BAR ============ */
+  /* ============ SLIDE PROGRESS BAR: segmented, colored per chapter ============ */
   .slide-progress {
-    position: fixed; bottom: 0; left: 0; right: 0; height: 3px;
-    background: rgba(26,26,78,0.10); z-index: 299;
+    position: fixed; bottom: 0; left: 0; right: 0; height: 4px;
+    display: flex; gap: 3px; z-index: 299;
     pointer-events: none;
   }
-  .slide-progress-fill {
-    height: 100%; background: var(--yellow);
-    transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-    width: 0%;
+  .progress-seg {
+    flex: 1; height: 100%;
+    background: rgba(26,26,78,0.10);
+    transition: background 0.4s ease;
   }
+  .progress-seg.reached { background: var(--seg-color, var(--yellow)); }
 
   @media (max-width: 768px) {
     .outcomes-layout { grid-template-columns: 1fr; }
@@ -2258,12 +2497,17 @@
     <img src="mtel logo.png" alt="mtel logo" />
   </span>
   <div class="chapter-tags" id="chapterTags">
-    <span class="chapter-tag" data-chapter="house">Software House</span>
+    <span class="chapter-tag" data-chapter="byteplus" onclick="goToSlide(2, true)">BytePlus</span>
     <span class="chapter-tag-sep"></span>
-    <span class="chapter-tag" data-chapter="workflow">AI Workflow</span>
+    <span class="chapter-tag" data-chapter="workflow" onclick="goToSlide(6, true)">AI Workflow</span>
     <span class="chapter-tag-sep"></span>
-    <span class="chapter-tag" data-chapter="byteplus">BytePlus</span>
+    <span class="chapter-tag" data-chapter="house" onclick="goToSlide(8, true)">Software House</span>
   </div>
+</div>
+
+<!-- Chapter intro: brief dark title card shown when a new theme begins -->
+<div class="chapter-intro" id="chapterIntro">
+  <span class="chapter-intro-text" id="chapterIntroText"></span>
 </div>
 
 <!-- Slides -->
@@ -2287,17 +2531,51 @@
               One partner. Software house DNA, AI workflow automation, and the ByteDance AI stack converged into a single operating system for modern enterprise.
             </p>
           </div>
-          <!-- Client logo marquee wall (reduced on the cover; full wall on slide 03) -->
+          <!-- Client logo marquee wall (full wall) -->
           <div class="hero-ecosystem logo-marquee" aria-hidden="true">
+            <!-- Row 1: Real Estate · Electric · Fintech -->
             <div class="marquee-row">
               <div class="marquee-card"><img src="logo/Logo-Realestate-Onebangkok.svg" alt="One Bangkok" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Realestate-Sansiri.svg" alt="Sansiri" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Realestate-Fraser.svg" alt="Frasers" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Realestate-Theparq.svg" alt="The Parq" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Electric-PTT.svg" alt="PTT" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Electric-Evme.svg" alt="EVme" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Electric-Sharge.svg" alt="Sharge" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Electric-Spectrum.svg" alt="Spectrum" loading="lazy"></div>
+              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Electric-Swapngo.svg" alt="Swap &amp; Go" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Fintech-Cryptomind.svg" alt="Cryptomind" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Fintech-Merkle.svg" alt="Merkle" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Fintech-100x.svg" alt="100x" loading="lazy"></div>
+            </div>
+            <!-- Row 2: Fintech · Entertainment · Others -->
+            <div class="marquee-row">
+              <div class="marquee-card"><img src="logo/Logo-Fintech-Imbee.svg" alt="imBee" loading="lazy"></div>
+              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Fintech-Beatsquares.svg" alt="BeatSquares" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Fintech-Elkrem.svg" alt="Elkrem" loading="lazy"></div>
               <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Entertainment-Major.svg" alt="Major Cineplex" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Entertainment-Ticketmelon.svg" alt="Ticketmelon" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Entertainment-Coolism.svg" alt="COOLISM" loading="lazy"></div>
+              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Entertainment-Nickelodeon.svg" alt="Nickelodeon" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Entertainment-RSmall.svg" alt="RS Mall" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Entertainment-Moov.svg" alt="Moov" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Other-Mc.svg" alt="McDonald's" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Other-Anatara.svg" alt="Anantara" loading="lazy"></div>
               <div class="marquee-card"><img src="logo/Logo-Other-AOT.svg" alt="AOT" loading="lazy"></div>
+            </div>
+            <!-- Row 3: Other sectors -->
+            <div class="marquee-row">
+              <div class="marquee-card"><img src="logo/Logo-Other-Thaipass.svg" alt="Thaipass" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Other-CTFLife.svg" alt="CTF Life" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Other-Rentyl.svg" alt="Rentyl" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Other-BCC.svg" alt="BCC" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Other-dropp.svg" alt="dropp" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Other-Flow.svg" alt="Flow" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Other-Jaga.svg" alt="Jaga" loading="lazy"></div>
+              <div class="marquee-card"><img src="logo/Logo-Other-Sipman.svg" alt="Sipman" loading="lazy"></div>
+              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Police.svg" alt="Police" loading="lazy"></div>
+              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Globalfish.svg" alt="Global Fish" loading="lazy"></div>
+              <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Ministryofindustry.svg" alt="Min. Industry" loading="lazy"></div>
             </div>
           </div>
         </div>
@@ -2315,99 +2593,68 @@
           </div>
           <p class="lede">Most agencies do one of these things well. We do all three, and because they live under one roof, they reinforce each other on every engagement.</p>
         </div>
-        <div class="who-map">
-          <div class="map-col map-col--house reveal">
-            <div class="map-num">01</div>
-            <img src="assets/software-house.png" alt="Software House" class="map-img">
-            <span class="map-tag">FOUNDATION</span>
-            <h3>Software House</h3>
-            <p>15+ years building the platforms your AI has to run on.</p>
-            <div class="map-link">→ The build layer</div>
+        <div class="who-pillars">
+          <div class="pillar reveal">
+            <div class="pillar-img">
+              <img src="assets/byteplus-partner.png" alt="BytePlus Partner">
+            </div>
+            <div class="pillar-body">
+              <span class="pillar-tag">INTELLIGENCE</span>
+              <h3>BytePlus Partner</h3>
+              <p>The ByteDance AI stack — the engine behind TikTok, CapCut, and Douyin — delivered through us. Content generation, customer intelligence, social signal capture.</p>
+            </div>
           </div>
-          <div class="map-col map-col--workflow reveal">
-            <div class="map-num">02</div>
-            <img src="assets/ai-workflow.png" alt="AI Workflow Operators" class="map-img">
-            <span class="map-tag">OPERATION</span>
-            <h3>AI Workflow Operators</h3>
-            <p>We don't sell tools. We hand back the hours your team spent on busywork.</p>
-            <div class="map-link">→ The operation layer</div>
+          <div class="pillar reveal">
+            <div class="pillar-img">
+              <img src="assets/ai-workflow.png" alt="AI Workflow Operators">
+            </div>
+            <div class="pillar-body">
+              <span class="pillar-tag">OPERATION</span>
+              <h3>AI Workflow Operators</h3>
+              <p>HR, Finance, Operations, and GEO automation: built, deployed, and operated. We don't sell tools. We hand back the hours your team spent on busywork.</p>
+            </div>
           </div>
-          <div class="map-col map-col--byteplus reveal">
-            <div class="map-num">03</div>
-            <img src="assets/byteplus-partner.png" alt="BytePlus Partner" class="map-img">
-            <span class="map-tag">INTELLIGENCE</span>
-            <h3>BytePlus Partner</h3>
-            <p>The ByteDance AI stack, available in Thailand exclusively through us.</p>
-            <div class="map-link">→ The intelligence layer</div>
+          <div class="pillar reveal">
+            <div class="pillar-img">
+              <img src="assets/software-house.png" alt="Software House">
+            </div>
+            <div class="pillar-body">
+              <span class="pillar-tag">FOUNDATION</span>
+              <h3>Software House</h3>
+              <p>15+ years of experience building custom platforms, system integrations, enterprise applications, cloud infrastructure, and the UX layer that drives user adoption. The foundation behind scalable digital products.</p>
+            </div>
           </div>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- SLIDE 03: WHAT WE BUILD -->
-  <div class="slide build ch-house" data-state="future" data-logo="dark" data-order="3">
+  <!-- SLIDE: SOFTWARE HOUSE CHAPTER OPENER -->
+  <div class="slide house-intro ch-house" data-state="future" data-logo="dark" data-order="9">
     <section class="top-align">
       <div class="container">
-        <div class="build-layout">
-          <div class="build-copy">
-            <div class="eyebrow chapter-eyebrow reveal">The software house</div>
-            <h2 class="reveal">What we <span class="accent">build.</span></h2>
-            <p class="lede reveal">15+ years building the platforms other people's AI has to run on.</p>
-            <div class="cap-grid reveal">
-              <div class="cap-chip">Custom Software Development</div>
-              <div class="cap-chip">System Integration</div>
-              <div class="cap-chip">Enterprise Platforms</div>
-              <div class="cap-chip">Cloud &amp; Infrastructure</div>
-              <div class="cap-chip">Testing &amp; QA</div>
-              <div class="cap-chip cap-chip--lead">UX/UI Design<span class="cap-chip-note">And the layer that decides whether any of it gets used — next slide.</span></div>
-            </div>
+        <div class="section-intro reveal">
+          <div>
+            <div class="eyebrow chapter-eyebrow">The software house</div>
+            <h2>We build digital products that are <span class="accent">scalable, human, and future-ready.</span></h2>
           </div>
-          <div class="build-wall reveal">
-            <div class="logo-wall-label">Platforms delivered for</div>
-            <div class="logo-marquee" aria-hidden="true">
-              <div class="marquee-row">
-                <div class="marquee-card"><img src="logo/Logo-Realestate-Onebangkok.svg" alt="One Bangkok" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Realestate-Sansiri.svg" alt="Sansiri" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Realestate-Fraser.svg" alt="Frasers" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Realestate-Theparq.svg" alt="The Parq" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Electric-PTT.svg" alt="PTT" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Electric-Evme.svg" alt="EVme" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Electric-Sharge.svg" alt="Sharge" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Electric-Spectrum.svg" alt="Spectrum" loading="lazy"></div>
-                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Electric-Swapngo.svg" alt="Swap &amp; Go" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Fintech-Cryptomind.svg" alt="Cryptomind" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Fintech-Merkle.svg" alt="Merkle" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Fintech-100x.svg" alt="100x" loading="lazy"></div>
-              </div>
-              <div class="marquee-row">
-                <div class="marquee-card"><img src="logo/Logo-Fintech-Imbee.svg" alt="imBee" loading="lazy"></div>
-                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Fintech-Beatsquares.svg" alt="BeatSquares" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Fintech-Elkrem.svg" alt="Elkrem" loading="lazy"></div>
-                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Entertainment-Major.svg" alt="Major Cineplex" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Entertainment-Ticketmelon.svg" alt="Ticketmelon" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Entertainment-Coolism.svg" alt="COOLISM" loading="lazy"></div>
-                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Entertainment-Nickelodeon.svg" alt="Nickelodeon" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Entertainment-RSmall.svg" alt="RS Mall" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Entertainment-Moov.svg" alt="Moov" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-Mc.svg" alt="McDonald's" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-Anatara.svg" alt="Anantara" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-AOT.svg" alt="AOT" loading="lazy"></div>
-              </div>
-              <div class="marquee-row">
-                <div class="marquee-card"><img src="logo/Logo-Other-Thaipass.svg" alt="Thaipass" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-CTFLife.svg" alt="CTF Life" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-Rentyl.svg" alt="Rentyl" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-BCC.svg" alt="BCC" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-dropp.svg" alt="dropp" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-Flow.svg" alt="Flow" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-Jaga.svg" alt="Jaga" loading="lazy"></div>
-                <div class="marquee-card"><img src="logo/Logo-Other-Sipman.svg" alt="Sipman" loading="lazy"></div>
-                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Police.svg" alt="Police" loading="lazy"></div>
-                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Globalfish.svg" alt="Global Fish" loading="lazy"></div>
-                <div class="marquee-card marquee-card--raw"><img src="logo/Logo-Other-Ministryofindustry.svg" alt="Min. Industry" loading="lazy"></div>
-              </div>
-            </div>
+          <p class="lede">15+ years shipping the platforms other people's AI has to run on — software that outlasts the trend it was built for.</p>
+        </div>
+        <div class="build-pillars reveal">
+          <div class="build-pillar-card">
+            <div class="build-pillar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
+            <h3>Scalable</h3>
+            <p>Architecture that grows with you, from first users to enterprise scale, without a rewrite.</p>
+          </div>
+          <div class="build-pillar-card">
+            <div class="build-pillar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div>
+            <h3>Human</h3>
+            <p>Interfaces people actually want to use. Every product starts with the user, not the stack.</p>
+          </div>
+          <div class="build-pillar-card">
+            <div class="build-pillar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 5-5 2 2-5z"/></svg></div>
+            <h3>Future-ready</h3>
+            <p>Built on modern foundations that keep pace with new AI capabilities, not locked behind them.</p>
           </div>
         </div>
       </div>
@@ -2415,30 +2662,30 @@
   </div>
 
   <!-- SLIDE 04: NO UX WITHOUT THE U -->
-  <div class="slide uxcase ch-house" data-state="future" data-logo="dark" data-order="4">
+  <div class="slide uxcase ch-house" data-state="future" data-logo="dark" data-order="10">
     <section>
       <div class="container">
         <div class="ux-return">
           <div class="eyebrow chapter-eyebrow reveal">The software house</div>
-          <h2 class="reveal">No UX without <span class="accent">the U.</span></h2>
-          <p class="lede reveal">Good design usually fails for one reason: the real user was never in the process. We build the process around them.</p>
-          <div class="ux-return reveal">
+          <h2 class="reveal">There's no UX without <span class="accent">the user.</span></h2>
+          <p class="lede reveal">Most design fails for one reason: the real user is never part of the process. We put them at the center of ours, from day one.</p>
+          <div class="ux-proof reveal">
             <div class="ux-return-num">
               <span class="ux-in">$1</span>
               <span class="ux-arrow">→</span>
               <span class="ux-return-val" data-target="100" data-format="usd">$100</span>
             </div>
-            <p class="ux-return-copy">Every dollar invested in UX returns up to $100.</p>
-            <p class="ux-source">Source: Forrester Research, <em>The Six Steps For Justifying Better UX</em>.</p>
+            <p class="ux-return-unit">saved in fixes after development</p>
+            <p class="ux-return-copy">That's right — one dollar spent on UX before development can save $100 after.</p>
+            <p class="ux-source">Source: <a href="https://www.forrester.com/report/The-Six-Steps-For-Justifying-Better-UX/RES117708" target="_blank" rel="noopener">Forrester Research, <em>The Six Steps For Justifying Better UX</em></a>.</p>
           </div>
-          <p class="ux-close reveal">Design is the cheapest place in a project to be wrong.</p>
         </div>
       </div>
     </section>
   </div>
 
   <!-- SLIDE 05: RESEARCH. DIAGNOSE. DESIGN. TEST. -->
-  <div class="slide scribe ch-house" data-state="future" data-logo="dark" data-order="5">
+  <div class="slide scribe ch-house" data-state="future" data-logo="dark" data-order="11">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
@@ -2511,7 +2758,7 @@
   </div>
 
   <!-- SLIDE 06: SOFTWARE HOUSE CASE STUDIES (PLACEHOLDER) -->
-  <div class="slide cases ch-house" data-state="future" data-logo="dark" data-order="6">
+  <div class="slide cases ch-house" data-state="future" data-logo="dark" data-order="12">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
@@ -2602,30 +2849,52 @@
           <p class="lede">We don't sell tools. We hand back the hours your team spent on busywork.</p>
         </div>
         <div class="automate-grid reveal">
-          <div class="automate-item"><strong>HR Workflow Automation</strong><p>Onboarding, leave, payroll queries — handled without a ticket queue.</p></div>
-          <div class="automate-item"><strong>Finance Operations</strong><p>Invoices, reconciliation, close — compressed from days to hours.</p></div>
-          <div class="automate-item"><strong>Ops &amp; Project Management</strong><p>Status, blockers, reporting — without the status meeting.</p></div>
-          <div class="automate-item"><strong>GEO Optimization</strong><p>Ranking in the answers AI generates, not just search results.</p></div>
-          <div class="automate-item"><strong>Custom AI Agents</strong><p>Built to your workflows, your data, your guardrails.</p></div>
-          <div class="automate-item"><strong>Knowledge Retrieval (RAG)</strong><p>Your documents answer questions instead of your people.</p></div>
+          <div class="automate-item">
+            <div class="automate-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div>
+            <strong>HR Workflow Automation</strong><p>Onboarding, leave, payroll queries — handled without a ticket queue.</p>
+          </div>
+          <div class="automate-item">
+            <div class="automate-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>
+            <strong>Finance Operations</strong><p>Invoices, reconciliation, close — compressed from days to hours.</p>
+          </div>
+          <div class="automate-item">
+            <div class="automate-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12.5l2.2 2.2L16 9.5"/></svg></div>
+            <strong>Ops &amp; Project Management</strong><p>Status, blockers, reporting — without the status meeting.</p>
+          </div>
+          <div class="automate-item">
+            <div class="automate-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.7" fill="currentColor" stroke="none"/></svg></div>
+            <strong>GEO Optimization</strong><p>Ranking in the answers AI generates, not just search results.</p>
+          </div>
+          <div class="automate-item">
+            <div class="automate-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="10" rx="2.5"/><path d="M12 8V5"/><circle cx="12" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="13" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.1" fill="currentColor" stroke="none"/></svg></div>
+            <strong>Custom AI Agents</strong><p>Built to your workflows, your data, your guardrails.</p>
+          </div>
+          <div class="automate-item">
+            <div class="automate-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H12v16H5.5C4.7 20 4 19.3 4 18.5v-13z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5c.8 0 1.5-.7 1.5-1.5v-13z"/></svg></div>
+            <strong>Knowledge Retrieval (RAG)</strong><p>Your documents answer questions instead of your people.</p>
+          </div>
         </div>
-        <p class="automate-note reveal"><strong>Operated, not installed.</strong> Measured by hours back, not features shipped.</p>
+        <div class="automate-foot reveal">
+          <p class="automate-note"><strong>Operated, not installed.</strong> Measured by hours back, not features shipped.</p>
+          <button class="automate-howto-btn" onclick="openProcessModal()">
+            How does it work? <span class="automate-howto-arrow">→</span>
+          </button>
+        </div>
       </div>
     </section>
   </div>
 
   <!-- SLIDE 10: THE STACK + EXCLUSIVITY (merged) -->
-  <div class="slide data ch-byteplus" data-state="future" data-logo="dark" data-order="10">
+  <div class="slide data ch-byteplus" data-state="future" data-logo="dark" data-order="3">
     <section class="top-align">
       <div class="container">
         <div class="data-inner">
           <div class="data-content">
             <div class="reveal">
-              <div class="eyebrow chapter-eyebrow">BytePlus</div>
               <h2>The stack, and why you can't buy it <span class="accent">elsewhere.</span></h2>
               <p class="lede-large">BytePlus is the enterprise AI division of ByteDance — the company that built TikTok, CapCut, and Douyin. The same engine their consumer products run on, made available to enterprises.</p>
               <div class="data-excl">
-                <strong>They choose their partners.</strong> In Thailand, that partner is <strong class="excl-name">mtel × BASICWARE.</strong> No reseller marketplace. No procurement portal.
+                <strong>They choose their partners.</strong> In Thailand, that partner is <strong class="excl-name">mtel × A1P.</strong> No reseller marketplace. No procurement portal.
               </div>
             </div>
             <div class="data-stats reveal">
@@ -2653,22 +2922,47 @@
             </div>
           </div>
           <div class="data-visual reveal">
-            <img src="assets/byteplus-mtel-basicware.png" alt="ByteDance to BytePlus to mtel and basicware stack">
-            <div class="data-partner-badge">Exclusive Thailand partnership &nbsp;|&nbsp; BytePlus Enterprise</div>
+            <img src="assets/byteplus-mtel-a1p.png" alt="ByteDance to BytePlus to mtel and A1P stack">
           </div>
         </div>
-        <div class="model-strip reveal">
-          <div class="model-strip-head">
-            <span class="model-strip-label">The models you get access to</span>
-            <span class="model-strip-note">Available in Thailand exclusively through mtel × BASICWARE</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- SLIDE: THE MODELS YOU GET ACCESS TO -->
+  <div class="slide models ch-byteplus" data-state="future" data-logo="dark" data-order="4">
+    <section class="top-align">
+      <div class="container">
+        <div class="section-intro reveal">
+          <div>
+            <h2>The models <span class="accent">you get access to.</span></h2>
           </div>
-          <div class="model-chips">
-            <div class="model-chip"><strong>Seedance 1.5 Pro</strong><span>Text &amp; image to cinematic video</span></div>
-            <div class="model-chip"><strong>Seedream 5.0 Lite</strong><span>Image generation at scale</span></div>
-            <div class="model-chip"><strong>OmniHuman 1.5</strong><span>Realistic digital humans</span></div>
-            <div class="model-chip"><strong>Data Agent</strong><span>Agentic data analysis</span></div>
-            <div class="model-chip"><strong>VeCDP / DataFinder</strong><span>Customer data platform &amp; search</span></div>
-            <div class="model-chip"><strong>Global Marketing Platform</strong><span>Campaigns, globally operated</span></div>
+          <p class="lede">Using these models, you can create faster and understand deeper — the two capabilities you're about to see.</p>
+        </div>
+        <div class="model-chips reveal">
+          <div class="model-chip">
+            <div class="model-chip-icon"><img src="assets/model-seedance.svg" alt="Seedance"></div>
+            <strong>Seedance 1.5 Pro</strong><span>Text &amp; image to cinematic video</span>
+          </div>
+          <div class="model-chip">
+            <div class="model-chip-icon"><img src="assets/model-seedream.svg" alt="Seedream"></div>
+            <strong>Seedream 5.0 Lite</strong><span>Image generation at scale</span>
+          </div>
+          <div class="model-chip">
+            <div class="model-chip-icon"><img src="assets/model-omnihuman.svg" alt="OmniHuman"></div>
+            <strong>OmniHuman 1.5</strong><span>Realistic digital humans</span>
+          </div>
+          <div class="model-chip">
+            <div class="model-chip-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20V14"/><path d="M4 20h16"/></svg></div>
+            <strong>Data Agent</strong><span>Agentic data analysis</span>
+          </div>
+          <div class="model-chip">
+            <div class="model-chip-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6"/><path d="M14.5 14.5 20 20"/></svg></div>
+            <strong>VeCDP / DataFinder</strong><span>Customer data platform &amp; search</span>
+          </div>
+          <div class="model-chip">
+            <div class="model-chip-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.8 2.6 4.2 5.8 4.2 9s-1.4 6.4-4.2 9c-2.8-2.6-4.2-5.8-4.2-9s1.4-6.4 4.2-9z"/></svg></div>
+            <strong>Global Marketing Platform</strong><span>Campaigns, globally operated</span>
           </div>
         </div>
       </div>
@@ -2676,32 +2970,8 @@
   </div>
 
   <!-- SLIDE 11: TWO THINGS EVERY BUSINESS NEEDS -->
-  <div class="slide pillars-section ch-byteplus" data-state="future" data-logo="dark" data-order="11">
-    <section>
-      <div class="container">
-        <div class="reveal">
-          <h2>Two things every business needs.</h2>
-        </div>
-        <div class="two-needs">
-          <div class="need-card reveal">
-            <div class="pill-num">01</div>
-            <h3>Create Faster</h3>
-            <p>Turn a brief into production-ready content in minutes.</p>
-            <div class="need-link">See it live →</div>
-          </div>
-          <div class="need-card reveal">
-            <div class="pill-num">02</div>
-            <h3>Understand Deeper</h3>
-            <p>Turn market data into live, clear business intelligence.</p>
-            <div class="need-link">Ask it live →</div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
   <!-- SLIDE 12: CREATE FASTER DEMO -->
-  <div class="slide create-faster ch-byteplus" data-state="future" data-logo="inv" data-order="12">
+  <div class="slide create-faster ch-byteplus" data-state="future" data-logo="inv" data-order="5">
     <section>
       <div class="container">
         <div class="create-faster-layout">
@@ -2775,7 +3045,7 @@
   </div>
 
   <!-- SLIDE 13: UNDERSTAND DEEPER DEMO -->
-  <div class="slide understand ch-byteplus" data-state="future" data-logo="inv" data-order="13">
+  <div class="slide understand ch-byteplus" data-state="future" data-logo="inv" data-order="6">
     <section>
       <div class="container">
         <div class="understand-layout">
@@ -3084,64 +3354,71 @@
   </div>
 
   <!-- SLIDE 08: HOW WE WORK -->
-  <div class="slide process ch-workflow" data-state="future" data-logo="dark" data-order="8">
+  <!-- Process modal: "How does it work?" detail, opened from the automate slide -->
+  <div class="process-modal-overlay" id="processModalOverlay">
+    <div class="process-modal-box ch-workflow">
+      <button class="process-modal-close" onclick="closeProcessModal()" title="Close">✕</button>
+      <div class="section-intro">
+        <div>
+          <div class="eyebrow chapter-eyebrow">The AI workflow operator</div>
+          <h2>Audit. Automate. <span class="accent">Operate.</span></h2>
+        </div>
+        <p class="lede">We don't sell roadmaps. We run the work and hand it back when your team is ready to own it. Most engagements ship their first production AI workflow in 6 weeks.</p>
+      </div>
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="process-step-head">
+            <span class="process-step-badge">01</span>
+            <span class="process-step-label">Audit</span>
+          </div>
+          <h3>Identify where AI delivers real business value</h3>
+          <p>We map current workflows, pinpoint bottlenecks, and prioritise the AI opportunities with the fastest path to ROI.</p>
+          <ul>
+            <li>Workflow mapping & process inventory</li>
+            <li>Bottleneck and repetition analysis</li>
+            <li>ROI-prioritised opportunity stack</li>
+          </ul>
+        </div>
+        <div class="process-step">
+          <div class="process-step-head">
+            <span class="process-step-badge">02</span>
+            <span class="process-step-label">Automate</span>
+          </div>
+          <h3>Deploy AI systems that actually work in production</h3>
+          <p>We integrate automation into your stack, build the AI agents, set up knowledge retrieval and support systems.</p>
+          <ul>
+            <li>AI automation tailored to your tech stack</li>
+            <li>Internal operations AI agents</li>
+            <li>Knowledge base & retrieval systems</li>
+            <li>AI-powered customer support</li>
+          </ul>
+        </div>
+        <div class="process-step">
+          <div class="process-step-head">
+            <span class="process-step-badge">03</span>
+            <span class="process-step-label">Operate</span>
+          </div>
+          <h3>Keep it healthy, measurable, and improving</h3>
+          <p>We monitor performance and spend, manage prompts, deliver analytics, and continuously optimise as your business evolves.</p>
+          <ul>
+            <li>Performance and spend monitoring</li>
+            <li>Prompt management & testing</li>
+            <li>AI analytics and reporting</li>
+            <li>Continuous optimisation & model updates</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SLIDE 14: INDUSTRIES -->
+  <div class="slide industries ch-workflow" data-state="future" data-logo="dark" data-order="8">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
           <div>
             <div class="eyebrow chapter-eyebrow">The AI workflow operator</div>
-            <h2>Audit. Automate. <span class="accent">Operate.</span></h2>
-          </div>
-          <p class="lede">We don't sell roadmaps. We run the work and hand it back when your team is ready to own it. Most engagements ship their first production AI workflow in 6 weeks.</p>
-        </div>
-        <div class="process-steps">
-          <div class="process-step reveal">
-            <div class="process-step-num">01</div>
-            <div class="process-step-label">PHASE 01 · AUDIT</div>
-            <h3>Identify where AI delivers real business value</h3>
-            <p>We map current workflows, pinpoint bottlenecks, and prioritise the AI opportunities with the fastest path to ROI.</p>
-            <ul>
-              <li>Workflow mapping & process inventory</li>
-              <li>Bottleneck and repetition analysis</li>
-              <li>ROI-prioritised opportunity stack</li>
-            </ul>
-          </div>
-          <div class="process-step reveal">
-            <div class="process-step-num">02</div>
-            <div class="process-step-label">PHASE 02 · AUTOMATE</div>
-            <h3>Deploy AI systems that actually work in production</h3>
-            <p>We integrate automation into your stack, build the AI agents, set up knowledge retrieval and support systems.</p>
-            <ul>
-              <li>AI automation tailored to your tech stack</li>
-              <li>Internal operations AI agents</li>
-              <li>Knowledge base & retrieval systems</li>
-              <li>AI-powered customer support</li>
-            </ul>
-          </div>
-          <div class="process-step reveal">
-            <div class="process-step-num">03</div>
-            <div class="process-step-label">PHASE 03 · OPERATE</div>
-            <h3>Keep it healthy, measurable, and improving</h3>
-            <p>We monitor performance and spend, manage prompts, deliver analytics, and continuously optimise as your business evolves.</p>
-            <ul>
-              <li>Performance and spend monitoring</li>
-              <li>Prompt management & testing</li>
-              <li>AI analytics and reporting</li>
-              <li>Continuous optimisation & model updates</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-
-  <!-- SLIDE 14: INDUSTRIES -->
-  <div class="slide industries" data-state="future" data-logo="dark" data-order="14">
-    <section class="top-align">
-      <div class="container">
-        <div class="section-intro reveal">
-          <div>
             <h2>Worked across sectors.<br><span class="accent">The principles don't change.</span></h2>
           </div>
           <p class="lede">Real Estate, EV, Fintech, Entertainment, F&B, Government, and more. Same fundamentals: workflows to compress, decisions to accelerate, content to scale.</p>
@@ -3171,24 +3448,54 @@
             </div>
           </div>
         </div>
+        <div class="deploy-strip reveal">
+          <div class="deploy-strip-head">
+            <span class="deploy-strip-label">Real deployments · Measured results</span>
+            <button class="deploy-strip-btn" onclick="openCasesModal()">See full case studies <span class="deploy-strip-arrow">→</span></button>
+          </div>
+          <div class="deploy-strip-grid">
+            <div class="deploy-chip">
+              <strong>Real Estate</strong>
+              <div class="deploy-chip-stats">
+                <span><span class="up">↑40%</span> faster strategic pivots</span>
+                <span><span class="down">↓25%</span> reduction in resource waste</span>
+              </div>
+            </div>
+            <div class="deploy-chip">
+              <strong>Hospitality &amp; Retail</strong>
+              <div class="deploy-chip-stats">
+                <span>35% reduction in operational costs</span>
+                <span>150% amplified campaign ROI</span>
+              </div>
+            </div>
+            <div class="deploy-chip">
+              <strong>Operations &amp; Logistics</strong>
+              <div class="deploy-chip-stats">
+                <span>1d → 30s leave request process</span>
+                <span>7 data sources unified</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </div>
 
-
-  <!-- SLIDE 09: CASE STUDIES -->
-  <div class="slide cases ch-workflow" data-state="future" data-logo="dark" data-order="9">
-    <section class="top-align">
-      <div class="container">
-        <div class="section-intro reveal">
-          <div>
-            <div class="eyebrow chapter-eyebrow">The AI workflow operator</div>
-            <h2>Real deployments. <span class="accent">Measured results.</span></h2>
-          </div>
-          <p class="lede">Three engagements. Different industries. Same playbook: audit, build, operate, hand over.</p>
+  <!-- Case studies modal: full detail behind the "See full case studies" link on the industries slide -->
+  <div class="cases-modal-overlay" id="casesModalOverlay">
+    <div class="cases-modal-box ch-workflow">
+      <button class="cases-modal-close" onclick="closeCasesModal()" title="Close">✕</button>
+      <div class="section-intro">
+        <div>
+          <div class="eyebrow chapter-eyebrow">The AI workflow operator</div>
+          <h2>Real deployments. <span class="accent">Measured results.</span></h2>
         </div>
-        <div class="case-grid">
-          <div class="case-card reveal">
+        <p class="lede">Three engagements. Different industries. Same playbook: audit, build, operate, hand over.</p>
+      </div>
+      <div class="case-grid">
+          <div class="case-card">
+            <!-- Drop an image at assets/case-real-estate.jpg and set it as this div's background -->
+            <div class="case-image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5-5-4 4-3-3-6 6"/></svg></div>
             <div class="case-tag">REAL ESTATE</div>
             <div class="case-body">
               <div class="case-block">
@@ -3209,7 +3516,9 @@
               </div>
             </div>
           </div>
-          <div class="case-card reveal">
+          <div class="case-card">
+            <!-- Drop an image at assets/case-hospitality.jpg and set it as this div's background -->
+            <div class="case-image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5-5-4 4-3-3-6 6"/></svg></div>
             <div class="case-tag">HOSPITALITY & RETAIL</div>
             <div class="case-body">
               <div class="case-block">
@@ -3231,7 +3540,9 @@
               </div>
             </div>
           </div>
-          <div class="case-card reveal">
+          <div class="case-card">
+            <!-- Drop an image at assets/case-logistics.jpg and set it as this div's background -->
+            <div class="case-image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5-5-4 4-3-3-6 6"/></svg></div>
             <div class="case-tag">OPERATIONS & LOGISTICS</div>
             <div class="case-body">
               <div class="case-block">
@@ -3254,15 +3565,15 @@
           </div>
         </div>
       </div>
-    </section>
-  </div>
+    </div>
 
   <!-- SLIDE 15: GET STARTED -->
-  <div class="slide ways" data-state="future" data-logo="dark" data-order="15">
+  <div class="slide ways ch-launch" data-state="future" data-logo="dark" data-order="13">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
           <div>
+            <div class="eyebrow chapter-eyebrow">Getting started</div>
             <h2>Three ways to <span class="accent">start.</span></h2>
           </div>
           <p class="lede">No procurement portal. No brief template. We meet you where the problem is and bring the right capability to it.</p>
@@ -3316,11 +3627,12 @@
   </div>
 
   <!-- SLIDE 16: PRICING -->
-  <div class="slide pricing" data-state="future" data-logo="dark" data-order="16">
+  <div class="slide pricing ch-launch" data-state="future" data-logo="dark" data-order="14">
     <section class="top-align">
       <div class="container">
         <div class="section-intro reveal">
           <div>
+            <div class="eyebrow chapter-eyebrow">Getting started</div>
             <h2>We don't quote. <span class="accent">We scope.</span></h2>
           </div>
           <p class="lede">There's no catalogue price. What we build commercially depends on who you are, what you're trying to achieve, and how fast you want to get there. We talk. We scope. We agree.</p>
@@ -3341,7 +3653,7 @@
   </div>
 
   <!-- SLIDE 17: READY TO BRING AI -->
-  <div class="slide ready-ops" data-state="future" data-logo="dark" data-order="17">
+  <div class="slide ready-ops ch-launch" data-state="future" data-logo="dark" data-order="15">
     <section>
       <div class="container">
         <div class="ready-ops-shell">
@@ -3352,7 +3664,7 @@
           <div class="ready-ops-meta reveal">
             <div class="ready-ops-item">
               <div class="ready-ops-item-label">Contact</div>
-              <strong>Mtel × BASICWARE</strong>
+              <strong>Mtel × A1P</strong>
               <p>info@mtel.co.th</p>
             </div>
             <div class="ready-ops-item">
@@ -3390,9 +3702,7 @@
 </div>
 
 <!-- Slide progress bar -->
-<div class="slide-progress" id="slideProgress">
-  <div class="slide-progress-fill" id="slideProgressFill"></div>
-</div>
+<div class="slide-progress" id="slideProgress"></div>
 
 <!-- Slide overview overlay -->
 <div class="overview-overlay" id="overviewOverlay">
@@ -3432,6 +3742,7 @@
     .sort((a, b) => (parseInt(a.dataset.order, 10) || 0) - (parseInt(b.dataset.order, 10) || 0));
   const totalSlides = slides.length;
   let currentIndex = 0;
+  let progressSegs = [];
 
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
@@ -3441,19 +3752,112 @@
 
   totalSlideNumEl.textContent = String(totalSlides).padStart(2, '0');
 
-  function goToSlide(newIndex) {
+  // ============ CHAPTER INTRO: title card shown when a theme begins ============
+  const chapterIntroEl = document.getElementById('chapterIntro');
+  const chapterIntroText = document.getElementById('chapterIntroText');
+  let chapterIntroFadeInTimer = null;
+  let chapterIntroTimer = null;
+  let chapterIntroActive = false;
+  let chapterIntroCovered = false;
+  let chapterIntroOnCovered = null;
+  const chapterIntros = {
+    2: { label: 'BytePlus', key: 'byteplus' },
+    6: { label: 'AI Workflow', key: 'workflow' },
+    8: { label: 'Software House', key: 'house' }
+  };
+
+  function pulseChapterTag(key) {
+    const tagEl = document.querySelector(`.chapter-tag[data-chapter="${key}"]`);
+    if (!tagEl) return;
+    tagEl.classList.remove('pulse');
+    void tagEl.offsetWidth; // restart animation
+    tagEl.classList.add('pulse');
+    setTimeout(() => tagEl.classList.remove('pulse'), 700);
+  }
+
+  // Quick dissolve-in, a hold fully covered, then a slower dissolve-out.
+  const CHAPTER_INTRO_FADE_IN_MS = 150;
+  const CHAPTER_INTRO_HOLD_MS = 800;
+  const CHAPTER_INTRO_DISSOLVE_MS = 600;
+
+  // Dissolves the dark title card in, runs onCovered (the actual slide swap)
+  // once it's FULLY covering the screen, holds, then dissolves out to reveal
+  // the finished slide.
+  function showChapterIntro(newIndex, onCovered) {
+    const intro = chapterIntros[newIndex];
+    if (!intro) { if (onCovered) onCovered(); return; }
+    clearTimeout(chapterIntroFadeInTimer);
+    clearTimeout(chapterIntroTimer);
+    chapterIntroActive = true;
+    chapterIntroCovered = false;
+    chapterIntroOnCovered = onCovered;
+    chapterIntroText.textContent = intro.label;
+    chapterIntroEl.style.transition = `opacity ${CHAPTER_INTRO_FADE_IN_MS}ms ease`;
+    chapterIntroEl.classList.add('active');
+    pulseChapterTag(intro.key);
+    chapterIntroFadeInTimer = setTimeout(() => {
+      chapterIntroCovered = true;
+      if (chapterIntroOnCovered) chapterIntroOnCovered();
+    }, CHAPTER_INTRO_FADE_IN_MS);
+    chapterIntroTimer = setTimeout(() => {
+      chapterIntroEl.style.transition = `opacity ${CHAPTER_INTRO_DISSOLVE_MS}ms ease`;
+      chapterIntroEl.classList.remove('active');
+      chapterIntroActive = false;
+    }, CHAPTER_INTRO_FADE_IN_MS + CHAPTER_INTRO_HOLD_MS);
+  }
+
+  // If the user advances again while the title card is still covering/holding/
+  // dissolving, skip straight to the end of it: finish the slide swap it was
+  // holding for (if it hadn't fired yet) and snap the card away instantly,
+  // instead of fighting its own fade-out on the way to the next navigation.
+  function cutChapterIntro() {
+    if (!chapterIntroActive) return;
+    clearTimeout(chapterIntroFadeInTimer);
+    clearTimeout(chapterIntroTimer);
+    if (!chapterIntroCovered && chapterIntroOnCovered) chapterIntroOnCovered();
+    chapterIntroEl.style.transition = 'none';
+    chapterIntroEl.classList.remove('active');
+    void chapterIntroEl.offsetWidth; // reflow: apply the cut before any new transition is queued
+    chapterIntroActive = false;
+    chapterIntroOnCovered = null;
+  }
+
+  // forceChapterAnim: bypass the "immediately-next-slide only" rule — used by
+  // the topbar chapter links, which should always play the intro card even
+  // when jumping from far away or backwards.
+  function goToSlide(newIndex, forceChapterAnim) {
+    // A press during an in-flight transition just cuts it short and lands on
+    // the slide it was already headed to — it should not ALSO be interpreted
+    // as a request to advance further (newIndex here was computed by the
+    // caller from the pre-cut currentIndex, e.g. nextBtn's currentIndex + 1).
+    if (chapterIntroActive) { cutChapterIntro(); return; }
     if (newIndex < 0 || newIndex >= totalSlides || newIndex === currentIndex) return;
-    slides.forEach((slide, i) => {
-      if (i < newIndex) slide.dataset.state = 'past';
-      else if (i === newIndex) slide.dataset.state = 'active';
-      else slide.dataset.state = 'future';
-    });
-    currentIndex = newIndex;
-    updateUI();
-    setTimeout(() => triggerReveals(slides[newIndex]), 100);
-    if (!isPresentMode) {
-      channel.postMessage({ type: 'slide', index: newIndex });
-      try { localStorage.setItem('mtel-pitch-slide', newIndex); } catch(e) {}
+
+    function applySlideChange() {
+      slides.forEach((slide, i) => {
+        if (i < newIndex) slide.dataset.state = 'past';
+        else if (i === newIndex) slide.dataset.state = 'active';
+        else slide.dataset.state = 'future';
+      });
+      currentIndex = newIndex;
+      updateUI();
+      setTimeout(() => triggerReveals(slides[newIndex]), 100);
+      if (!isPresentMode) {
+        channel.postMessage({ type: 'slide', index: newIndex });
+        try { localStorage.setItem('mtel-pitch-slide', newIndex); } catch(e) {}
+      }
+    }
+
+    // Only animate the chapter bookend when stepping forward into the very
+    // next slide, or when explicitly requested (topbar links) — not when
+    // arriving from a later slide (e.g. going backward from 8 to 7).
+    const isSequentialForward = newIndex === currentIndex + 1;
+    const shouldAnimateChapter = isSequentialForward || forceChapterAnim;
+
+    if (shouldAnimateChapter && chapterIntros[newIndex]) {
+      showChapterIntro(newIndex, applySlideChange);
+    } else {
+      applySlideChange();
     }
   }
 
@@ -3520,8 +3924,6 @@
     });
   }
 
-  const slideProgressFill = document.getElementById('slideProgressFill');
-
   function updateUI() {
     const activeSlide = slides[currentIndex];
     // The topbar pill is a constant light surface above every slide, so the
@@ -3533,8 +3935,7 @@
       t.classList.toggle('active', t.dataset.chapter === tag);
     });
 
-    const pct = totalSlides > 1 ? (currentIndex / (totalSlides - 1)) * 100 : 100;
-    slideProgressFill.style.width = pct + '%';
+    progressSegs.forEach((seg, i) => seg.classList.toggle('reached', i <= currentIndex));
 
     if (isPresentMode) {
       return;
@@ -3553,6 +3954,8 @@
 
   document.addEventListener('keydown', (e) => {
     if (isPresentMode) return;
+    if (processModalOpen) { if (e.key === 'Escape') closeProcessModal(); return; }
+    if (casesModalOpen) { if (e.key === 'Escape') closeCasesModal(); return; }
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goToSlide(currentIndex + 1);
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goToSlide(currentIndex - 1);
     if (e.key === 'Escape') closeOverview();
@@ -3603,37 +4006,58 @@
 
   // ============ SLIDE TITLES, TAGS & NOTES ============
   const slideTitles = [
-    'Cover', 'Three Capabilities, One Partner', 'What We Build', 'No UX Without the U',
-    'Research. Diagnose. Design. Test.', 'Built. Shipped. Still Running.', 'What We Automate',
-    'Audit. Automate. Operate.', 'Real Deployments. Measured Results.', 'The Stack, Exclusively',
-    'Two Things Every Business Needs', 'Create Faster', 'Understand Deeper', 'Worked Across Sectors',
-    'Three Ways to Start', 'We Don\'t Quote. We Scope.', 'Ready to Bring AI'
+    'Cover', 'Three Capabilities, One Partner', 'The Stack, Exclusively',
+    'Create Faster', 'Understand Deeper',
+    'What We Automate', 'Worked Across Sectors',
+    'Scalable, Human, Future-Ready', 'No UX Without the U', 'Research. Diagnose. Design. Test.',
+    'Built. Shipped. Still Running.', 'Three Ways to Start', 'We Don\'t Quote. We Scope.',
+    'Ready to Bring AI'
   ];
 
   const slideTags = [
-    'neutral', 'neutral', 'house', 'house',
-    'house', 'house', 'workflow',
-    'workflow', 'workflow', 'byteplus',
-    'byteplus', 'byteplus', 'byteplus', 'neutral',
+    'neutral', 'neutral', 'byteplus',
+    'byteplus', 'byteplus',
+    'workflow', 'workflow',
+    'house', 'house', 'house', 'house',
     'neutral', 'neutral', 'neutral'
   ];
 
+  // Broader grouping for the overview grid's tag pill — About / chapter / Get Started.
+  const slideGroups = [
+    'about', 'about', 'byteplus',
+    'byteplus', 'byteplus',
+    'workflow', 'workflow',
+    'house', 'house', 'house', 'house',
+    'getstarted', 'getstarted', 'getstarted'
+  ];
+
+  // Segmented progress rail — one block per slide, colored by chapter, lit up as reached.
+  const chapterSegColors = {
+    byteplus: 'var(--ch-byteplus)', workflow: 'var(--ch-workflow)',
+    house: 'var(--ch-house)', neutral: 'var(--yellow)'
+  };
+  const slideProgressEl = document.getElementById('slideProgress');
+  progressSegs = slideTags.map((tag) => {
+    const seg = document.createElement('div');
+    seg.className = 'progress-seg';
+    seg.style.setProperty('--seg-color', chapterSegColors[tag]);
+    slideProgressEl.appendChild(seg);
+    return seg;
+  });
+
   const slideNotes = [
-    'Open with the partnership. mtel builds and operates; basicware brings the BytePlus stack. Keep it high-level.',
-    'Three capabilities under one roof. Emphasize that they compound: software + automation + intelligence, together. Each maps to a chapter that follows.',
-    'Software House chapter opens. 15+ years of shipped platforms. The logo wall is the proof — name a recognizable client if the audience knows them.',
-    'Why UX comes first. Design determines how many AI mistakes the user never sees. $1 spent on UX fixes what would cost $100 later in dev — Forrester.',
-    'Four-stage method: Research, Diagnose, Design, Test. 55% of defects trace to bad requirements (Basili & Boehm). 70% of rework is avoidable (Boehm). Testing with real people catches problems before the build.',
-    'Software house track record. Walk the cases as delivery stories: shipped, running, measured. Keep to software delivery metrics — this is the foundation chapter.',
-    'AI Workflow chapter opens. We do not sell tools; we return hours. Workflows are the unit of work, not features.',
-    'The three-phase engine. Audit the workflow, automate the repeatable parts, then operate and measure. First production workflow typically live within 6 weeks.',
-    'Real deployments with measured results. Hour counts, cycle-time cuts, cost per task. Ask which workflow pains them most before the slide.',
-    'BytePlus is the enterprise AI division of ByteDance. TikTok, CapCut, Douyin prove what the models train on. Exclusivity is real: mtel × basicware is the only route to this stack in Thailand. The model strip shows what they get access to.',
-    'Everything in the deck serves two needs: create faster, understand deeper. The two demos that follow answer both.',
+    'Open with the partnership. mtel builds and operates; A1P brings the BytePlus stack. Keep it high-level.',
+    'Three capabilities under one roof. Emphasize that they compound: intelligence + automation + software, together. Each maps to a chapter that follows.',
+    'BytePlus is the enterprise AI division of ByteDance. TikTok, CapCut, Douyin prove what the models train on. Exclusivity is real: mtel \u00d7 A1P is the only route to this stack in Thailand. The model strip shows what they get access to.',
     'Live demo moment. Describe it, see it. Type a prompt or let the typewriter run, then walk through the featured video and the creative directions from one brief.',
     'Second demo: intelligence. Click a pill and let the report regenerate live. Emphasize real-time signals, no analyst needed.',
-    'Ask which industry they are in before this slide, then jump straight to their tab.',
-    'Three entry points — intelligence report, problem statement, or workflow audit. Then the partnership path: we run it, embed it, hand it over. Most clients own it within 12 months.',
+    'AI Workflow chapter opens. We do not sell tools; we return hours. Workflows are the unit of work, not features. Click "How does it work?" to walk through the Audit, Automate, Operate phases in the modal if they want the detail.',
+    'Ask which industry they are in before this slide, then jump straight to their tab. The strip below shows headline metrics for three deployments — click "See full case studies" for the full challenge, build, and results detail in the modal if they want the depth.',
+    'Software House chapter opens. The three pillars \u2014 scalable, human, future-ready \u2014 set up everything that follows in this chapter.',
+    'Why UX comes first. Design determines how many AI mistakes the user never sees. $1 spent on UX fixes what would cost $100 later in dev \u2014 Forrester.',
+    'Four-stage method: Research, Diagnose, Design, Test. 55% of defects trace to bad requirements (Basili & Boehm). 70% of rework is avoidable (Boehm). Testing with real people catches problems before the build.',
+    'Software house track record. Walk the cases as delivery stories: shipped, running, measured. Keep to software delivery metrics \u2014 this is the foundation chapter.',
+    'Three entry points \u2014 intelligence report, problem statement, or workflow audit. Then the partnership path: we run it, embed it, hand it over. Most clients own it within 12 months.',
     'No catalogue price. The scope comes from the conversation. Set up the close by focusing on the business problem, not procurement.',
     'Closing CTA. No form, no brief, just a conversation about what is costing them hours and what it is worth to get those hours back.'
   ];
@@ -3643,10 +4067,15 @@
   const overviewList = document.getElementById('overviewList');
   let overviewOpen = false;
 
+  const groupLabels = {
+    about: 'About', byteplus: 'BytePlus', workflow: 'AI Workflow',
+    house: 'Software House', getstarted: 'Get Started'
+  };
+
   function buildOverview() {
     overviewList.innerHTML = slideTitles.map((title, i) => {
-      const tag = slideTags[i];
-      const tagLbl = tag === 'neutral' ? '' : `<span class="ov-tag ov-tag--${tag}">${tag === 'house' ? 'Software House' : tag === 'workflow' ? 'AI Workflow' : 'BytePlus'}</span>`;
+      const group = slideGroups[i];
+      const tagLbl = `<span class="ov-tag ov-tag--${group}">${groupLabels[group]}</span>`;
       return `
       <div class="overview-item${i === currentIndex ? ' ov-active' : ''}" onclick="goToSlide(${i});closeOverview();">
         <span class="ov-num">${String(i + 1).padStart(2, '0')}</span>
@@ -3670,6 +4099,51 @@
 
   overviewOverlay.addEventListener('click', (e) => {
     if (e.target === overviewOverlay) closeOverview();
+  });
+
+  // ============ PROCESS MODAL: "How does it work?" ============
+  const processModalOverlay = document.getElementById('processModalOverlay');
+  let processModalOpen = false;
+
+  function openProcessModal() {
+    processModalOverlay.classList.add('open');
+    // Double rAF so the display:flex paints before opacity/transform transition in.
+    requestAnimationFrame(() => requestAnimationFrame(() => processModalOverlay.classList.add('visible')));
+    processModalOpen = true;
+  }
+
+  function closeProcessModal() {
+    processModalOverlay.classList.remove('visible');
+    processModalOpen = false;
+    setTimeout(() => {
+      if (!processModalOpen) processModalOverlay.classList.remove('open');
+    }, 300);
+  }
+
+  processModalOverlay.addEventListener('click', (e) => {
+    if (e.target === processModalOverlay) closeProcessModal();
+  });
+
+  // ============ CASE STUDIES MODAL: "See full case studies" ============
+  const casesModalOverlay = document.getElementById('casesModalOverlay');
+  let casesModalOpen = false;
+
+  function openCasesModal() {
+    casesModalOverlay.classList.add('open');
+    requestAnimationFrame(() => requestAnimationFrame(() => casesModalOverlay.classList.add('visible')));
+    casesModalOpen = true;
+  }
+
+  function closeCasesModal() {
+    casesModalOverlay.classList.remove('visible');
+    casesModalOpen = false;
+    setTimeout(() => {
+      if (!casesModalOpen) casesModalOverlay.classList.remove('open');
+    }, 300);
+  }
+
+  casesModalOverlay.addEventListener('click', (e) => {
+    if (e.target === casesModalOverlay) closeCasesModal();
   });
 
   // ============ PRESENTER MODE ============
@@ -4711,7 +5185,7 @@
       ctx.fillStyle = '#1A1A4E';
       ctx.font      = '700 8.5px "DM Sans", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('MTEL × BASICWARE', cx + 5, cy + 3.5);
+      ctx.fillText('MTEL × A1P', cx + 5, cy + 3.5);
 
       rafId = requestAnimationFrame(frame);
     }
