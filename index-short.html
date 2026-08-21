@@ -2570,16 +2570,16 @@
     display: flex; align-items: center; gap: 11px;
     width: 100%; text-align: left;
     background: #f8f5f3; border: none; border-radius: 11px;
-    padding: 6px 13px;
+    padding: 16px 13px;
     font-family: inherit; cursor: pointer;
     transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
   }
   .xc-card-icon { flex-shrink: 0; width: 34px; height: 40px; border-radius: 7px; overflow: hidden; }
   .xc-card-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .xc-card-body { display: flex; flex-direction: column; min-width: 0; }
-  .xc-card-body strong { font-size: 12px; font-weight: 700; color: var(--navy); letter-spacing: -0.1px; line-height: 1.2; }
+  .xc-card-body strong { font-size: 14px; font-weight: 700; color: var(--navy); letter-spacing: -0.1px; line-height: 1.22; }
   .xc-card-desc {
-    font-size: 10.2px; line-height: 1.28; color: var(--body); margin-top: 1px;
+    font-size: 12px; line-height: 1.32; color: var(--body); margin-top: 1px;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
   /* Connector node — present at rest (the "this connects to something"
@@ -2627,7 +2627,7 @@
     background: var(--yellow); border-color: var(--yellow);
     box-shadow: 0 0 0 5px rgba(245,197,24,0.22);
   }
-  .xc-card[data-xc-state="unavailable"] { opacity: 0.4; pointer-events: none; cursor: default; }
+  .xc-card[data-xc-state="unavailable"] { opacity: 0.4; }
   .xc-card[data-xc-state="sibling"] { opacity: 0.6; }
   .xc-card[data-xc-state="unavailable"] .xc-card-icon img,
   .xc-card[data-xc-state="sibling"] .xc-card-icon img,
@@ -2695,10 +2695,10 @@
     .xc-panel { padding: 14px 18px; }
     .xc-panel-head { margin-bottom: 8px; }
     .xc-grid { gap: 5px; }
-    .xc-card { padding: 6px 10px; gap: 9px; }
+    .xc-card { padding: 16px 10px; gap: 9px; }
     .xc-card-icon { width: 30px; height: 36px; }
-    .xc-card-body strong { font-size: 11px; }
-    .xc-card-desc { font-size: 9.5px; -webkit-line-clamp: 1; }
+    .xc-card-body strong { font-size: 12.5px; }
+    .xc-card-desc { font-size: 11px; -webkit-line-clamp: 1; }
     .xc-result { margin-top: 10px; padding: 10px 20px; min-height: 90px; }
     .xc-result-title { font-size: 15px; margin-bottom: 3px; }
     .xc-result-line { font-size: 11.5px; }
@@ -4578,12 +4578,11 @@
         const state = cardState(panel, cardId);
         el.dataset.xcState = state;
         el.setAttribute('aria-pressed', state === 'selected' ? 'true' : 'false');
+        el.removeAttribute('aria-disabled');
         if (state === 'unavailable') {
           const otherPanel = panel === 'automate' ? 'create' : 'automate';
-          el.setAttribute('aria-disabled', 'true');
-          el.title = 'No pairing with ' + LABELS[otherPanel][selected[otherPanel]];
+          el.title = 'Tap to disconnect from ' + LABELS[otherPanel][selected[otherPanel]] + ' and select this instead';
         } else {
-          el.removeAttribute('aria-disabled');
           el.removeAttribute('title');
         }
       });
@@ -4708,12 +4707,27 @@
 
     function select(panel, cardId) {
       const state = cardState(panel, cardId);
-      if (state === 'unavailable') return;
+      const otherPanel = panel === 'automate' ? 'create' : 'automate';
       if (state === 'selected') {
         selected[panel] = null;
       } else {
+        // Tapping a card that doesn't pair with the opposite panel's current
+        // selection cuts that connection — the other side resets and this
+        // tap becomes the new anchor, ready for a fresh pairing.
+        if (state === 'unavailable') {
+          selected[otherPanel] = null;
+        }
         selected[panel] = cardId;
         if (!demoRunning) track('crossconnect_card_select', { panel: panel, card: cardId });
+        // If this pick has exactly one valid partner on the other side,
+        // and that side is empty, complete the connection automatically.
+        if (!selected[otherPanel]) {
+          const options = PAIRINGS.filter((p) => p[panel] === cardId).map((p) => p[otherPanel]);
+          if (options.length === 1) {
+            selected[otherPanel] = options[0];
+            if (!demoRunning) track('crossconnect_card_select', { panel: otherPanel, card: options[0] });
+          }
+        }
       }
       render();
     }
