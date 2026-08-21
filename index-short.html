@@ -3241,6 +3241,7 @@
   const currentSlideNum = document.getElementById('currentSlideNum');
   const totalSlideNumEl = document.getElementById('totalSlideNum');
   const logoEl = document.getElementById('logoEl');
+  const logoImgEl = logoEl.querySelector('img');
 
   totalSlideNumEl.textContent = String(totalSlides).padStart(2, '0');
 
@@ -3415,8 +3416,11 @@
   function updateUI() {
     const activeSlide = slides[currentIndex];
     // The topbar pill is a constant light surface above every slide, so the
-    // logo keeps a single dark rendition regardless of the slide's own theme.
+    // logo keeps a single dark rendition regardless of the slide's own theme
+    // — except the last slide, whose yellow background swallows the logo's
+    // yellow "m", so it swaps to the all-white mark there instead.
     logoEl.className = 'logo';
+    logoImgEl.src = currentIndex === totalSlides - 1 ? 'logo_white.png' : 'mtel logo.png';
 
     const tag = slideTags[currentIndex];
     document.querySelectorAll('.chapter-tag').forEach((t) => {
