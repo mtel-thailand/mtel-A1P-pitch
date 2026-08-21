@@ -84,15 +84,8 @@
 
   /* ============ TOP BAR: LOGO + PERSISTENT CHAPTER TAG ============ */
   .topbar {
-    position: fixed; top: 22px; left: 50%; transform: translateX(-50%); z-index: 250;
+    position: fixed; top: 54px; left: 50%; transform: translateX(-50%); z-index: 250;
     display: flex; align-items: center; gap: 0;
-    background: rgba(255,255,255,0.78);
-    border: 1px solid rgba(26,26,78,0.10);
-    border-radius: 999px;
-    padding: 14px 24px 14px 28px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 1px 3px rgba(26,26,78,0.05), 0 6px 20px rgba(26,26,78,0.08);
   }
   .topbar .logo {
     display: inline-flex; align-items: center; cursor: pointer;
@@ -150,7 +143,7 @@
   }
   .chapter-tag.pulse { animation: chapterTagPulse 0.6s ease; }
   @media (max-width: 768px) {
-    .topbar { top: 16px; }
+    .topbar { top: 48px; }
     .chapter-tags { display: none; }
   }
 
@@ -2535,7 +2528,7 @@
   .automate .automate-head .lede { max-width: 640px; margin: 0 auto; }
   .ai-card-stage {
     display: flex; flex-direction: column; align-items: center;
-    margin-top: 20px;
+    margin-top: 8px;
     /* Large relative to the card so tilting doesn't stretch the text
        texture much at the edges — the single biggest lever against blurry
        type while a 3D transform is live. Sized up further to help absorb
@@ -2543,9 +2536,41 @@
        perspective, which is what makes rotated text look soft). */
     perspective: 4600px;
   }
-  .ai-card-float {
+  /* .ai-card-rig is the pendulum: it pivots from its own top-center, so the
+     ribbon (drawn inside it, above the card) and the card swing together as
+     one rigid body around that anchor point. JS (aiFlipCard) drives its
+     rotate()/translateX() every frame from a small spring-damper sim, not a
+     CSS transition — a transition would ease toward each new pointer sample
+     instantly and never overshoot/settle the way something hanging under
+     gravity actually does. */
+  .ai-card-rig {
     position: relative;
     width: min(1360px, 100%);
+    transform-origin: 50% 0%;
+    will-change: transform;
+  }
+  .ai-card-ribbon {
+    position: relative;
+    width: 14px; height: 48px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #2a2a6e 0%, var(--navy) 100%);
+    border-radius: 1px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 4px 10px rgba(15,15,50,0.18);
+  }
+  .ai-card-ribbon::before {
+    content: '';
+    position: absolute; left: 50%; top: -8px; transform: translateX(-50%);
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--yellow);
+    box-shadow: 0 2px 5px rgba(15,15,50,0.28), inset 0 1px 1px rgba(255,255,255,0.6);
+  }
+  .ai-card-ribbon::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: inherit;
+    background: linear-gradient(90deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 70%, rgba(0,0,0,0.12) 100%);
+  }
+  .ai-card-float {
+    position: relative;
     animation: aiCardFloat 8s ease-in-out infinite;
   }
   .ai-card-tilt {
@@ -2570,22 +2595,36 @@
   .ai-card-face {
     grid-area: 1 / 1;
     position: relative;
+    /* z-index (any value, even 0) turns this into a stacking context of its
+       own — required for the shine pseudo-element's negative z-index below
+       to be trapped behind this card's normal content instead of escaping
+       to compete with unrelated elements elsewhere on the page. */
+    z-index: 0;
     overflow: hidden;
     max-height: 70vh;
     backface-visibility: hidden; -webkit-backface-visibility: hidden;
-    border-radius: 20px; padding: 34px 44px 48px;
+    border-radius: 20px; padding: 30px 44px 40px;
     box-shadow: 0 60px 100px rgba(15,15,50,0.12), 0 20px 40px rgba(15,15,50,0.07), 0 6px 14px rgba(15,15,50,0.05);
   }
   /* Specular highlight — a soft light patch that drifts toward the JS-set
      --ai-shine-x/--ai-shine-y position (driven by the same pointer data as
      the tilt), so the glare visibly moves across the surface as the card
-     "tilts", reinforcing the 3D read independent of the rotation itself. */
-  .ai-card-face::after {
-    content: ''; position: absolute; inset: -25%; border-radius: inherit;
+     "tilts", reinforcing the 3D read independent of the rotation itself.
+     z-index:-1 (not source order / ::before vs ::after) is what actually
+     keeps this behind the item cards and icons: an absolutely positioned
+     pseudo-element paints in the "positioned descendants" layer above ALL
+     static in-flow content regardless of whether it's ::before or ::after,
+     so source order alone doesn't control it. Negative z-index is the only
+     thing that sinks it below the item cards while staying above the plain
+     card background (see .ai-card-face's z-index:0 above, which traps it
+     inside this card's own stacking context) — without that, this washes
+     out the icon images sitting on top of it with a white blend. */
+  .ai-card-face::before {
+    content: ''; position: absolute; inset: -25%; z-index: -1; border-radius: inherit;
     background: radial-gradient(circle at var(--ai-shine-x, 50%) var(--ai-shine-y, 12%), rgba(255,255,255,0.65), rgba(255,255,255,0) 52%);
     mix-blend-mode: overlay; pointer-events: none;
   }
-  .ai-card-back::after {
+  .ai-card-back::before {
     background: radial-gradient(circle at var(--ai-shine-x, 50%) var(--ai-shine-y, 12%), rgba(255,255,255,0.32), rgba(255,255,255,0) 52%);
   }
   .ai-card-front { background: var(--white); }
@@ -2605,7 +2644,7 @@
   .ai-card-item strong { display: block; font-size: 15.5px; font-weight: 700; color: var(--navy); margin-bottom: 4px; letter-spacing: -0.2px; }
   .ai-card-item p { font-size: 12.5px; line-height: 1.42; color: var(--body); margin: 0; }
   .ai-card-flip-btn {
-    margin-top: 22px;
+    margin-top: 14px;
     display: inline-flex; align-items: center; gap: 10px;
     border: none; border-radius: 999px;
     background: var(--yellow); color: var(--navy);
@@ -2627,6 +2666,7 @@
     .automate .automate-head h2 { margin-bottom: 4px; }
     .automate .automate-head .lede { display: none; }
     .ai-card-stage { margin-top: 8px; }
+    .ai-card-ribbon { height: 34px; }
     .ai-card-head-row { margin-bottom: 8px; }
     .ai-card-face { padding: 18px 28px 24px; }
     .ai-card-title { font-size: clamp(22px, 2.6vw, 30px); }
@@ -2892,7 +2932,9 @@
           <p class="lede">Same partner, same operating model — one half gives your team back its hours, the other gives your brand a production line.</p>
         </div>
         <div class="ai-card-stage reveal">
-          <div class="ai-card-float">
+          <div class="ai-card-rig" id="aiCardRig">
+            <div class="ai-card-ribbon" aria-hidden="true"></div>
+            <div class="ai-card-float">
             <div class="ai-card-tilt" id="aiCardTilt">
               <div class="ai-card-flip" id="aiCardFlip">
                 <div class="ai-card-face ai-card-front">
@@ -2961,6 +3003,7 @@
                 </div>
               </div>
             </div>
+            </div>
           </div>
           <button class="ai-card-flip-btn" id="aiCardFlipBtn" type="button">
             <svg class="ai-card-flip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2.1l4 4-4 4"/><path d="M3 12.6v-1a4 4 0 0 1 4-4h14"/><path d="M7 21.9l-4-4 4-4"/><path d="M21 11.4v1a4 4 0 0 1-4 4H3"/></svg>
@@ -2976,7 +3019,7 @@
     <section class="top-align">
       <div class="container">
         <div class="automate-head reveal">
-          <h2>Twenty ways <span class="accent">we've delivered.</span></h2>
+          <h2>So many ways <span class="accent">we've delivered.</span></h2>
           <p class="lede">Software builds and AI deployments, side by side. Hover left or right to browse, tap a card for the full story.</p>
         </div>
         <div class="pf-stack-outer reveal">
@@ -3426,106 +3469,124 @@
 
   // ============ PORTFOLIO GRID + MODAL: "Selected work" ============
   const portfolioCases = [
-    { id: 'onebangkok', sector: 'Real Estate', title: 'One Bangkok', kind: 'software', hero: 'assets-cases-short/case-03.png', photo: true,
-      short: 'A resident and tenant super-app for Bangkok’s largest mixed-use development.',
-      challenge: 'One Bangkok needed a single app to run building access, services, and daily tenant life across multiple towers and a large public podium.',
-      built: 'A tenant super-app covering building operations, amenities, and daily services for the One Bangkok community.',
-      bullets: ['Digital access card & elevator call', 'Visitor access management', 'EV shuttle, parking & AQI monitoring', 'Amenity booking & building news'] },
-    { id: 'fleetco-manager', sector: 'Fleet & Logistics', title: 'FleetCo Manager', kind: 'software', hero: 'assets-cases-short/mock_case_01.png', photo: true,
-      short: 'Fleet management dashboard for rental companies — all in one place.',
-      bullets: ['Live rental & revenue overview', 'Vehicle & customer management', 'Invoicing & reports', 'Recent activity feed'] },
-    { id: 'littlegenius', sector: 'Education', title: 'Little Genius', kind: 'software', hero: 'assets-cases-short/mock_case_02.png', photo: true,
-      short: 'Fun learning app for kids aged 4–8 — learn, play and grow every day.',
-      bullets: ['Math, Reading, Science & Art modules', 'Daily missions & rewards', 'Progress tracking for parents'] },
-    { id: 'calmind', sector: 'Wellness', title: 'CalMind', kind: 'software', hero: 'assets-cases-short/mock_case_03.png', photo: true,
-      short: 'Guided meditations and mindfulness for a calmer you.',
-      bullets: ['Guided meditation library', 'Sleep, anxiety & focus sessions', 'Daily calm reminders'] },
-    { id: 'financedash', sector: 'Fintech', title: 'Finance Dash', kind: 'ai', hero: 'assets-cases-short/mock_case_04.png', photo: true,
-      short: 'A smart dashboard for personal finance — see your money, grow your future.',
-      bullets: ['Balance, income & expense overview', 'Spending breakdown by category', 'Expense trend charts'] },
-    { id: 'triply', sector: 'Travel', title: 'Triply', kind: 'software', hero: 'assets-cases-short/mock_case_05.png', photo: true,
-      short: 'An all-in-one trip planner — plan, organize and explore with ease.',
-      bullets: ['Destination search & itineraries', 'Trip timeline & bookings', 'Interactive maps'] },
-    { id: 'cookiedoh', sector: 'Food & Retail', title: 'Cookie DOH!', kind: 'software', hero: 'assets-cases-short/mock_case_06.png', photo: true,
-      short: 'E-commerce app for a gourmet cookie brand — ordering made sweet and simple.',
-      bullets: ['Product catalog & ordering', 'Best-seller highlights', 'Cart & checkout flow'] },
-    { id: 'moov', sector: 'Entertainment', title: 'MOOV', kind: 'software', hero: 'assets-cases-short/case-05.png', photo: true,
-      short: 'MOOV Music App — discover, listen, and live, connecting fans to artists and events.',
-      challenge: 'MOOV wanted a personal music companion that goes beyond streaming into live events and fan experiences.',
-      built: 'A music streaming app with personalization, event discovery, and immersive artist experiences.',
-      bullets: ['Streaming & smart recommendations', 'Concert & event discovery', 'Curated playlists & top charts', 'Immersive MOOV Experience features'] },
-    { id: 'thinkacademy', sector: 'Education', title: 'think! academy', kind: 'software', hero: 'assets-cases-short/mock_case_08.png', photo: true,
-      short: 'A modern learning platform for students to learn, track progress and achieve goals.',
-      bullets: ['Course library & lessons', 'Progress tracking & certificates', 'Offline access'] },
-    { id: 'flowwork', sector: 'Productivity', title: 'FlowWork', kind: 'ai', hero: 'assets-cases-short/mock_case_09.png', photo: true,
-      short: 'Project management web app — helping teams plan, collaborate and deliver efficiently.',
-      bullets: ['Project dashboard & timeline', 'Task management', 'Team activity & reporting'] },
-    { id: 'bloom', sector: 'Wellness', title: 'Bloom', kind: 'ai', hero: 'assets-cases-short/mock_case_12.png', photo: true,
-      short: 'Guided meditations, mood tracking and habit building for a healthier mind.',
-      bullets: ['Mood check-ins & journaling', 'Daily mindfulness sessions', 'Habit progress tracking'] },
-    { id: 'fleetco-logistics', sector: 'Fleet & Logistics', title: 'FleetCo Logistics', kind: 'ai', hero: 'assets-cases-short/mock_case_13.png', photo: true,
-      short: 'Real-time fleet monitoring, route optimization and analytics for smarter operations.',
-      bullets: ['Live vehicle tracking & routes', 'Delivery & on-time rate monitoring', 'Alerts & performance analytics'] },
-    { id: 'learnify', sector: 'Education', title: 'Learnify', kind: 'software', hero: 'assets-cases-short/mock_case_14.png', photo: true,
-      short: 'Engaging online courses, progress tracking and certificates on the go.',
-      bullets: ['Course catalog & progress bars', 'Lesson checklists', 'Certificates on completion'] },
-    { id: 'wanderly', sector: 'Travel', title: 'Wanderly', kind: 'software', hero: 'assets-cases-short/mock_case_16.png', photo: true,
-      short: 'Plan smarter trips with personalized itineraries, collaborative lists and real-time updates.',
-      bullets: ['Personalized trip itineraries', 'Collaborative trip lists', 'Real-time travel updates'] },
-    { id: 'mcdonalds', sector: 'Services', title: "McDonald's", kind: 'software', hero: 'assets-cases-short/case-04.png', photo: true,
-      short: 'McDonald’s Delivery & Privilege Platform, live since October 2018.',
-      challenge: 'McDonald’s needed a mobile ordering and loyalty platform to run delivery, promotions, and rewards at national scale.',
-      built: 'A delivery and privilege mobile platform handling ordering, McDelivery, catering, and loyalty campaigns.',
-      bullets: ['McDelivery ordering & remote order', 'Loyalty points & redeemable privileges', 'Promotions & bundle campaigns', 'Order tracking & digital receipts'] },
-    { id: 'anantara', sector: 'Services', title: 'Anantara', kind: 'software', hero: 'assets-cases-short/case-01.png', photo: true,
-      short: 'Anantara Concorso Roma — a bespoke event app for a luxury automotive heritage festival.',
-      challenge: 'Anantara needed a premium digital companion for an invite-only concours d’elegance in Rome, presented with UBS.',
-      built: 'A luxury event app covering the full guest journey — schedule, judging, and judge profiles.',
-      bullets: ['Live event programme & schedule', 'Concorso judging updates', 'Judge & entrant profiles', 'Presented-by sponsor integration (UBS)'] },
-    { id: 'aot', sector: 'Government', title: 'AOT', kind: 'software', hero: 'logo/Logo-Other-AOT.svg',
-      short: '[One-line what we did.]',
-      challenge: '[What was broken.]', built: '[What we delivered.]', results: ['[Metric] [label]', '[Metric] [label]', '[Metric] [label]'] },
-    { id: 'yohomall', sector: 'Services', title: 'YOHO Mall × HSBC', kind: 'ai', hero: 'assets-cases-short/case-02.png', photo: true,
-      short: 'An AI digital-human concierge kiosk deployed across YOHO Mall, backed by HSBC.',
-      challenge: 'YOHO Mall wanted an always-on concierge that could answer shopper questions in-language without staffing every kiosk.',
-      built: 'An AI-powered digital human kiosk that answers shopper questions, surfaces the store directory, and hands out QR promotions.',
-      bullets: ['Conversational AI digital human', 'Store directory & directions', 'Multi-language support', 'QR-code coupon hand-off'] },
-    { id: 'ministryofindustry', sector: 'Government', title: 'Ministry of Industry', kind: 'software', hero: 'logo/Logo-Other-Ministryofindustry.svg',
-      short: '[One-line what we did.]',
-      challenge: '[What was broken.]', built: '[What we delivered.]', results: ['[Metric] [label]', '[Metric] [label]', '[Metric] [label]'] },
-    { id: 'police', sector: 'Government', title: 'Royal Thai Police', kind: 'software', hero: 'logo/Logo-Other-Police.svg',
-      short: '[One-line what we did.]',
-      challenge: '[What was broken.]', built: '[What we delivered.]', results: ['[Metric] [label]', '[Metric] [label]', '[Metric] [label]'] }
+    { id: 'onebangkok', sector: 'Proptech', title: 'One Bangkok', kind: 'software', hero: 'assets-cases-short/Case_1.png', photo: true,
+      short: "Resident and tenant super-app for Bangkok's largest mixed-use development.",
+      challenge: "One Bangkok brings residents, office tenants, retailers and visitors onto a single estate, each group with different needs and separate service touchpoints. Access, facilities, payments and communications risked being spread across disconnected tools.",
+      built: "We designed and built a single super-app covering the whole development — resident and tenant onboarding, digital access, facility and amenity booking, service requests, billing and estate-wide announcements — on one platform with role-based experiences.",
+      bullets: ['One app serving residents, tenants and visitors across the entire development', 'Digital access and facility booking replacing manual, counter-based processes', 'Service requests and announcements centralised for the estate management team', 'Scalable platform designed to absorb new buildings and services as the district opens'] },
+    { id: 'minorhotel', sector: 'Hospitality', title: 'Minor Hotel', kind: 'software', hero: 'assets-cases-short/Case_2.png', photo: true,
+      short: "Event companion app for Anantara's heritage car show, built in React Native for iOS and Android.",
+      challenge: "Anantara needed a digital companion for a heritage car show event that matched the brand's luxury positioning. A standard event app could not carry the vintage, Italian aesthetic the occasion called for, and the audience was international and split across both mobile platforms.",
+      built: "We designed and developed a mobile app reflecting Anantara's luxury brand with a vintage, Italian aesthetic, and built it in React Native to hold app quality consistent across platforms. Booking, schedule and gallery features were integrated to support engagement throughout the event.",
+      bullets: ['Smooth, visually rich experience aligned with the feel of a heritage car show', 'Booking, schedule and gallery in one app to support event engagement', 'Consistent quality on iOS and Android from a single React Native codebase', 'Enhanced international reach and brand prestige through digital sophistication'] },
+    { id: 'flowyachtclub', sector: 'Luxury', title: 'Flow Yacht Club', kind: 'software', hero: 'assets-cases-short/Case_3.png', photo: true,
+      short: 'Fractional yacht ownership and booking platform with yield optimisation for owners and members.',
+      challenge: 'Flow Yacht Club runs on fractional ownership, where owners and members draw on the same limited fleet. Without an intelligent reservation system, booking conflicts, under-used yachts and manually handled concierge requests would cap both member satisfaction and owner returns.',
+      built: 'We developed a fractional yacht ownership and booking platform serving both sides: an intelligent reservation system with calendar sync, availability tracking and yield optimisation; member profiles with a personalised request system for luxury experiences; and an owner dashboard for real-time monitoring of yacht usage, ROI and bookings.',
+      bullets: ['Intelligent reservation system with calendar sync and availability tracking', 'Yield optimisation improving fleet utilisation and owner returns', 'Personalised luxury request handling through member profiles', 'Real-time visibility of usage, ROI and bookings for owners', 'Streamlined operations and an elevated premium booking experience through smart automation'] },
+    { id: 'sansiri', sector: 'Hospitality', title: 'Sansiri', kind: 'software', hero: 'assets-cases-short/Case_4.png', photo: true,
+      short: "Revamped juristic chat, parcel delivery and news feed back-office for Sansiri's residential platform.",
+      challenge: "Sansiri's residential service tools had aged. Juristic chat created heavy administrative workload for property management teams, the parcel delivery flow frustrated tenants, and the back-office could not support deep-linking or tracking for its news feed.",
+      built: 'We revamped three areas of the platform: juristic chat, with key features to increase the efficiency and productivity of administrative work; parcel delivery, rebuilt around the tenant’s experience; and back-office news feed management, extended to support deep-linking and tracking.',
+      bullets: ['Faster, less manual administrative work for juristic teams', 'Improved tenant experience for parcel notification and collection', 'News feed back-office supporting deep-linking and campaign tracking', 'A more maintainable base for future resident-facing features'] },
+    { id: 'sharge', sector: 'EV', title: 'SHARGE', kind: 'software', hero: 'assets-cases-short/Case_5.png', photo: true,
+      short: 'EV charging software infrastructure — helped secure Series A and reach top-5 network share in Thailand.',
+      challenge: 'Sharge was scaling an EV charging network in an early-stage Thai market. Growth depended on both the software infrastructure to run and expand the network, and the technical credibility to raise institutional funding.',
+      built: 'We acted as the client’s technical advisor and helped build the software infrastructure underpinning the expansion of their EV ecosystem, covering the platform layer connecting charging hardware, drivers and operators.',
+      bullets: ['Assisted the client as technical advisor and helped secure Series A investment', 'Helped build the software infrastructure to expand the EV ecosystem', 'As of 2022, Sharge held top-5 market share in Thailand by number of EV stations'] },
+    { id: 'swapandgo', sector: 'EV', title: 'Swap & Go', kind: 'software', hero: 'assets-cases-short/Case_6.png', photo: true,
+      short: 'Battery-swap app for EV riders — Phase 1 proof of concept with 24-hour self-service lockers.',
+      challenge: 'Swap & Go needed to prove that battery swapping for electric motorbikes could work as an unattended, self-service model. That meant connecting a rider-facing app to physical battery locker hardware before committing to a full rollout.',
+      built: 'We assisted the client in launching Phase 1 as a proof-of-concept app, identified and supported the IoT integration required between app and lockers, and worked through the implementation so riders could authenticate and operate lockers on their own.',
+      bullets: ['Phase 1 proof-of-concept app launched', 'IoT integration between app and battery lockers identified and supported', 'Riders gained access to 24-hour self-operated battery lockers', 'Self-service swap model validated ahead of wider rollout'] },
+    { id: 'mcdonalds', sector: 'Food & Beverage', title: "McDonald's Thailand", kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: "Delivery app, website and CRM with a modular promotion engine for McDonald's Thailand.",
+      challenge: "McDonald's Thailand wanted a brand-new delivery website and mobile app to make ordering smoother and easier, whether at home or in the office. Marketing also needed to launch varied promotional mechanics without a development cycle behind every campaign.",
+      built: 'We developed the delivery website and mobile app end to end, integrated with a third-party delivery service, and built a CRM platform with a modular promotion engine supporting mechanics such as “Buy 1 Get 1” and “Spend X, Get Y”.',
+      bullets: ['Order food and drinks for delivery, with the nearest branch selected automatically for members', 'Full menu available at any time, with no minimum order value', 'Payment by cash at counter or by credit card', 'Delivery status tracking through a simple in-app notification system', 'Points earned and redeemed for discounts or free items on the next order', 'Nearest-restaurant branch finder', 'Marketing teams launch and manage promotions without additional development each time'] },
+    { id: 'aichatbot', sector: 'Retail', title: 'AI Chatbot', kind: 'ai', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: 'Proprietary chatbot engine deployed for YOHO Mall and HSBC as concierge and campaign experiences.',
+      challenge: 'Retail and banking clients needed conversational experiences beyond scripted FAQ bots. A mall wanted a multilingual concierge that could serve shoppers in person; a bank wanted to extend a TV commercial into something audiences could play.',
+      built: 'We deployed our proprietary chatbot engine for both. At YOHO Mall, the AI Ambassador chatbot integrates with kiosks as a digital concierge, providing real-time store navigation, personalised upselling, multilingual support and data-driven marketing insights. For HSBC, an interactive Facebook chatbot game extended a TV commercial storyline, letting players make decisions for the main characters and play mini-games across multiple touchpoints.',
+      bullets: ['Digital concierge on mall kiosks with real-time navigation and multilingual support', 'Personalised upselling and data-driven marketing insight for mall operations', 'Reduced operational costs against staffed information counters', 'TVC storyline extended into an interactive branded game, boosting awareness and interaction'] },
+    { id: 'major', sector: 'Entertainment', title: 'Major', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: 'Showtime and smart ticketing app for cinema-goers, from browsing to seat selection and payment.',
+      challenge: 'Cinema audiences expect to check showtimes, choose seats and pay within a few taps, while the operator needs ticketing that holds up under the demand spikes around major releases.',
+      built: 'We built a showtime and smart ticketing application covering cinema and showtime browsing, seat selection, digital ticketing and payment, designed for high-traffic release windows.',
+      bullets: ['Showtime browsing and seat selection in a single mobile flow', 'Digital tickets reducing counter and kiosk queues', 'Ticketing built to hold through peak release demand', 'Foundation in place for membership and promotional mechanics'] },
+    { id: 'moov', sector: 'Entertainment', title: 'Moov', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: "Product consulting and a retained cross-functional team driving Moov's roadmap and faster releases.",
+      challenge: 'Moov needed to evolve its app rapidly to stay competitive, but lacked clear feature prioritisation and market-driven product direction. The team faced uncertainty around which features would create the most impact, leading to slow decision-making and difficulty aligning development with business goals.',
+      built: "We acted as Moov's product consultant and development extension, providing continuous insight on market trends, defining feature requirements and shaping the product roadmap. Our design and development team on retainer enabled rapid prototyping and execution without increasing internal headcount.",
+      bullets: ['Clear, insight-driven product roadmap', 'Faster feature delivery with a dedicated cross-functional team', 'Improved user experience through refined UX and prioritised enhancements', 'Reduced operational burden, allowing Moov to focus on growth'] },
+    { id: 'ticketmelon', sector: 'Entertainment', title: 'Ticketmelon', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: "Retained QA team and solution architecture now used as Ticketmelon's official partner integration reference.",
+      challenge: 'Ticketmelon, a leading ticketing and event-tech company, needed to scale its platform rapidly to support complex partner integrations while maintaining high service reliability. Limited QA capacity created a testing bottleneck, delaying releases and raising the risk of bugs in live environments. At the same time, partners required detailed technical documentation and integration flows the internal team did not have bandwidth to produce, slowing onboarding and increasing support dependency.',
+      built: "We provided a dedicated QA team on retainer, delivering continuous test coverage across new features, integrations and releases. In parallel, our Solution Architect worked with Ticketmelon's engineering team to design clear, scalable, partner-ready system architectures: mapping technical flows for multi-partner integrations, creating reusable architectural diagrams and API specifications, ensuring new integrations aligned with long-term technical strategy, and supporting technical planning and feasibility assessments.",
+      bullets: ['Higher platform reliability through ongoing QA coverage', 'Faster, clearer partner integrations via structured architecture documents', 'SA output adopted as the official reference for partners during integration', 'Reduced engineering workload, freeing the team for core development', 'Scalable system design supporting future business expansion'] },
+    { id: 'rsmall', sector: 'Retail', title: 'RS Mall', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: "E-commerce platform linking RS Mall's on-air TV promotions to real-time online purchasing.",
+      challenge: "RS Mall's business runs on TV commerce, where an on-air promotion has to convert while it is still on screen. The existing website could not carry that attention through to purchase, and frequent campaigns and bundled offers were difficult to configure across a broad health and wellness catalogue.",
+      built: "We redesigned the website for a modern, user-friendly shopping experience and developed a robust e-commerce platform tailored to RS's TV-commerce strategy, with flexible promotion and discount modules and improved product discovery, search and categorisation.",
+      bullets: ['Seamless linkage between on-air promotions and online purchasing for real-time campaign conversion', 'Flexible promotion and discount modules supporting frequent campaigns and bundled offers', 'Product discovery, search and categorisation suited to a diverse health and wellness catalogue', 'A modern, user-friendly shopping experience'] },
+    { id: 'merklecapital', sector: 'Finance', title: 'Merkle Capital', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: "Investment platform for Thailand's first licensed digital asset fund manager.",
+      challenge: 'Merkle Capital, part of Cryptomind Group, became the first company in Thailand licensed by the SEC as a digital asset fund manager. Launching regulated crypto funds meant giving investors a way to subscribe, fund and monitor holdings that felt as trustworthy as traditional asset management, under full regulatory scrutiny.',
+      built: 'We built the investor-facing platform — onboarding and KYC, fund subscription and redemption, portfolio and performance tracking, and reporting — designed to communicate credibility to investors new to regulated digital asset products.',
+      bullets: ['Investor onboarding and KYC aligned with regulatory requirements', 'Fund subscription, redemption and portfolio tracking in one place', 'Clear performance reporting for investors new to digital assets', 'Digital foundation supporting the launch of further regulated funds'] },
+    { id: 'beatsquares', sector: 'AI Innovation', title: 'Beatsquares', kind: 'ai', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: 'AI platform for journalists — workshops through to MVP 0.5, which secured initial investment.',
+      challenge: 'Beatsquares was starting from an idea for an AI-driven platform for journalists, without validated product-market fit, a design foundation, or a clear route to an investable MVP.',
+      built: 'We led workshops to kickstart development, conducted UX/UI research and design tailored to the needs of journalists, and carried out business proof-of-concept research to validate product-market fit, then collaborated closely with the development team and founder through launch.',
+      bullets: ['Workshops that turned the concept into a development plan', "UX/UI research and design grounded in journalists' actual workflows", 'Proof-of-concept research validating product-market fit', 'MVP 0.5 launched and initial investment secured', 'Design foundation established for MVP 1.0, with key features prioritised for the next phase'] },
+    { id: 'pulse', sector: 'Management', title: 'Pulse', kind: 'ai', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: 'AI analytics platform turning company data into role-specific insight for staff, PMs and executives.',
+      challenge: 'Company data sits across systems and rarely reaches the people who need it in a form they can act on. Employees, project managers and executives each need a different view of the same underlying data, and building a separate report for every need does not scale.',
+      built: 'We built an AI-powered analytics platform that transforms company data into actionable insights, personalised for each user and reached through intuitive AI-driven queries rather than dashboards that have to be configured.',
+      bullets: ['Employees track their own productivity', 'Project managers evaluate team resources and allocation', 'Executives access real-time financial overviews', 'Complex data simplified into insight available at the click of a button', 'Smarter, faster business decisions'] },
+    { id: 'ctflife', sector: 'Insurance', title: 'CTF Life', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: 'Website revamp that simplified the insurance purchase journey and lifted conversion.',
+      challenge: "Insurance buying journeys are long and comparison-heavy. CTF Life's site made it hard for visitors to understand the differences between plans and reach a decision, holding back conversion and trust.",
+      built: 'We revamped the website to improve user experience and simplify the insurance purchase journey — optimising CTAs, navigation and product presentation, developing smart comparison tools, and integrating personalised product recommendations based on user profile and behaviour.',
+      bullets: ['Simplified insurance purchase journey', 'Improved conversion through optimised CTAs, navigation and product presentation', 'Smart comparison tools helping users choose the right plan more easily', 'Personalised recommendations based on profile and behaviour', 'Improved brand trust and retention through modern UI and transparent workflows'] },
+    { id: 'jaga', sector: 'Education', title: 'Jaga', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: 'All-in-one education and operations platform for a growing golf academy, built in React Native.',
+      challenge: 'A growing golf academy was running class scheduling, instructor feedback and student progress across disconnected tools, making it hard to keep staff, students and parents aligned — or to support expansion plans.',
+      built: 'We built an all-in-one education and operations platform with instructor and student portals for class schedules, feedback and performance tracking, developed with React Native for seamless mobile accessibility on both iOS and Android.',
+      bullets: ['Instructor and student portals covering scheduling, feedback and performance tracking', 'Seamless mobile accessibility on iOS and Android from one codebase', 'Data-driven insights to personalise training and support academy expansion goals', 'Simplified internal workflows and communication between staff, students and parents'] },
+    { id: 'bangkokcable', sector: 'Manufacturing', title: 'Bangkok Cable Company', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: '60th-anniversary corporate site rebuilt on stakeholder research, with measurable usability and SEO gains.',
+      challenge: 'Bangkok Cable wanted a modern, professional digital presence to mark their 60th anniversary. Research showed the real problems ran deeper than visual design: visitors struggled to find products, certifications and distribution channels, and there were perception and performance gaps to close.',
+      built: 'We went beyond the initial brief, conducting stakeholder and user research to uncover hidden challenges and unmet needs, then facilitating workshops with client teams to define measurable KPIs so every decision aligned with business and user goals.',
+      bullets: ['Stakeholder and user research surfacing issues the brief had not identified', 'Products, certifications and distribution channels made easy to find', 'KPIs defined with client teams to anchor design decisions', 'Measurable improvement in usability, perception and performance metrics such as page speed and SEO'] },
+    { id: 'monopolygamification', sector: 'Gamification', title: 'Monopoly Gamification', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+      short: 'Monopoly-inspired mall campaign for Hang Lung — exceeded registration KPIs by 5x.',
+      challenge: 'Hang Lung Property Group aimed to boost foot traffic to their retail mall and grow CRM programme registrations, which meant giving shoppers a reason both to sign up and to keep spending with participating tenants.',
+      built: 'We designed a web-based gamification campaign inspired by Monopoly gameplay and integrated it into the customer journey — easy to access, with no app download. Shoppers converted their spending into chance card draws, each offering a redeemable reward from participating mall partners: the more they spent, the more rewards they earned. Proprietary OCR technology extracted spending data from receipts, with built-in fraud detection to ensure integrity.',
+      bullets: ['Exceeded user registration KPIs by 5x', 'Recorded 8-figure spending (HKD)', 'Distributed 100,000+ rewards', 'Drove CRM sign-ups and repeat spending through game play and rewards', 'Receipt OCR with fraud detection removing manual validation'] },
+    { id: 'garfield', sector: 'Gamification', title: 'Garfield in Mood for Food', kind: 'software', hero: 'assets-cases-short/Case_20.png', photo: true,
+      short: 'Browser-based Garfield game for Nickelodeon — instant play on desktop and mobile, no download.',
+      challenge: 'Nickelodeon needed a branded game that could reach audiences across the region instantly, without an app download, and hold attention long enough to build repeat engagement with the Garfield property.',
+      built: 'We built a browser-based HTML5 game playable on desktop and mobile via a link or QR code. Players guide Garfield around town collecting coins to buy dishes across western, Japanese, Chinese, Singaporean and Malaysian cuisines before his health bar runs down, then race the clock home — with Odie available as a ride to double travelling speed.',
+      bullets: ['Instant access on desktop and mobile with no app install', 'Player profiles tracking progress and unlocked levels to drive return visits', 'Collectible dish album rewarding repeat play', 'Regional cuisine line-up localising the campaign across Southeast Asian markets'] }
   ];
 
-  // ============ PORTFOLIO CARD ROW: side-by-side, hover-edge auto-scroll ============
+  // ============ PORTFOLIO CARD ROW: side-by-side, hover-edge auto-scroll, infinite loop ============
+  // The row is rendered 3× back-to-back (60 cards) and scrollLeft is wrapped
+  // by exactly one set's width whenever it drifts into a cloned copy, so the
+  // row loops seamlessly in both directions — the wrap is invisible because
+  // each copy is pixel-identical. Starting parked in the middle copy means
+  // both hover-left and hover-right always have a clone to scroll into.
   const pfStackEl = document.getElementById('pfStack');
   const pfStackOuterEl = document.querySelector('.pf-stack-outer');
   let pfCardEls = [];
   let pfScrollDir = 0;
+  let pfSetWidth = 0;
   const PF_SCROLL_SPEED = 1.8;
+  const PF_LOOP_COPIES = 3;
 
-  // Continuous scroll while hovering the left/right half of the row's
-  // viewport — direction only, not distance-proportional, per spec.
-  function pfScrollStep() {
-    if (pfScrollDir !== 0 && pfStackEl) pfStackEl.scrollLeft += pfScrollDir * PF_SCROLL_SPEED;
-    requestAnimationFrame(pfScrollStep);
-  }
-  requestAnimationFrame(pfScrollStep);
-
-  if (pfStackOuterEl) {
-    pfStackOuterEl.addEventListener('mousemove', (e) => {
-      const rect = pfStackOuterEl.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      if (x < rect.width / 3) pfScrollDir = -1;
-      else if (x > (rect.width * 2) / 3) pfScrollDir = 1;
-      else pfScrollDir = 0;
-    });
-    pfStackOuterEl.addEventListener('mouseleave', () => { pfScrollDir = 0; });
-  }
-
-  if (pfStackEl) {
-    pfCardEls = portfolioCases.map((c, i) => {
+  function renderPfCardSet() {
+    return portfolioCases.map((c, i) => {
       const el = document.createElement('div');
       el.className = 'pf-stack-card';
       el.dataset.index = String(i);
@@ -3542,6 +3603,50 @@
       pfStackEl.appendChild(el);
       return el;
     });
+  }
+
+  // Measures the real DOM distance between equivalent cards in adjacent
+  // copies (not scrollWidth / 3 — the row's own left/right padding would
+  // throw that off) and re-anchors scrollLeft into the middle copy,
+  // preserving the current relative position so a live resize doesn't jump.
+  function pfRecalcSetWidth() {
+    const n = portfolioCases.length;
+    if (!pfStackEl || pfCardEls.length < n * 2) return;
+    const oldSetWidth = pfSetWidth;
+    const relative = oldSetWidth ? pfStackEl.scrollLeft % oldSetWidth : 0;
+    pfSetWidth = pfCardEls[n].offsetLeft - pfCardEls[0].offsetLeft;
+    pfStackEl.scrollLeft = oldSetWidth ? pfSetWidth + relative * (pfSetWidth / oldSetWidth) : pfSetWidth;
+  }
+
+  // Continuous scroll while hovering the left/right half of the row's
+  // viewport — direction only, not distance-proportional, per spec. Runs
+  // every frame regardless of hover state so it also catches (and wraps)
+  // native wheel/trackpad/touch-drag scrolling, not just the autoscroll.
+  function pfScrollStep() {
+    if (pfScrollDir !== 0 && pfStackEl) pfStackEl.scrollLeft += pfScrollDir * PF_SCROLL_SPEED;
+    if (pfStackEl && pfSetWidth) {
+      if (pfStackEl.scrollLeft >= pfSetWidth * 2) pfStackEl.scrollLeft -= pfSetWidth;
+      else if (pfStackEl.scrollLeft <= 0) pfStackEl.scrollLeft += pfSetWidth;
+    }
+    requestAnimationFrame(pfScrollStep);
+  }
+
+  if (pfStackOuterEl) {
+    pfStackOuterEl.addEventListener('mousemove', (e) => {
+      const rect = pfStackOuterEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      if (x < rect.width / 3) pfScrollDir = -1;
+      else if (x > (rect.width * 2) / 3) pfScrollDir = 1;
+      else pfScrollDir = 0;
+    });
+    pfStackOuterEl.addEventListener('mouseleave', () => { pfScrollDir = 0; });
+  }
+
+  if (pfStackEl) {
+    for (let i = 0; i < PF_LOOP_COPIES; i++) pfCardEls = pfCardEls.concat(renderPfCardSet());
+    pfRecalcSetWidth();
+    window.addEventListener('resize', pfRecalcSetWidth);
+    requestAnimationFrame(pfScrollStep);
   }
 
   function renderPortfolioDetail(c) {
@@ -4234,10 +4339,11 @@
 
   (function aiFlipCard() {
     const stage = document.querySelector('.ai-card-stage');
+    const rigEl = document.getElementById('aiCardRig');
     const tiltEl = document.getElementById('aiCardTilt');
     const flipEl = document.getElementById('aiCardFlip');
     const flipBtn = document.getElementById('aiCardFlipBtn');
-    if (!stage || !tiltEl || !flipEl || !flipBtn) return;
+    if (!stage || !rigEl || !tiltEl || !flipEl || !flipBtn) return;
 
     const aiSlide = stage.closest('.slide');
     const MAX_TILT = 15;
@@ -4245,6 +4351,20 @@
     // cursor reaches the edge of the screen, so small movements near the
     // card swing it hard instead of needing a full-width sweep.
     const SENSITIVITY = 2.6;
+    // The pendulum: how far the ribbon lets the card swing/slide sideways,
+    // and how stiff/damped the spring pulling it back toward "hanging
+    // straight down" is. This pair is deliberately underdamped (damping is
+    // well under the critical value for this stiffness) so a fast pointer
+    // move overshoots the rest angle by a degree or two before settling —
+    // that overshoot-and-settle is what actually reads as gravity and
+    // inertia, rather than the rotation just tracking the mouse 1:1.
+    // Numerically verified: a step input to 16° overshoots to ~17.9° at
+    // 0.42s and is settled within ~1.3s — see the physics comment on
+    // .ai-card-rig in the CSS for the transform this drives.
+    const MAX_SWING = 16; // degrees the card can swing off vertical
+    const MAX_PULL = 30;  // px the card can slide sideways on the ribbon
+    const STIFFNESS = 70;
+    const DAMPING = 9;
 
     function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -4253,6 +4373,12 @@
     }
     flipEl.addEventListener('click', toggleFlip);
     flipBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFlip(); });
+
+    let targetAngle = 0, targetPull = 0;
+    let angle = 0, angleVel = 0;
+    let pull = 0, pullVel = 0;
+    let lastT = null;
+    let rafId = null;
 
     window.addEventListener('pointermove', (e) => {
       if (aiSlide.dataset.state !== 'active') return;
@@ -4269,18 +4395,56 @@
       // glare visibly slides across the card as it "moves" in 3D.
       tiltEl.style.setProperty('--ai-shine-x', `${50 + dx * 35}%`);
       tiltEl.style.setProperty('--ai-shine-y', `${50 + dy * 35}%`);
+      // Where the pendulum eases toward — the physics loop below is what
+      // actually moves .ai-card-rig, this only updates the rest point.
+      targetAngle = dx * MAX_SWING;
+      targetPull = dx * MAX_PULL;
     });
 
-    // Reset the tilt and shine when the slide leaves view, so navigating
-    // back to it never shows a stale skew/glare from wherever the pointer
-    // last was.
+    function step(t) {
+      if (lastT === null) lastT = t;
+      const dt = Math.min((t - lastT) / 1000, 0.05);
+      lastT = t;
+
+      const angleAccel = -STIFFNESS * (angle - targetAngle) - DAMPING * angleVel;
+      angleVel += angleAccel * dt;
+      angle += angleVel * dt;
+
+      const pullAccel = -STIFFNESS * (pull - targetPull) - DAMPING * pullVel;
+      pullVel += pullAccel * dt;
+      pull += pullVel * dt;
+
+      rigEl.style.transform = `rotate(${angle.toFixed(3)}deg) translateX(${pull.toFixed(2)}px)`;
+      rafId = requestAnimationFrame(step);
+    }
+
+    function startPhysics() {
+      if (rafId !== null) return;
+      lastT = null;
+      rafId = requestAnimationFrame(step);
+    }
+    function stopPhysics() {
+      if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+      angle = 0; angleVel = 0; pull = 0; pullVel = 0;
+      targetAngle = 0; targetPull = 0;
+      rigEl.style.transform = '';
+    }
+
+    // Run the pendulum sim only while the slide is on screen, and reset the
+    // tilt/shine/swing state on the way out so navigating back to this
+    // slide never shows a stale pose from wherever the pointer last was.
     new MutationObserver(() => {
-      if (aiSlide.dataset.state !== 'active') {
+      if (aiSlide.dataset.state === 'active') {
+        startPhysics();
+      } else {
+        stopPhysics();
         tiltEl.style.transform = '';
         tiltEl.style.removeProperty('--ai-shine-x');
         tiltEl.style.removeProperty('--ai-shine-y');
       }
     }).observe(aiSlide, { attributes: true, attributeFilter: ['data-state'] });
+
+    if (aiSlide.dataset.state === 'active') startPhysics();
   })();
 
 </script>

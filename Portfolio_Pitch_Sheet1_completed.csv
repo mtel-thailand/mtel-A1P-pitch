@@ -1,0 +1,249 @@
+﻿Img,Title,Category,Short description,Long
+Case_1,One Bangkok,Proptech,Resident and tenant super-app for Bangkok's largest mixed-use development.,"Challenge
+One Bangkok brings residents, office tenants, retailers and visitors onto a single estate, each group with different needs and separate service touchpoints. Access, facilities, payments and communications risked being spread across disconnected tools.
+
+Solution
+We designed and built a single super-app covering the whole development — resident and tenant onboarding, digital access, facility and amenity booking, service requests, billing and estate-wide announcements — on one platform with role-based experiences.
+
+Value Delivered
+• One app serving residents, tenants and visitors across the entire development
+• Digital access and facility booking replacing manual, counter-based processes
+• Service requests and announcements centralised for the estate management team
+• Scalable platform designed to absorb new buildings and services as the district opens"
+Case_2,Minor Hotel,Hospitality,"Event companion app for Anantara's heritage car show, built in React Native for iOS and Android.","Challenge
+Anantara needed a digital companion for a heritage car show event that matched the brand's luxury positioning. A standard event app could not carry the vintage, Italian aesthetic the occasion called for, and the audience was international and split across both mobile platforms.
+
+Solution
+We designed and developed a mobile app reflecting Anantara's luxury brand with a vintage, Italian aesthetic, and built it in React Native to hold app quality consistent across platforms. Booking, schedule and gallery features were integrated to support engagement throughout the event.
+
+Value Delivered
+• Smooth, visually rich experience aligned with the feel of a heritage car show
+• Booking, schedule and gallery in one app to support event engagement
+• Consistent quality on iOS and Android from a single React Native codebase
+• Enhanced international reach and brand prestige through digital sophistication"
+Case_3,Flow Yacht Club,Luxury,Fractional yacht ownership and booking platform with yield optimisation for owners and members.,"Challenge
+Flow Yacht Club runs on fractional ownership, where owners and members draw on the same limited fleet. Without an intelligent reservation system, booking conflicts, under-used yachts and manually handled concierge requests would cap both member satisfaction and owner returns.
+
+Solution
+We developed a fractional yacht ownership and booking platform serving both sides: an intelligent reservation system with calendar sync, availability tracking and yield optimisation; member profiles with a personalised request system for luxury experiences; and an owner dashboard for real-time monitoring of yacht usage, ROI and bookings.
+
+Value Delivered
+• Intelligent reservation system with calendar sync and availability tracking
+• Yield optimisation improving fleet utilisation and owner returns
+• Personalised luxury request handling through member profiles
+• Real-time visibility of usage, ROI and bookings for owners
+• Streamlined operations and an elevated premium booking experience through smart automation"
+Case_4,Sansiri,Hospitality,"Revamped juristic chat, parcel delivery and news feed back-office for Sansiri's residential platform.","Challenge
+Sansiri's residential service tools had aged. Juristic chat created heavy administrative workload for property management teams, the parcel delivery flow frustrated tenants, and the back-office could not support deep-linking or tracking for its news feed.
+
+Solution
+We revamped three areas of the platform: juristic chat, with key features to increase the efficiency and productivity of administrative work; parcel delivery, rebuilt around the tenant's experience; and back-office news feed management, extended to support deep-linking and tracking.
+
+Value Delivered
+• Faster, less manual administrative work for juristic teams
+• Improved tenant experience for parcel notification and collection
+• News feed back-office supporting deep-linking and campaign tracking
+• A more maintainable base for future resident-facing features"
+Case_5,SHARGE,EV,EV charging software infrastructure — helped secure Series A and reach top-5 network share in Thailand.,"Challenge
+Sharge was scaling an EV charging network in an early-stage Thai market. Growth depended on both the software infrastructure to run and expand the network, and the technical credibility to raise institutional funding.
+
+Solution
+We acted as the client's technical advisor and helped build the software infrastructure underpinning the expansion of their EV ecosystem, covering the platform layer connecting charging hardware, drivers and operators.
+
+Value Delivered
+• Assisted the client as technical advisor and helped secure Series A investment
+• Helped build the software infrastructure to expand the EV ecosystem
+• As of 2022, Sharge held top-5 market share in Thailand by number of EV stations"
+Case_6,Swap & Go,EV,Battery-swap app for EV riders — Phase 1 proof of concept with 24-hour self-service lockers.,"Challenge
+Swap & Go needed to prove that battery swapping for electric motorbikes could work as an unattended, self-service model. That meant connecting a rider-facing app to physical battery locker hardware before committing to a full rollout.
+
+Solution
+We assisted the client in launching Phase 1 as a proof-of-concept app, identified and supported the IoT integration required between app and lockers, and worked through the implementation so riders could authenticate and operate lockers on their own.
+
+Value Delivered
+• Phase 1 proof-of-concept app launched
+• IoT integration between app and battery lockers identified and supported
+• Riders gained access to 24-hour self-operated battery lockers
+• Self-service swap model validated ahead of wider rollout"
+Case_7,McDonald's Thailand,Food & Beverage,"Delivery app, website and CRM with a modular promotion engine for McDonald's Thailand.","Challenge
+McDonald's Thailand wanted a brand-new delivery website and mobile app to make ordering smoother and easier, whether at home or in the office. Marketing also needed to launch varied promotional mechanics without a development cycle behind every campaign.
+
+Solution
+We developed the delivery website and mobile app end to end, integrated with a third-party delivery service, and built a CRM platform with a modular promotion engine supporting mechanics such as “Buy 1 Get 1” and “Spend X, Get Y”.
+
+Value Delivered
+• Order food and drinks for delivery, with the nearest branch selected automatically for members
+• Full menu available at any time, with no minimum order value
+• Payment by cash at counter or by credit card
+• Delivery status tracking through a simple in-app notification system
+• Points earned and redeemed for discounts or free items on the next order
+• Nearest-restaurant branch finder
+• Marketing teams launch and manage promotions without additional development each time"
+Case_8,AI Chatbot,Retail,Proprietary chatbot engine deployed for YOHO Mall and HSBC as concierge and campaign experiences.,"Challenge
+Retail and banking clients needed conversational experiences beyond scripted FAQ bots. A mall wanted a multilingual concierge that could serve shoppers in person; a bank wanted to extend a TV commercial into something audiences could play.
+
+Solution
+We deployed our proprietary chatbot engine for both. At YOHO Mall, the AI Ambassador chatbot integrates with kiosks as a digital concierge, providing real-time store navigation, personalised upselling, multilingual support and data-driven marketing insights. For HSBC, an interactive Facebook chatbot game extended a TV commercial storyline, letting players make decisions for the main characters and play mini-games across multiple touchpoints.
+
+Value Delivered
+• Digital concierge on mall kiosks with real-time navigation and multilingual support
+• Personalised upselling and data-driven marketing insight for mall operations
+• Reduced operational costs against staffed information counters
+• TVC storyline extended into an interactive branded game, boosting awareness and interaction"
+Case_9,Major,Entertainment,"Showtime and smart ticketing app for cinema-goers, from browsing to seat selection and payment.","Challenge
+Cinema audiences expect to check showtimes, choose seats and pay within a few taps, while the operator needs ticketing that holds up under the demand spikes around major releases.
+
+Solution
+We built a showtime and smart ticketing application covering cinema and showtime browsing, seat selection, digital ticketing and payment, designed for high-traffic release windows.
+
+Value Delivered
+• Showtime browsing and seat selection in a single mobile flow
+• Digital tickets reducing counter and kiosk queues
+• Ticketing built to hold through peak release demand
+• Foundation in place for membership and promotional mechanics"
+Case_10,Moov,Entertainment,Product consulting and a retained cross-functional team driving Moov's roadmap and faster releases.,"Challenge
+Moov needed to evolve its app rapidly to stay competitive, but lacked clear feature prioritisation and market-driven product direction. The team faced uncertainty around which features would create the most impact, leading to slow decision-making and difficulty aligning development with business goals.
+
+Solution
+We acted as Moov's product consultant and development extension, providing continuous insight on market trends, defining feature requirements and shaping the product roadmap. Our design and development team on retainer enabled rapid prototyping and execution without increasing internal headcount.
+
+Value Delivered
+• Clear, insight-driven product roadmap
+• Faster feature delivery with a dedicated cross-functional team
+• Improved user experience through refined UX and prioritised enhancements
+• Reduced operational burden, allowing Moov to focus on growth"
+Case_11,Ticketmelon,Entertainment,Retained QA team and solution architecture now used as Ticketmelon's official partner integration reference.,"Challenge
+Ticketmelon, a leading ticketing and event-tech company, needed to scale its platform rapidly to support complex partner integrations while maintaining high service reliability. Limited QA capacity created a testing bottleneck, delaying releases and raising the risk of bugs in live environments. At the same time, partners required detailed technical documentation and integration flows the internal team did not have bandwidth to produce, slowing onboarding and increasing support dependency.
+
+Solution
+We provided a dedicated QA team on retainer, delivering continuous test coverage across new features, integrations and releases. In parallel, our Solution Architect worked with Ticketmelon's engineering team to design clear, scalable, partner-ready system architectures: mapping technical flows for multi-partner integrations, creating reusable architectural diagrams and API specifications, ensuring new integrations aligned with long-term technical strategy, and supporting technical planning and feasibility assessments.
+
+Value Delivered
+• Higher platform reliability through ongoing QA coverage
+• Faster, clearer partner integrations via structured architecture documents
+• SA output adopted as the official reference for partners during integration
+• Reduced engineering workload, freeing the team for core development
+• Scalable system design supporting future business expansion"
+Case_12,RS Mall,Retail,E-commerce platform linking RS Mall's on-air TV promotions to real-time online purchasing.,"Challenge
+RS Mall's business runs on TV commerce, where an on-air promotion has to convert while it is still on screen. The existing website could not carry that attention through to purchase, and frequent campaigns and bundled offers were difficult to configure across a broad health and wellness catalogue.
+
+Solution
+We redesigned the website for a modern, user-friendly shopping experience and developed a robust e-commerce platform tailored to RS's TV-commerce strategy, with flexible promotion and discount modules and improved product discovery, search and categorisation.
+
+Value Delivered
+• Seamless linkage between on-air promotions and online purchasing for real-time campaign conversion
+• Flexible promotion and discount modules supporting frequent campaigns and bundled offers
+• Product discovery, search and categorisation suited to a diverse health and wellness catalogue
+• A modern, user-friendly shopping experience"
+Case_13,Merkle Capital,Finance,Investment platform for Thailand's first licensed digital asset fund manager.,"Challenge
+Merkle Capital, part of Cryptomind Group, became the first company in Thailand licensed by the SEC as a digital asset fund manager. Launching regulated crypto funds meant giving investors a way to subscribe, fund and monitor holdings that felt as trustworthy as traditional asset management, under full regulatory scrutiny.
+
+Solution
+We built the investor-facing platform — onboarding and KYC, fund subscription and redemption, portfolio and performance tracking, and reporting — designed to communicate credibility to investors new to regulated digital asset products.
+
+Value Delivered
+• Investor onboarding and KYC aligned with regulatory requirements
+• Fund subscription, redemption and portfolio tracking in one place
+• Clear performance reporting for investors new to digital assets
+• Digital foundation supporting the launch of further regulated funds
+
+[Drafted from public sources — confirm scope and wording before publishing.]"
+Case_14,Beatsquares,AI Innovation,"AI platform for journalists — workshops through to MVP 0.5, which secured initial investment.","Challenge
+Beatsquares was starting from an idea for an AI-driven platform for journalists, without validated product-market fit, a design foundation, or a clear route to an investable MVP.
+
+Solution
+We led workshops to kickstart development, conducted UX/UI research and design tailored to the needs of journalists, and carried out business proof-of-concept research to validate product-market fit, then collaborated closely with the development team and founder through launch.
+
+Value Delivered
+• Workshops that turned the concept into a development plan
+• UX/UI research and design grounded in journalists' actual workflows
+• Proof-of-concept research validating product-market fit
+• MVP 0.5 launched and initial investment secured
+• Design foundation established for MVP 1.0, with key features prioritised for the next phase"
+Case_15,Pulse,Management,"AI analytics platform turning company data into role-specific insight for staff, PMs and executives.","Challenge
+Company data sits across systems and rarely reaches the people who need it in a form they can act on. Employees, project managers and executives each need a different view of the same underlying data, and building a separate report for every need does not scale.
+
+Solution
+We built an AI-powered analytics platform that transforms company data into actionable insights, personalised for each user and reached through intuitive AI-driven queries rather than dashboards that have to be configured.
+
+Value Delivered
+• Employees track their own productivity
+• Project managers evaluate team resources and allocation
+• Executives access real-time financial overviews
+• Complex data simplified into insight available at the click of a button
+• Smarter, faster business decisions"
+Case_16,CTF Life,Insurance,Website revamp that simplified the insurance purchase journey and lifted conversion.,"Challenge
+Insurance buying journeys are long and comparison-heavy. CTF Life's site made it hard for visitors to understand the differences between plans and reach a decision, holding back conversion and trust.
+
+Solution
+We revamped the website to improve user experience and simplify the insurance purchase journey — optimising CTAs, navigation and product presentation, developing smart comparison tools, and integrating personalised product recommendations based on user profile and behaviour.
+
+Value Delivered
+• Simplified insurance purchase journey
+• Improved conversion through optimised CTAs, navigation and product presentation
+• Smart comparison tools helping users choose the right plan more easily
+• Personalised recommendations based on profile and behaviour
+• Improved brand trust and retention through modern UI and transparent workflows"
+Case_17,Jaga,Education,"All-in-one education and operations platform for a growing golf academy, built in React Native.","Challenge
+A growing golf academy was running class scheduling, instructor feedback and student progress across disconnected tools, making it hard to keep staff, students and parents aligned — or to support expansion plans.
+
+Solution
+We built an all-in-one education and operations platform with instructor and student portals for class schedules, feedback and performance tracking, developed with React Native for seamless mobile accessibility on both iOS and Android.
+
+Value Delivered
+• Instructor and student portals covering scheduling, feedback and performance tracking
+• Seamless mobile accessibility on iOS and Android from one codebase
+• Data-driven insights to personalise training and support academy expansion goals
+• Simplified internal workflows and communication between staff, students and parents"
+Case_18,Bangkok Cable Company,Manufacturing,"60th-anniversary corporate site rebuilt on stakeholder research, with measurable usability and SEO gains.","Challenge
+Bangkok Cable wanted a modern, professional digital presence to mark their 60th anniversary. Research showed the real problems ran deeper than visual design: visitors struggled to find products, certifications and distribution channels, and there were perception and performance gaps to close.
+
+Solution
+We went beyond the initial brief, conducting stakeholder and user research to uncover hidden challenges and unmet needs, then facilitating workshops with client teams to define measurable KPIs so every decision aligned with business and user goals.
+
+Value Delivered
+• Stakeholder and user research surfacing issues the brief had not identified
+• Products, certifications and distribution channels made easy to find
+• KPIs defined with client teams to anchor design decisions
+• Measurable improvement in usability, perception and performance metrics such as page speed and SEO"
+Case_19,Monopoly Gamification,Gamification,Monopoly-inspired mall campaign for Hang Lung — exceeded registration KPIs by 5x.,"Challenge
+Hang Lung Property Group aimed to boost foot traffic to their retail mall and grow CRM programme registrations, which meant giving shoppers a reason both to sign up and to keep spending with participating tenants.
+
+Solution
+We designed a web-based gamification campaign inspired by Monopoly gameplay and integrated it into the customer journey — easy to access, with no app download. Shoppers converted their spending into chance card draws, each offering a redeemable reward from participating mall partners: the more they spent, the more rewards they earned. Proprietary OCR technology extracted spending data from receipts, with built-in fraud detection to ensure integrity.
+
+Value Delivered
+• Exceeded user registration KPIs by 5x
+• Recorded 8-figure spending (HKD)
+• Distributed 100,000+ rewards
+• Drove CRM sign-ups and repeat spending through game play and rewards
+• Receipt OCR with fraud detection removing manual validation"
+Case_20,Garfield in Mood for Food,Gamification,"Browser-based Garfield game for Nickelodeon — instant play on desktop and mobile, no download.","Challenge
+Nickelodeon needed a branded game that could reach audiences across the region instantly, without an app download, and hold attention long enough to build repeat engagement with the Garfield property.
+
+Solution
+We built a browser-based HTML5 game playable on desktop and mobile via a link or QR code. Players guide Garfield around town collecting coins to buy dishes across western, Japanese, Chinese, Singaporean and Malaysian cuisines before his health bar runs down, then race the clock home — with Odie available as a ride to double travelling speed.
+
+Value Delivered
+• Instant access on desktop and mobile with no app install
+• Player profiles tracking progress and unlocked levels to drive return visits
+• Collectible dish album rewarding repeat play
+• Regional cuisine line-up localising the campaign across Southeast Asian markets
+
+[Drafted from public information about the campaign — confirm results and credits before publishing.]"
+Case_21,Patrick Year of the Star,Gamification,Character-led Nickelodeon gamification campaign built around Patrick Star.,"Challenge
+[NEEDS YOUR INPUT] No public information was found on this campaign. Based on the sibling Nickelodeon work, the likely frame is a character-led seasonal campaign that had to convert audience attention into measurable participation.
+
+Solution
+[NEEDS YOUR INPUT] Please confirm: the client and market, the platform (web game, app, or mall activation), the campaign period, and the core mechanic.
+
+Value Delivered
+[NEEDS YOUR INPUT] Please supply the results you want quoted — registrations, plays, redemptions, or spend uplift."
+Case_22,AIGC,AI Innovation,AI-generated content pipeline for producing on-brand campaign assets at scale.,"Challenge
+[NEEDS YOUR INPUT] No public information was found on this case. The likely frame: marketing teams need large volumes of on-brand visual and copy assets — per market, per channel, per promotion — and traditional production cannot keep pace with campaign cycles or budgets.
+
+Solution
+[NEEDS YOUR INPUT] Please confirm the client and use case. Draft framing: an AIGC pipeline that generates campaign visuals and copy from brand inputs, with human review in the loop to hold brand standards.
+
+Value Delivered
+[NEEDS YOUR INPUT] Please supply the client, the use case and any results — assets produced, turnaround time saved, or cost per asset."
