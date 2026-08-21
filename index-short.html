@@ -2508,178 +2508,209 @@
   .who-excl .data-tech-row { margin-top: 0; padding-top: 24px; border-top: none; justify-content: center; gap: 48px; }
   .who-excl-sub { font-size: 12px; line-height: 1.45; color: var(--body); max-width: 700px; margin-top: 10px; }
 
-  /* ============ SHORT DECK: SLIDE 03 — AUTOMATE / CREATE FLIP CARD ============ */
-  /* Three nested layers so the float animation, the mouse-tilt (JS, fast
-     transition), and the click-flip (JS, slow transition) each own a single
-     transform and never fight each other on the same element. */
-  /* The flip button sits BELOW the card in normal flow (not overlapping
-     it) — simpler and safer than the earlier straddle-the-edge layout,
-     and it sidesteps entirely the class of bug that layout invited: every
-     .slide in this deck sits in the same position:absolute rect at all
-     times, so a stray inline pointer-events style on an off-slide element
-     (e.g. slide 4's portfolio cards) can paint over anything sharing its
-     screen position. The real fix for that lives with .pf-stack-card's own
-     rules (search for it): an `!important`
-     override that forces pointer-events:none on that card whenever its
-     slide isn't active. This layout change just removes the temptation to
-     ever re-introduce the overlap. */
+  /* ============ SHORT DECK: SLIDE 03 — CROSS-CONNECT ============ */
+  /* Two panels (AUTOMATE / CREATE), each a column of pairable cards. Pick
+     one from each side to draw a connection and reveal what the pairing
+     actually does. State is driven entirely by data-xc-state on each
+     .xc-card (see the xConnect IIFE in <script>): default | selected |
+     available | unavailable | sibling. Layout below just styles those five
+     states — it never decides which one applies. */
   .automate .automate-head { margin-bottom: 4px; text-align: center; }
   .automate .automate-head h2 { margin-bottom: 10px; }
   .automate .automate-head .lede { max-width: 640px; margin: 0 auto; }
-  .ai-card-stage {
-    display: flex; flex-direction: column; align-items: center;
-    margin-top: 8px;
-    /* Large relative to the card so tilting doesn't stretch the text
-       texture much at the edges — the single biggest lever against blurry
-       type while a 3D transform is live. Sized up further to help absorb
-       the 15° max tilt (a bigger angle foreshortens more at any given
-       perspective, which is what makes rotated text look soft). */
-    perspective: 4600px;
+  .xc-prompt {
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.3px; color: var(--navy);
+    margin-top: 10px; text-align: center;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
   }
-  /* .ai-card-rig is the pendulum: it pivots from its own top-center, so the
-     ribbon (drawn inside it, above the card) and the card swing together as
-     one rigid body around that anchor point. JS (aiFlipCard) drives its
-     rotate()/translateX() every frame from a small spring-damper sim, not a
-     CSS transition — a transition would ease toward each new pointer sample
-     instantly and never overshoot/settle the way something hanging under
-     gravity actually does. */
-  .ai-card-rig {
+  .xc-prompt.visible { opacity: 0.75; transform: translateY(0); }
+
+  .xc-stage {
     position: relative;
-    width: min(1360px, 100%);
-    transform-origin: 50% 0%;
-    will-change: transform;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+    margin-top: 10px;
   }
-  .ai-card-ribbon {
+  .xc-line-svg {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    overflow: visible; pointer-events: none; z-index: 5;
+  }
+  .xc-line-path {
+    fill: none; stroke: var(--yellow); stroke-width: 2.5px; stroke-linecap: round;
+    filter: drop-shadow(0 0 5px rgba(245,197,24,0.6));
+    opacity: 0;
+  }
+  .xc-line-path.visible { opacity: 1; }
+  .xc-line-dot { fill: var(--yellow); opacity: 0; filter: drop-shadow(0 0 4px rgba(245,197,24,0.85)); }
+  .xc-line-dot.visible { opacity: 1; }
+
+  .xc-rail { display: none; }
+
+  .xc-panel {
+    border-radius: 22px;
+    padding: 16px 22px;
+    display: flex; flex-direction: column;
+  }
+  .xc-panel--automate {
+    background: var(--white);
+    box-shadow: 0 40px 80px rgba(15,15,50,0.10), 0 14px 28px rgba(15,15,50,0.06);
+  }
+  .xc-panel--create {
+    background: var(--navy);
+  }
+  .xc-panel-head { margin-bottom: 8px; }
+  .xc-panel-title { font-size: clamp(19px, 2vw, 25px); font-weight: 700; color: var(--navy); line-height: 1.1; }
+  .xc-panel--create .xc-panel-title { color: #f8f5f3; }
+  .xc-panel-subtitle { font-size: 11.5px; font-weight: 600; color: var(--navy); opacity: 0.4; margin-top: 3px; }
+  .xc-panel--create .xc-panel-subtitle { color: #f8f5f3; opacity: 0.7; }
+
+  .xc-grid { display: grid; grid-template-columns: 1fr; gap: 6px; }
+  .xc-card {
     position: relative;
-    width: 14px; height: 48px;
-    margin: 0 auto;
-    background: linear-gradient(180deg, #2a2a6e 0%, var(--navy) 100%);
-    border-radius: 1px;
-    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 4px 10px rgba(15,15,50,0.18);
+    display: flex; align-items: center; gap: 11px;
+    width: 100%; text-align: left;
+    background: #f8f5f3; border: none; border-radius: 11px;
+    padding: 6px 13px;
+    font-family: inherit; cursor: pointer;
+    transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
   }
-  .ai-card-ribbon::before {
-    content: '';
-    position: absolute; left: 50%; top: -8px; transform: translateX(-50%);
-    width: 18px; height: 18px; border-radius: 50%;
-    background: var(--yellow);
-    box-shadow: 0 2px 5px rgba(15,15,50,0.28), inset 0 1px 1px rgba(255,255,255,0.6);
+  .xc-card-icon { flex-shrink: 0; width: 34px; height: 40px; border-radius: 7px; overflow: hidden; }
+  .xc-card-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .xc-card-body { display: flex; flex-direction: column; min-width: 0; }
+  .xc-card-body strong { font-size: 12px; font-weight: 700; color: var(--navy); letter-spacing: -0.1px; line-height: 1.2; }
+  .xc-card-desc {
+    font-size: 10.2px; line-height: 1.28; color: var(--body); margin-top: 1px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
-  .ai-card-ribbon::after {
-    content: '';
-    position: absolute; inset: 0; border-radius: inherit;
-    background: linear-gradient(90deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 70%, rgba(0,0,0,0.12) 100%);
+  /* Connector node — present at rest (the "this connects to something"
+     affordance from spec §3.3), on the panel-facing edge of each card. */
+  .xc-node {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--white); border: 2px solid var(--line);
+    transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   }
-  .ai-card-float {
-    position: relative;
-    animation: aiCardFloat 8s ease-in-out infinite;
+  .xc-panel--automate .xc-node { right: -6px; }
+  .xc-panel--create .xc-node { left: -6px; background: var(--navy); border-color: rgba(255,255,255,0.35); }
+  .xc-card:hover .xc-node { border-color: var(--yellow); }
+
+  /* ---- Ambient breathing at rest ---- */
+  @keyframes xcBreathe {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
   }
-  .ai-card-tilt {
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-    transition: transform 0.2s ease-out;
-    will-change: transform;
+  .xc-card-icon img { animation: xcBreathe 8s ease-in-out infinite; }
+  /* Staggered so none of the 12 icons are ever in phase with each other. */
+  .xc-panel--automate .xc-grid > .xc-card:nth-child(1) .xc-card-icon img { animation-delay: 0s; }
+  .xc-panel--automate .xc-grid > .xc-card:nth-child(2) .xc-card-icon img { animation-delay: -1.33s; }
+  .xc-panel--automate .xc-grid > .xc-card:nth-child(3) .xc-card-icon img { animation-delay: -2.66s; }
+  .xc-panel--automate .xc-grid > .xc-card:nth-child(4) .xc-card-icon img { animation-delay: -4s; }
+  .xc-panel--automate .xc-grid > .xc-card:nth-child(5) .xc-card-icon img { animation-delay: -5.33s; }
+  .xc-panel--automate .xc-grid > .xc-card:nth-child(6) .xc-card-icon img { animation-delay: -6.66s; }
+  .xc-panel--create .xc-grid > .xc-card:nth-child(1) .xc-card-icon img { animation-delay: -0.66s; }
+  .xc-panel--create .xc-grid > .xc-card:nth-child(2) .xc-card-icon img { animation-delay: -2s; }
+  .xc-panel--create .xc-grid > .xc-card:nth-child(3) .xc-card-icon img { animation-delay: -3.33s; }
+  .xc-panel--create .xc-grid > .xc-card:nth-child(4) .xc-card-icon img { animation-delay: -4.66s; }
+  .xc-panel--create .xc-grid > .xc-card:nth-child(5) .xc-card-icon img { animation-delay: -6s; }
+  .xc-panel--create .xc-grid > .xc-card:nth-child(6) .xc-card-icon img { animation-delay: -7.33s; }
+
+  /* ---- Card states ---- */
+  .xc-card[data-xc-state="selected"] {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(15,15,50,0.16);
   }
-  .ai-card-flip {
-    position: relative;
-    display: grid;
-    cursor: pointer;
-    transform-style: preserve-3d;
-    transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
-    will-change: transform;
+  .xc-panel--automate .xc-card[data-xc-state="selected"]::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--yellow); border-radius: 12px 0 0 12px;
   }
-  .ai-card-flip.flipped { transform: rotateY(180deg); }
-  @keyframes aiCardFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
+  .xc-panel--create .xc-card[data-xc-state="selected"] .xc-node {
+    background: var(--yellow); border-color: var(--yellow);
+    box-shadow: 0 0 0 5px rgba(245,197,24,0.22);
   }
-  .ai-card-face {
-    grid-area: 1 / 1;
-    position: relative;
-    /* z-index (any value, even 0) turns this into a stacking context of its
-       own — required for the shine pseudo-element's negative z-index below
-       to be trapped behind this card's normal content instead of escaping
-       to compete with unrelated elements elsewhere on the page. */
-    z-index: 0;
-    overflow: hidden;
-    max-height: 70vh;
-    backface-visibility: hidden; -webkit-backface-visibility: hidden;
-    border-radius: 20px; padding: 30px 44px 40px;
-    box-shadow: 0 60px 100px rgba(15,15,50,0.12), 0 20px 40px rgba(15,15,50,0.07), 0 6px 14px rgba(15,15,50,0.05);
+  .xc-card[data-xc-state="unavailable"] { opacity: 0.4; pointer-events: none; cursor: default; }
+  .xc-card[data-xc-state="sibling"] { opacity: 0.6; }
+  .xc-card[data-xc-state="unavailable"] .xc-card-icon img,
+  .xc-card[data-xc-state="sibling"] .xc-card-icon img,
+  .xc-card[data-xc-state="selected"] .xc-card-icon img { animation-play-state: paused; }
+
+  /* ---- Result band ---- */
+  .xc-result {
+    margin-top: 10px;
+    background: var(--off-white);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 28px;
+    min-height: 112px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
   }
-  /* Specular highlight — a soft light patch that drifts toward the JS-set
-     --ai-shine-x/--ai-shine-y position (driven by the same pointer data as
-     the tilt), so the glare visibly moves across the surface as the card
-     "tilts", reinforcing the 3D read independent of the rotation itself.
-     z-index:-1 (not source order / ::before vs ::after) is what actually
-     keeps this behind the item cards and icons: an absolutely positioned
-     pseudo-element paints in the "positioned descendants" layer above ALL
-     static in-flow content regardless of whether it's ::before or ::after,
-     so source order alone doesn't control it. Negative z-index is the only
-     thing that sinks it below the item cards while staying above the plain
-     card background (see .ai-card-face's z-index:0 above, which traps it
-     inside this card's own stacking context) — without that, this washes
-     out the icon images sitting on top of it with a white blend. */
-  .ai-card-face::before {
-    content: ''; position: absolute; inset: -25%; z-index: -1; border-radius: inherit;
-    background: radial-gradient(circle at var(--ai-shine-x, 50%) var(--ai-shine-y, 12%), rgba(255,255,255,0.65), rgba(255,255,255,0) 52%);
-    mix-blend-mode: overlay; pointer-events: none;
+  .xc-result-empty { font-size: 12.5px; font-weight: 600; color: var(--navy); opacity: 0.55; }
+  .xc-result-title { font-size: clamp(16px, 1.7vw, 20px); font-weight: 700; color: var(--navy); letter-spacing: -0.3px; margin-bottom: 4px; }
+  .xc-result-line { font-size: 13px; line-height: 1.5; color: var(--body); max-width: 760px; margin-bottom: 8px; }
+  .xc-result-sources { font-size: 10.5px; font-weight: 600; letter-spacing: 0.3px; color: var(--meta); text-transform: uppercase; }
+
+  /* ---- Focus rings — visible on both light and dark panels ---- */
+  .xc-card:focus-visible {
+    outline: 2px solid var(--navy); outline-offset: 2px;
   }
-  .ai-card-back::before {
-    background: radial-gradient(circle at var(--ai-shine-x, 50%) var(--ai-shine-y, 12%), rgba(255,255,255,0.32), rgba(255,255,255,0) 52%);
+  .xc-panel--create .xc-card:focus-visible {
+    outline: 2px solid var(--white);
   }
-  .ai-card-front { background: var(--white); }
-  .ai-card-back { background: var(--navy); transform: rotateY(180deg); }
-  .ai-card-head-row { letter-spacing: 0.4px; margin-bottom: 16px; }
-  .ai-card-title { font-size: clamp(27px, 2.9vw, 39px); font-weight: 700; color: var(--navy); line-height: 1.1; }
-  .ai-card-subtitle { font-size: 13.5px; font-weight: 600; color: var(--navy); opacity: 0.4; margin-top: 5px; }
-  .ai-card-back .ai-card-title { color: #f8f5f3; }
-  .ai-card-back .ai-card-subtitle { color: #f8f5f3; opacity: 0.75; }
-  .ai-card-items { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .ai-card-item { display: flex; align-items: center; gap: 16px; background: #f8f5f3; border-radius: 16px; padding: 16px 20px; }
-  .ai-card-item-icon {
-    flex-shrink: 0; width: 66px; height: 78px; border-radius: 12px;
-    overflow: hidden;
-  }
-  .ai-card-item-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .ai-card-item strong { display: block; font-size: 15.5px; font-weight: 700; color: var(--navy); margin-bottom: 4px; letter-spacing: -0.2px; }
-  .ai-card-item p { font-size: 12.5px; line-height: 1.42; color: var(--body); margin: 0; }
-  .ai-card-flip-btn {
-    margin-top: 14px;
-    display: inline-flex; align-items: center; gap: 10px;
-    border: none; border-radius: 999px;
-    background: var(--yellow); color: var(--navy);
-    padding: 13px 26px 13px 30px;
-    font-size: 12.5px; font-weight: 700; letter-spacing: 0.4px;
-    box-shadow: 0 14px 30px rgba(245,197,24,0.32), 0 4px 10px rgba(26,26,78,0.1);
-    cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .ai-card-flip-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 36px rgba(245,197,24,0.4), 0 6px 14px rgba(26,26,78,0.14); }
-  .ai-card-flip-icon { width: 18px; height: 18px; }
+
   @media (max-width: 900px) {
-    .ai-card-face { padding: 30px 26px 40px; }
-    .ai-card-items { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .ai-card-item { padding: 14px 16px; gap: 12px; }
-    .ai-card-item-icon { width: 56px; height: 66px; }
+    .xc-stage { grid-template-columns: 1fr; gap: 0; margin-top: 12px; padding-left: 22px; }
+    .xc-line-svg { display: none; }
+    .xc-panel { margin-bottom: 10px; }
+    .xc-panel--automate, .xc-panel--create { border-radius: 16px; padding: 18px 20px; }
+    .xc-node { display: none; }
+    /* Vertical rail replaces the SVG connector line: a track running down
+       the left edge of the stacked panels, with a node per selection and a
+       fill between them once both are chosen. Positioned by JS (xConnect)
+       against the same card rects used to compute state. */
+    .xc-rail {
+      display: block; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      margin-left: 6px;
+    }
+    .xc-rail-track { position: absolute; inset: 0; background: var(--line); border-radius: 2px; }
+    .xc-rail-fill {
+      position: absolute; left: 0; width: 100%; background: var(--yellow); border-radius: 2px;
+      top: 0; height: 0; transition: top 0.35s cubic-bezier(.22,1,.36,1), height 0.35s cubic-bezier(.22,1,.36,1), opacity 0.2s ease;
+      opacity: 0;
+    }
+    .xc-rail-fill.visible { opacity: 1; }
+    .xc-rail-node {
+      position: absolute; left: 50%; transform: translate(-50%, -50%);
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--white); border: 2px solid var(--line);
+      opacity: 0; transition: opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+    .xc-rail-node.visible { opacity: 1; background: var(--yellow); border-color: var(--yellow); }
   }
   @media (max-height: 780px) {
     .automate .automate-head { margin-bottom: 0; }
     .automate .automate-head h2 { margin-bottom: 4px; }
     .automate .automate-head .lede { display: none; }
-    .ai-card-stage { margin-top: 8px; }
-    .ai-card-ribbon { height: 34px; }
-    .ai-card-head-row { margin-bottom: 8px; }
-    .ai-card-face { padding: 18px 28px 24px; }
-    .ai-card-title { font-size: clamp(22px, 2.6vw, 30px); }
-    .ai-card-items { gap: 8px; }
-    .ai-card-item { padding: 9px 14px; gap: 12px; }
-    .ai-card-item-icon { width: 44px; height: 52px; }
-    .ai-card-item strong { font-size: 13px; margin-bottom: 2px; }
-    .ai-card-item p { font-size: 11px; }
-    .ai-card-flip-btn { margin-top: 10px; padding: 9px 20px 9px 24px; }
+    .xc-prompt { margin-top: 6px; }
+    .xc-stage { margin-top: 10px; gap: 40px; }
+    .xc-panel { padding: 14px 18px; }
+    .xc-panel-head { margin-bottom: 8px; }
+    .xc-grid { gap: 5px; }
+    .xc-card { padding: 6px 10px; gap: 9px; }
+    .xc-card-icon { width: 30px; height: 36px; }
+    .xc-card-body strong { font-size: 11px; }
+    .xc-card-desc { font-size: 9.5px; -webkit-line-clamp: 1; }
+    .xc-result { margin-top: 10px; padding: 10px 20px; min-height: 90px; }
+    .xc-result-title { font-size: 15px; margin-bottom: 3px; }
+    .xc-result-line { font-size: 11.5px; }
+    .xc-result-sources { font-size: 9.5px; }
   }
-  @media (max-width: 720px) {
-    .ai-card-items { grid-template-columns: 1fr; }
-    .ai-card-face { padding: 26px 22px 44px; }
+  @media (prefers-reduced-motion: reduce) {
+    .xc-card-icon img { animation: none; }
+    .xc-card { transition: opacity 0.01s linear; }
+    .xc-line-path { transition: opacity 0.01s linear; }
+    .xc-line-dot { transition: none; }
+    .xc-prompt { transition: opacity 0.01s linear; }
+    .xc-rail-fill, .xc-rail-node { transition: none; }
   }
 
   /* ============ SHORT DECK: SLIDE 04 — PORTFOLIO CARD ROW + MODAL ============ */
@@ -2701,15 +2732,20 @@
     background: var(--white); border: 1px solid var(--line); border-radius: 18px;
     overflow: hidden; cursor: pointer; padding: 0;
     box-shadow: 0 1px 2px rgba(26,26,78,0.05), 0 24px 48px rgba(26,26,78,0.14);
-    opacity: 0.45; transition: opacity 0.3s ease;
+    opacity: 0.65; transition: opacity 0.3s ease;
   }
   .pf-stack-card:hover { opacity: 1; }
+  /* Set by JS while the row idle-drifts (cursor off the row entirely) — the
+     card nearest the row's horizontal center gets the same full opacity as
+     a real :hover, so the "spotlight" reads consistently either way. */
+  .pf-stack-card--auto-focus { opacity: 1; }
   /* Every .slide sits in the same position:absolute rect at all times, so an
      off-slide card must never be a hit target — otherwise a click meant for
      whatever slide is actually showing can land here instead. !important
      forces that off regardless of any other rule touching pointer-events. */
   .slide:not([data-state="active"]) .pf-stack-card { pointer-events: none !important; }
   .pf-stack-media {
+    position: relative;
     aspect-ratio: 16 / 10; background: var(--off-white); flex-shrink: 0;
     display: flex; align-items: center; justify-content: center; padding: 32px; pointer-events: none;
   }
@@ -2717,6 +2753,21 @@
   .pf-stack-media img { max-width: 100%; max-height: 100%; object-fit: contain; }
   .pf-stack-media--photo { padding: 0; }
   .pf-stack-media--photo img { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; }
+  .pf-stack-tag {
+    position: absolute; top: 10px; left: 10px; z-index: 2;
+    background: rgba(17,17,17,0.75); color: #fff; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.7px; text-transform: uppercase; padding: 5px 10px; border-radius: 999px;
+  }
+  .pf-stack-play {
+    position: absolute; inset: 0; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pf-stack-play-circle {
+    width: 56px; height: 56px; border-radius: 50%; background: rgba(17,17,17,0.55);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .pf-stack-play-circle svg { width: 20px; height: 20px; color: #fff; margin-left: 2px; }
   .pf-stack-body { padding: 20px 26px 22px; display: flex; flex-direction: column; gap: 6px; pointer-events: none; min-height: 0; overflow: hidden; flex: 1; }
   .pf-stack-sector { font-size: 11px; letter-spacing: 1.2px; font-weight: 600; color: var(--meta); text-transform: uppercase; }
   .pf-stack-title { font-size: 20px; color: var(--navy); letter-spacing: -0.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2768,6 +2819,25 @@
   .pf-modal-results li::before {
     content: ''; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--yellow);
   }
+  .pf-video-overlay {
+    position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.85); opacity: 0; transition: opacity 0.3s ease; z-index: 210; padding: 40px;
+  }
+  .pf-video-overlay.open { display: flex; }
+  .pf-video-overlay.visible { opacity: 1; }
+  .pf-video-box {
+    position: relative; width: 100%; max-width: 960px;
+    transform: scale(0.98); transition: transform 0.3s ease;
+  }
+  .pf-video-overlay.visible .pf-video-box { transform: scale(1); }
+  .pf-video-box video { width: 100%; max-height: 82vh; border-radius: 12px; display: block; background: #000; }
+  .pf-video-close {
+    position: absolute; top: -44px; right: 0; width: 36px; height: 36px; border-radius: 50%;
+    border: none; background: rgba(255,255,255,0.92); cursor: pointer; font-size: 14px; color: var(--navy);
+    display: flex; align-items: center; justify-content: center; z-index: 2;
+  }
+  .pf-video-close:hover { background: #fff; }
+
   @media (min-width: 1920px) { .pf-stack { padding-left: 120px; padding-right: 120px; } }
   @media (max-width: 1024px) { .pf-stack-card { flex-basis: 300px; width: 300px; height: 500px; } }
   @media (max-width: 640px) {
@@ -2923,92 +2993,114 @@
   </div>
 
 
-  <!-- SLIDE 03: WHAT AI DOES (split: automate + create) -->
-  <div class="slide automate ai-split" data-state="future" data-logo="dark" data-order="3">
+  <!-- SLIDE 03: WHAT AI DOES (Cross-Connect: pair an AUTOMATE card with a CREATE card) -->
+  <div class="slide automate ai-split xconnect" data-state="future" data-logo="dark" data-order="3">
     <section class="top-align">
       <div class="container">
         <div class="automate-head reveal">
           <h2>Two sides of AI, <span class="accent">both operated by us.</span></h2>
           <p class="lede">Same partner, same operating model — one half gives your team back its hours, the other gives your brand a production line.</p>
+          <p class="xc-prompt" id="xcPrompt">Pick one from each side.</p>
         </div>
-        <div class="ai-card-stage reveal">
-          <div class="ai-card-rig" id="aiCardRig">
-            <div class="ai-card-ribbon" aria-hidden="true"></div>
-            <div class="ai-card-float">
-            <div class="ai-card-tilt" id="aiCardTilt">
-              <div class="ai-card-flip" id="aiCardFlip">
-                <div class="ai-card-face ai-card-front">
-                  <div class="ai-card-head-row">
-                    <div class="ai-card-title">AUTOMATE</div>
-                    <div class="ai-card-subtitle">The back office</div>
-                  </div>
-                  <div class="ai-card-items">
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-hr-workflow.jpg" alt=""></div>
-                      <div><strong>HR Workflow Automation</strong><p>Onboarding, leave, payroll queries — handled without a ticket queue.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-finance-operations.jpg" alt=""></div>
-                      <div><strong>Finance Operations</strong><p>Invoices, reconciliation, close — compressed from days to hours.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-ops-project.jpg" alt=""></div>
-                      <div><strong>Ops &amp; Project Management</strong><p>Status, blockers, reporting — without the status meeting.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-geo-optimization.jpg" alt=""></div>
-                      <div><strong>GEO Optimization</strong><p>Ranking in the answers AI generates, not just search results.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-custom-agents.jpg" alt=""></div>
-                      <div><strong>Custom AI Agents</strong><p>Built to your workflows, your data, your guardrails.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-knowledge-retrieval.jpg" alt=""></div>
-                      <div><strong>Knowledge Retrieval (RAG)</strong><p>Your documents answer questions instead of your people.</p></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="ai-card-face ai-card-back">
-                  <div class="ai-card-head-row">
-                    <div class="ai-card-title">CREATE</div>
-                    <div class="ai-card-subtitle">The generative stack</div>
-                  </div>
-                  <div class="ai-card-items">
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-video-generation.jpg" alt=""></div>
-                      <div><strong>Video Generation</strong><p>From a single brief to a finished video, minutes not weeks.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-image-generation.jpg" alt=""></div>
-                      <div><strong>Image Generation</strong><p>Product shots, campaign art, social creative — generated, not scheduled.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-websites-landing.jpg" alt=""></div>
-                      <div><strong>Websites &amp; Landing Pages</strong><p>Brief in, live page out.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-digital-humans.jpg" alt=""></div>
-                      <div><strong>Digital Humans</strong><p>Presenters, hosts, spokespeople — without a shoot.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-apps.jpg" alt=""></div>
-                      <div><strong>Apps</strong><p>iOS, Android, and cross-platform — built and shipped end to end.</p></div>
-                    </div>
-                    <div class="ai-card-item">
-                      <div class="ai-card-item-icon"><img src="assets/ai-cards/ai-icon-complex-systems.jpg" alt=""></div>
-                      <div><strong>Complex Digital Systems</strong><p>Multi-service platforms and integrations, engineered as one build.</p></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
+        <div class="xc-stage reveal" id="xcStage">
+          <svg class="xc-line-svg" id="xcLineSvg" aria-hidden="true" focusable="false">
+            <path class="xc-line-path" id="xcLinePath"></path>
+            <circle class="xc-line-dot" id="xcLineDot" r="4"></circle>
+          </svg>
+          <div class="xc-rail" id="xcRail" aria-hidden="true">
+            <span class="xc-rail-track"></span>
+            <span class="xc-rail-fill" id="xcRailFill"></span>
+            <span class="xc-rail-node xc-rail-node--a" id="xcRailNodeA"></span>
+            <span class="xc-rail-node xc-rail-node--b" id="xcRailNodeB"></span>
+          </div>
+
+          <div class="xc-panel xc-panel--automate" id="xcPanelAutomate">
+            <div class="xc-panel-head">
+              <div class="xc-panel-title">AUTOMATE</div>
+              <div class="xc-panel-subtitle">The back office</div>
             </div>
+            <div class="xc-grid">
+              <button class="xc-card" type="button" data-panel="automate" data-card="hr" aria-pressed="false">
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-hr-workflow.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>HR Workflow Automation</strong><span class="xc-card-desc">Onboarding, leave, payroll queries — handled without a ticket queue.</span></span>
+                <span class="xc-node" aria-hidden="true"></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="automate" data-card="finance" aria-pressed="false">
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-finance-operations.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Finance Operations</strong><span class="xc-card-desc">Invoices, reconciliation, close — compressed from days to hours.</span></span>
+                <span class="xc-node" aria-hidden="true"></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="automate" data-card="ops" aria-pressed="false">
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-ops-project.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Ops &amp; Project Management</strong><span class="xc-card-desc">Status, blockers, reporting — without the status meeting.</span></span>
+                <span class="xc-node" aria-hidden="true"></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="automate" data-card="geo" aria-pressed="false">
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-geo-optimization.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>GEO Optimization</strong><span class="xc-card-desc">Ranking in the answers AI generates, not just search results.</span></span>
+                <span class="xc-node" aria-hidden="true"></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="automate" data-card="agents" aria-pressed="false">
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-custom-agents.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Custom AI Agents</strong><span class="xc-card-desc">Built to your workflows, your data, your guardrails.</span></span>
+                <span class="xc-node" aria-hidden="true"></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="automate" data-card="rag" aria-pressed="false">
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-knowledge-retrieval.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Knowledge Retrieval (RAG)</strong><span class="xc-card-desc">Your documents answer questions instead of your people.</span></span>
+                <span class="xc-node" aria-hidden="true"></span>
+              </button>
             </div>
           </div>
-          <button class="ai-card-flip-btn" id="aiCardFlipBtn" type="button">
-            <svg class="ai-card-flip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2.1l4 4-4 4"/><path d="M3 12.6v-1a4 4 0 0 1 4-4h14"/><path d="M7 21.9l-4-4 4-4"/><path d="M21 11.4v1a4 4 0 0 1-4 4H3"/></svg>
-            <span>Tap to flip</span>
-          </button>
+
+          <div class="xc-panel xc-panel--create" id="xcPanelCreate">
+            <div class="xc-panel-head">
+              <div class="xc-panel-title">CREATE</div>
+              <div class="xc-panel-subtitle">The generative stack</div>
+            </div>
+            <div class="xc-grid">
+              <button class="xc-card" type="button" data-panel="create" data-card="video" aria-pressed="false">
+                <span class="xc-node" aria-hidden="true"></span>
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-video-generation.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Video Generation</strong><span class="xc-card-desc">From a single brief to a finished video, minutes not weeks.</span></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="create" data-card="image" aria-pressed="false">
+                <span class="xc-node" aria-hidden="true"></span>
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-image-generation.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Image Generation</strong><span class="xc-card-desc">Product shots, campaign art, social creative — generated, not scheduled.</span></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="create" data-card="websites" aria-pressed="false">
+                <span class="xc-node" aria-hidden="true"></span>
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-websites-landing.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Websites &amp; Landing Pages</strong><span class="xc-card-desc">Brief in, live page out.</span></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="create" data-card="humans" aria-pressed="false">
+                <span class="xc-node" aria-hidden="true"></span>
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-digital-humans.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Digital Humans</strong><span class="xc-card-desc">Presenters, hosts, spokespeople — without a shoot.</span></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="create" data-card="apps" aria-pressed="false">
+                <span class="xc-node" aria-hidden="true"></span>
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-apps.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Apps</strong><span class="xc-card-desc">Internal tools and customer portals — built in weeks, not quarters.</span></span>
+              </button>
+              <button class="xc-card" type="button" data-panel="create" data-card="platform" aria-pressed="false">
+                <span class="xc-node" aria-hidden="true"></span>
+                <span class="xc-card-icon"><img src="assets/ai-cards/ai-icon-complex-systems.jpg" alt=""></span>
+                <span class="xc-card-body"><strong>Platform Engineering</strong><span class="xc-card-desc">Platforms, integrations, pipelines — architected, built, and operated.</span></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="xc-result" id="xcResult" aria-live="polite">
+          <div class="xc-result-empty" id="xcResultEmpty">Pick one from each side.</div>
+          <div class="xc-result-content" id="xcResultContent" hidden>
+            <div class="xc-result-title" id="xcResultTitle"></div>
+            <p class="xc-result-line" id="xcResultLine"></p>
+            <div class="xc-result-sources" id="xcResultSources"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -3039,6 +3131,14 @@
         <h3 class="pf-modal-title" id="pfModalTitle"></h3>
         <div class="pf-modal-body" id="pfModalBody"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Portfolio video player (shared, outside slides) -->
+  <div class="pf-video-overlay" id="pfVideoOverlay">
+    <div class="pf-video-box">
+      <button class="pf-video-close" onclick="closeVideo()" title="Close">✕</button>
+      <video id="pfVideoPlayer" controls playsinline></video>
     </div>
   </div>
 
@@ -3343,6 +3443,7 @@
   document.addEventListener('keydown', (e) => {
     if (isPresentMode) return;
     if (pfModalOpen) { if (e.key === 'Escape') closePortfolio(); return; }
+    if (pfVideoOpen) { if (e.key === 'Escape') closeVideo(); return; }
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goToSlide(currentIndex + 1);
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goToSlide(currentIndex - 1);
     if (e.key === 'Escape') closeOverview();
@@ -3358,7 +3459,7 @@
     _touchStartY = e.touches[0].clientY;
   }, { passive: true });
   document.addEventListener('touchend', (e) => {
-    if (overviewOpen || pfModalOpen) return;
+    if (overviewOpen || pfModalOpen || pfVideoOpen) return;
     // Let horizontally scrollable/swipeable areas (outcomes cards, the portfolio
     // stack) handle the gesture themselves instead of swiping slides.
     const t = e.target instanceof Element ? e.target : null;
@@ -3468,107 +3569,64 @@
   });
 
   // ============ PORTFOLIO GRID + MODAL: "Selected work" ============
+  // Curated order per client request — cases outside this list are kept
+  // out of the deck for now rather than deleted from history.
   const portfolioCases = [
     { id: 'onebangkok', sector: 'Proptech', title: 'One Bangkok', kind: 'software', hero: 'assets-cases-short/Case_1.png', photo: true,
       short: "Resident and tenant super-app for Bangkok's largest mixed-use development.",
       challenge: "One Bangkok brings residents, office tenants, retailers and visitors onto a single estate, each group with different needs and separate service touchpoints. Access, facilities, payments and communications risked being spread across disconnected tools.",
       built: "We designed and built a single super-app covering the whole development — resident and tenant onboarding, digital access, facility and amenity booking, service requests, billing and estate-wide announcements — on one platform with role-based experiences.",
       bullets: ['One app serving residents, tenants and visitors across the entire development', 'Digital access and facility booking replacing manual, counter-based processes', 'Service requests and announcements centralised for the estate management team', 'Scalable platform designed to absorb new buildings and services as the district opens'] },
+    { id: 'hkpromotion', sector: 'AI Generation', title: 'HK Promotion', kind: 'software', hero: 'assets-cases-short/HK_Promotion_cover.jpg', photo: true,
+      video: 'assets-cases-short/videos/HK%20Promotion.mp4',
+      short: 'AI-generated promotional video for the Hong Kong Business Association Vietnam, opening on traditional Chinese opera imagery.',
+      paragraph: 'Full case study coming soon.' },
     { id: 'minorhotel', sector: 'Hospitality', title: 'Minor Hotel', kind: 'software', hero: 'assets-cases-short/Case_2.png', photo: true,
       short: "Event companion app for Anantara's heritage car show, built in React Native for iOS and Android.",
       challenge: "Anantara needed a digital companion for a heritage car show event that matched the brand's luxury positioning. A standard event app could not carry the vintage, Italian aesthetic the occasion called for, and the audience was international and split across both mobile platforms.",
       built: "We designed and developed a mobile app reflecting Anantara's luxury brand with a vintage, Italian aesthetic, and built it in React Native to hold app quality consistent across platforms. Booking, schedule and gallery features were integrated to support engagement throughout the event.",
       bullets: ['Smooth, visually rich experience aligned with the feel of a heritage car show', 'Booking, schedule and gallery in one app to support event engagement', 'Consistent quality on iOS and Android from a single React Native codebase', 'Enhanced international reach and brand prestige through digital sophistication'] },
-    { id: 'flowyachtclub', sector: 'Luxury', title: 'Flow Yacht Club', kind: 'software', hero: 'assets-cases-short/Case_3.png', photo: true,
-      short: 'Fractional yacht ownership and booking platform with yield optimisation for owners and members.',
-      challenge: 'Flow Yacht Club runs on fractional ownership, where owners and members draw on the same limited fleet. Without an intelligent reservation system, booking conflicts, under-used yachts and manually handled concierge requests would cap both member satisfaction and owner returns.',
-      built: 'We developed a fractional yacht ownership and booking platform serving both sides: an intelligent reservation system with calendar sync, availability tracking and yield optimisation; member profiles with a personalised request system for luxury experiences; and an owner dashboard for real-time monitoring of yacht usage, ROI and bookings.',
-      bullets: ['Intelligent reservation system with calendar sync and availability tracking', 'Yield optimisation improving fleet utilisation and owner returns', 'Personalised luxury request handling through member profiles', 'Real-time visibility of usage, ROI and bookings for owners', 'Streamlined operations and an elevated premium booking experience through smart automation'] },
-    { id: 'sansiri', sector: 'Hospitality', title: 'Sansiri', kind: 'software', hero: 'assets-cases-short/Case_4.png', photo: true,
-      short: "Revamped juristic chat, parcel delivery and news feed back-office for Sansiri's residential platform.",
-      challenge: "Sansiri's residential service tools had aged. Juristic chat created heavy administrative workload for property management teams, the parcel delivery flow frustrated tenants, and the back-office could not support deep-linking or tracking for its news feed.",
-      built: 'We revamped three areas of the platform: juristic chat, with key features to increase the efficiency and productivity of administrative work; parcel delivery, rebuilt around the tenant’s experience; and back-office news feed management, extended to support deep-linking and tracking.',
-      bullets: ['Faster, less manual administrative work for juristic teams', 'Improved tenant experience for parcel notification and collection', 'News feed back-office supporting deep-linking and campaign tracking', 'A more maintainable base for future resident-facing features'] },
-    { id: 'sharge', sector: 'EV', title: 'SHARGE', kind: 'software', hero: 'assets-cases-short/Case_5.png', photo: true,
-      short: 'EV charging software infrastructure — helped secure Series A and reach top-5 network share in Thailand.',
-      challenge: 'Sharge was scaling an EV charging network in an early-stage Thai market. Growth depended on both the software infrastructure to run and expand the network, and the technical credibility to raise institutional funding.',
-      built: 'We acted as the client’s technical advisor and helped build the software infrastructure underpinning the expansion of their EV ecosystem, covering the platform layer connecting charging hardware, drivers and operators.',
-      bullets: ['Assisted the client as technical advisor and helped secure Series A investment', 'Helped build the software infrastructure to expand the EV ecosystem', 'As of 2022, Sharge held top-5 market share in Thailand by number of EV stations'] },
-    { id: 'swapandgo', sector: 'EV', title: 'Swap & Go', kind: 'software', hero: 'assets-cases-short/Case_6.png', photo: true,
-      short: 'Battery-swap app for EV riders — Phase 1 proof of concept with 24-hour self-service lockers.',
-      challenge: 'Swap & Go needed to prove that battery swapping for electric motorbikes could work as an unattended, self-service model. That meant connecting a rider-facing app to physical battery locker hardware before committing to a full rollout.',
-      built: 'We assisted the client in launching Phase 1 as a proof-of-concept app, identified and supported the IoT integration required between app and lockers, and worked through the implementation so riders could authenticate and operate lockers on their own.',
-      bullets: ['Phase 1 proof-of-concept app launched', 'IoT integration between app and battery lockers identified and supported', 'Riders gained access to 24-hour self-operated battery lockers', 'Self-service swap model validated ahead of wider rollout'] },
-    { id: 'mcdonalds', sector: 'Food & Beverage', title: "McDonald's Thailand", kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: "Delivery app, website and CRM with a modular promotion engine for McDonald's Thailand.",
-      challenge: "McDonald's Thailand wanted a brand-new delivery website and mobile app to make ordering smoother and easier, whether at home or in the office. Marketing also needed to launch varied promotional mechanics without a development cycle behind every campaign.",
-      built: 'We developed the delivery website and mobile app end to end, integrated with a third-party delivery service, and built a CRM platform with a modular promotion engine supporting mechanics such as “Buy 1 Get 1” and “Spend X, Get Y”.',
-      bullets: ['Order food and drinks for delivery, with the nearest branch selected automatically for members', 'Full menu available at any time, with no minimum order value', 'Payment by cash at counter or by credit card', 'Delivery status tracking through a simple in-app notification system', 'Points earned and redeemed for discounts or free items on the next order', 'Nearest-restaurant branch finder', 'Marketing teams launch and manage promotions without additional development each time'] },
-    { id: 'aichatbot', sector: 'Retail', title: 'AI Chatbot', kind: 'ai', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: 'Proprietary chatbot engine deployed for YOHO Mall and HSBC as concierge and campaign experiences.',
-      challenge: 'Retail and banking clients needed conversational experiences beyond scripted FAQ bots. A mall wanted a multilingual concierge that could serve shoppers in person; a bank wanted to extend a TV commercial into something audiences could play.',
-      built: 'We deployed our proprietary chatbot engine for both. At YOHO Mall, the AI Ambassador chatbot integrates with kiosks as a digital concierge, providing real-time store navigation, personalised upselling, multilingual support and data-driven marketing insights. For HSBC, an interactive Facebook chatbot game extended a TV commercial storyline, letting players make decisions for the main characters and play mini-games across multiple touchpoints.',
-      bullets: ['Digital concierge on mall kiosks with real-time navigation and multilingual support', 'Personalised upselling and data-driven marketing insight for mall operations', 'Reduced operational costs against staffed information counters', 'TVC storyline extended into an interactive branded game, boosting awareness and interaction'] },
-    { id: 'major', sector: 'Entertainment', title: 'Major', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+    { id: 'neymarworldcup', sector: 'AI Generation', title: 'Neymar World Cup', kind: 'software', hero: 'assets-cases-short/Neymar_World_Cup_cover.jpg', photo: true,
+      video: 'assets-cases-short/videos/Neymar%20World%20Cup.mp4',
+      short: "AI-generated football campaign video starring Neymar, centered on a child's dream.",
+      paragraph: 'Full case study coming soon.' },
+    { id: 'majorcineplex', sector: 'Entertainment', title: 'Major Cineplex', kind: 'software', hero: 'assets-cases-short/Case%20major.png', photo: true,
       short: 'Showtime and smart ticketing app for cinema-goers, from browsing to seat selection and payment.',
       challenge: 'Cinema audiences expect to check showtimes, choose seats and pay within a few taps, while the operator needs ticketing that holds up under the demand spikes around major releases.',
       built: 'We built a showtime and smart ticketing application covering cinema and showtime browsing, seat selection, digital ticketing and payment, designed for high-traffic release windows.',
       bullets: ['Showtime browsing and seat selection in a single mobile flow', 'Digital tickets reducing counter and kiosk queues', 'Ticketing built to hold through peak release demand', 'Foundation in place for membership and promotional mechanics'] },
-    { id: 'moov', sector: 'Entertainment', title: 'Moov', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: "Product consulting and a retained cross-functional team driving Moov's roadmap and faster releases.",
-      challenge: 'Moov needed to evolve its app rapidly to stay competitive, but lacked clear feature prioritisation and market-driven product direction. The team faced uncertainty around which features would create the most impact, leading to slow decision-making and difficulty aligning development with business goals.',
-      built: "We acted as Moov's product consultant and development extension, providing continuous insight on market trends, defining feature requirements and shaping the product roadmap. Our design and development team on retainer enabled rapid prototyping and execution without increasing internal headcount.",
-      bullets: ['Clear, insight-driven product roadmap', 'Faster feature delivery with a dedicated cross-functional team', 'Improved user experience through refined UX and prioritised enhancements', 'Reduced operational burden, allowing Moov to focus on growth'] },
-    { id: 'ticketmelon', sector: 'Entertainment', title: 'Ticketmelon', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
+    { id: 'momaxvibego', sector: 'AI Generation', title: 'Momax Vibe Go', kind: 'software', hero: 'assets-cases-short/Momax_Vibe_Go_cover.jpg', photo: true,
+      video: 'assets-cases-short/videos/Momax%20Vibe%20Go.mp4',
+      short: "AI-generated product film for Momax's Vibe Go, used for product promotion campaigns.",
+      paragraph: 'Full case study coming soon.' },
+    { id: 'mcdonalds', sector: 'Food & Beverage', title: "McDonald's Thailand", kind: 'software', hero: 'assets-cases-short/Case%20mcdonalds.png', photo: true,
+      short: "Delivery app, website and CRM with a modular promotion engine for McDonald's Thailand.",
+      challenge: "McDonald's Thailand wanted a brand-new delivery website and mobile app to make ordering smoother and easier, whether at home or in the office. Marketing also needed to launch varied promotional mechanics without a development cycle behind every campaign.",
+      built: 'We developed the delivery website and mobile app end to end, integrated with a third-party delivery service, and built a CRM platform with a modular promotion engine supporting mechanics such as “Buy 1 Get 1” and “Spend X, Get Y”.',
+      bullets: ['Order food and drinks for delivery, with the nearest branch selected automatically for members', 'Full menu available at any time, with no minimum order value', 'Payment by cash at counter or by credit card', 'Delivery status tracking through a simple in-app notification system', 'Points earned and redeemed for discounts or free items on the next order', 'Nearest-restaurant branch finder', 'Marketing teams launch and manage promotions without additional development each time'] },
+    { id: 'thereverievietnam', sector: 'AI Generation', title: 'The Reverie Vietnam', kind: 'software', hero: 'assets-cases-short/The_Reverie_Vietnam_cover.jpg', photo: true,
+      video: 'assets-cases-short/videos/The%20Reverie%20Vietnam.mp4',
+      short: 'AI-generated brand film for The Reverie Vietnam.',
+      paragraph: 'Full case study coming soon.' },
+    { id: 'theparq', sector: 'Proptech', title: 'The PARQ', kind: 'software', hero: 'assets-cases-short/Case%20The%20Parq.png', photo: true,
+      short: 'Smart building app unifying shopping, wayfinding and IoT-connected access for a Bangkok mixed-use development.',
+      challenge: "The PARQ is a fully integrated mixed-use Smart Building in Bangkok, built on innovative architecture and sustainable design principles. The client needed a smart mobile app to connect every part of the building at a touch, delivering a seamless experience whether users were shopping, working from an office, or attending a meeting.",
+      built: "We designed a smart application for shoppers, tenants and visitors, covering a shopper digital marketing platform, a shopper insights platform, digital wayfinding, and a unified access and merchant acquiring platform for payments and invoicing. The app also integrates with the building's network of IoT sensors for building, lift and parking access, and real-time environmental information.",
+      bullets: ['Shopper digital marketing platform delivering user insights', 'Smart building services with identity access and membership management', 'Integrated customer engagement and loyalty program', 'User feedback and reporting services'] },
+    { id: 'vietnaminochi', sector: 'AI Generation', title: 'Vietnam Inochi', kind: 'software', hero: 'assets-cases-short/Vietnam_Inochi_cover.jpg', photo: true,
+      video: 'assets-cases-short/videos/Vietnam_Inochi.mp4',
+      short: 'AI-generated lifestyle video for Inochi.',
+      paragraph: 'Full case study coming soon.' },
+    { id: 'ptt', sector: 'EV', title: 'PTT (Swap&Go and EVme)', kind: 'software', hero: 'assets-cases-short/Case_6.png', photo: true,
+      short: 'Battery-swap app for EV riders — Phase 1 proof of concept with 24-hour self-service lockers.',
+      challenge: 'Swap & Go needed to prove that battery swapping for electric motorbikes could work as an unattended, self-service model. That meant connecting a rider-facing app to physical battery locker hardware before committing to a full rollout.',
+      built: 'We assisted the client in launching Phase 1 as a proof-of-concept app, identified and supported the IoT integration required between app and lockers, and worked through the implementation so riders could authenticate and operate lockers on their own.',
+      bullets: ['Phase 1 proof-of-concept app launched', 'IoT integration between app and battery lockers identified and supported', 'Riders gained access to 24-hour self-operated battery lockers', 'Self-service swap model validated ahead of wider rollout'] },
+    { id: 'ticketmelon', sector: 'Entertainment', title: 'Ticketmelon', kind: 'software', hero: 'assets-cases-short/Case%20Ticketmelon.png', photo: true,
       short: "Retained QA team and solution architecture now used as Ticketmelon's official partner integration reference.",
       challenge: 'Ticketmelon, a leading ticketing and event-tech company, needed to scale its platform rapidly to support complex partner integrations while maintaining high service reliability. Limited QA capacity created a testing bottleneck, delaying releases and raising the risk of bugs in live environments. At the same time, partners required detailed technical documentation and integration flows the internal team did not have bandwidth to produce, slowing onboarding and increasing support dependency.',
       built: "We provided a dedicated QA team on retainer, delivering continuous test coverage across new features, integrations and releases. In parallel, our Solution Architect worked with Ticketmelon's engineering team to design clear, scalable, partner-ready system architectures: mapping technical flows for multi-partner integrations, creating reusable architectural diagrams and API specifications, ensuring new integrations aligned with long-term technical strategy, and supporting technical planning and feasibility assessments.",
-      bullets: ['Higher platform reliability through ongoing QA coverage', 'Faster, clearer partner integrations via structured architecture documents', 'SA output adopted as the official reference for partners during integration', 'Reduced engineering workload, freeing the team for core development', 'Scalable system design supporting future business expansion'] },
-    { id: 'rsmall', sector: 'Retail', title: 'RS Mall', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: "E-commerce platform linking RS Mall's on-air TV promotions to real-time online purchasing.",
-      challenge: "RS Mall's business runs on TV commerce, where an on-air promotion has to convert while it is still on screen. The existing website could not carry that attention through to purchase, and frequent campaigns and bundled offers were difficult to configure across a broad health and wellness catalogue.",
-      built: "We redesigned the website for a modern, user-friendly shopping experience and developed a robust e-commerce platform tailored to RS's TV-commerce strategy, with flexible promotion and discount modules and improved product discovery, search and categorisation.",
-      bullets: ['Seamless linkage between on-air promotions and online purchasing for real-time campaign conversion', 'Flexible promotion and discount modules supporting frequent campaigns and bundled offers', 'Product discovery, search and categorisation suited to a diverse health and wellness catalogue', 'A modern, user-friendly shopping experience'] },
-    { id: 'merklecapital', sector: 'Finance', title: 'Merkle Capital', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: "Investment platform for Thailand's first licensed digital asset fund manager.",
-      challenge: 'Merkle Capital, part of Cryptomind Group, became the first company in Thailand licensed by the SEC as a digital asset fund manager. Launching regulated crypto funds meant giving investors a way to subscribe, fund and monitor holdings that felt as trustworthy as traditional asset management, under full regulatory scrutiny.',
-      built: 'We built the investor-facing platform — onboarding and KYC, fund subscription and redemption, portfolio and performance tracking, and reporting — designed to communicate credibility to investors new to regulated digital asset products.',
-      bullets: ['Investor onboarding and KYC aligned with regulatory requirements', 'Fund subscription, redemption and portfolio tracking in one place', 'Clear performance reporting for investors new to digital assets', 'Digital foundation supporting the launch of further regulated funds'] },
-    { id: 'beatsquares', sector: 'AI Innovation', title: 'Beatsquares', kind: 'ai', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: 'AI platform for journalists — workshops through to MVP 0.5, which secured initial investment.',
-      challenge: 'Beatsquares was starting from an idea for an AI-driven platform for journalists, without validated product-market fit, a design foundation, or a clear route to an investable MVP.',
-      built: 'We led workshops to kickstart development, conducted UX/UI research and design tailored to the needs of journalists, and carried out business proof-of-concept research to validate product-market fit, then collaborated closely with the development team and founder through launch.',
-      bullets: ['Workshops that turned the concept into a development plan', "UX/UI research and design grounded in journalists' actual workflows", 'Proof-of-concept research validating product-market fit', 'MVP 0.5 launched and initial investment secured', 'Design foundation established for MVP 1.0, with key features prioritised for the next phase'] },
-    { id: 'pulse', sector: 'Management', title: 'Pulse', kind: 'ai', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: 'AI analytics platform turning company data into role-specific insight for staff, PMs and executives.',
-      challenge: 'Company data sits across systems and rarely reaches the people who need it in a form they can act on. Employees, project managers and executives each need a different view of the same underlying data, and building a separate report for every need does not scale.',
-      built: 'We built an AI-powered analytics platform that transforms company data into actionable insights, personalised for each user and reached through intuitive AI-driven queries rather than dashboards that have to be configured.',
-      bullets: ['Employees track their own productivity', 'Project managers evaluate team resources and allocation', 'Executives access real-time financial overviews', 'Complex data simplified into insight available at the click of a button', 'Smarter, faster business decisions'] },
-    { id: 'ctflife', sector: 'Insurance', title: 'CTF Life', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: 'Website revamp that simplified the insurance purchase journey and lifted conversion.',
-      challenge: "Insurance buying journeys are long and comparison-heavy. CTF Life's site made it hard for visitors to understand the differences between plans and reach a decision, holding back conversion and trust.",
-      built: 'We revamped the website to improve user experience and simplify the insurance purchase journey — optimising CTAs, navigation and product presentation, developing smart comparison tools, and integrating personalised product recommendations based on user profile and behaviour.',
-      bullets: ['Simplified insurance purchase journey', 'Improved conversion through optimised CTAs, navigation and product presentation', 'Smart comparison tools helping users choose the right plan more easily', 'Personalised recommendations based on profile and behaviour', 'Improved brand trust and retention through modern UI and transparent workflows'] },
-    { id: 'jaga', sector: 'Education', title: 'Jaga', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: 'All-in-one education and operations platform for a growing golf academy, built in React Native.',
-      challenge: 'A growing golf academy was running class scheduling, instructor feedback and student progress across disconnected tools, making it hard to keep staff, students and parents aligned — or to support expansion plans.',
-      built: 'We built an all-in-one education and operations platform with instructor and student portals for class schedules, feedback and performance tracking, developed with React Native for seamless mobile accessibility on both iOS and Android.',
-      bullets: ['Instructor and student portals covering scheduling, feedback and performance tracking', 'Seamless mobile accessibility on iOS and Android from one codebase', 'Data-driven insights to personalise training and support academy expansion goals', 'Simplified internal workflows and communication between staff, students and parents'] },
-    { id: 'bangkokcable', sector: 'Manufacturing', title: 'Bangkok Cable Company', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: '60th-anniversary corporate site rebuilt on stakeholder research, with measurable usability and SEO gains.',
-      challenge: 'Bangkok Cable wanted a modern, professional digital presence to mark their 60th anniversary. Research showed the real problems ran deeper than visual design: visitors struggled to find products, certifications and distribution channels, and there were perception and performance gaps to close.',
-      built: 'We went beyond the initial brief, conducting stakeholder and user research to uncover hidden challenges and unmet needs, then facilitating workshops with client teams to define measurable KPIs so every decision aligned with business and user goals.',
-      bullets: ['Stakeholder and user research surfacing issues the brief had not identified', 'Products, certifications and distribution channels made easy to find', 'KPIs defined with client teams to anchor design decisions', 'Measurable improvement in usability, perception and performance metrics such as page speed and SEO'] },
-    { id: 'monopolygamification', sector: 'Gamification', title: 'Monopoly Gamification', kind: 'software', hero: 'assets-cases-short/Case_placeholder.png', photo: true,
-      short: 'Monopoly-inspired mall campaign for Hang Lung — exceeded registration KPIs by 5x.',
-      challenge: 'Hang Lung Property Group aimed to boost foot traffic to their retail mall and grow CRM programme registrations, which meant giving shoppers a reason both to sign up and to keep spending with participating tenants.',
-      built: 'We designed a web-based gamification campaign inspired by Monopoly gameplay and integrated it into the customer journey — easy to access, with no app download. Shoppers converted their spending into chance card draws, each offering a redeemable reward from participating mall partners: the more they spent, the more rewards they earned. Proprietary OCR technology extracted spending data from receipts, with built-in fraud detection to ensure integrity.',
-      bullets: ['Exceeded user registration KPIs by 5x', 'Recorded 8-figure spending (HKD)', 'Distributed 100,000+ rewards', 'Drove CRM sign-ups and repeat spending through game play and rewards', 'Receipt OCR with fraud detection removing manual validation'] },
-    { id: 'garfield', sector: 'Gamification', title: 'Garfield in Mood for Food', kind: 'software', hero: 'assets-cases-short/Case_20.png', photo: true,
-      short: 'Browser-based Garfield game for Nickelodeon — instant play on desktop and mobile, no download.',
-      challenge: 'Nickelodeon needed a branded game that could reach audiences across the region instantly, without an app download, and hold attention long enough to build repeat engagement with the Garfield property.',
-      built: 'We built a browser-based HTML5 game playable on desktop and mobile via a link or QR code. Players guide Garfield around town collecting coins to buy dishes across western, Japanese, Chinese, Singaporean and Malaysian cuisines before his health bar runs down, then race the clock home — with Odie available as a ride to double travelling speed.',
-      bullets: ['Instant access on desktop and mobile with no app install', 'Player profiles tracking progress and unlocked levels to drive return visits', 'Collectible dish album rewarding repeat play', 'Regional cuisine line-up localising the campaign across Southeast Asian markets'] }
+      bullets: ['Higher platform reliability through ongoing QA coverage', 'Faster, clearer partner integrations via structured architecture documents', 'SA output adopted as the official reference for partners during integration', 'Reduced engineering workload, freeing the team for core development', 'Scalable system design supporting future business expansion'] }
   ];
 
   // ============ PORTFOLIO CARD ROW: side-by-side, hover-edge auto-scroll, infinite loop ============
@@ -3582,7 +3640,11 @@
   let pfCardEls = [];
   let pfScrollDir = 0;
   let pfSetWidth = 0;
+  let pfIdle = true;
+  let pfFocusedEl = null;
+  let pfIdleRemainder = 0;
   const PF_SCROLL_SPEED = 1.8;
+  const PF_IDLE_SCROLL_SPEED = 0.4;
   const PF_LOOP_COPIES = 3;
 
   function renderPfCardSet() {
@@ -3590,16 +3652,19 @@
       const el = document.createElement('div');
       el.className = 'pf-stack-card';
       el.dataset.index = String(i);
+      const tagHtml = c.tag ? `<div class="pf-stack-tag">${c.tag}</div>` : '';
+      const playHtml = c.video ? '<div class="pf-stack-play"><div class="pf-stack-play-circle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div>' : '';
+      const ctaLabel = c.video ? 'Watch video' : 'Full story';
       el.innerHTML = `
-        <div class="pf-stack-media${c.photo ? ' pf-stack-media--photo' : ''}"><img src="${c.hero}" alt="${c.title}" loading="lazy"></div>
+        <div class="pf-stack-media${c.photo ? ' pf-stack-media--photo' : ''}">${tagHtml}${playHtml}<img src="${c.hero}" alt="${c.title}" loading="lazy"></div>
         <div class="pf-stack-body">
           <div class="pf-stack-sector">${c.sector}</div>
           <h3 class="pf-stack-title">${c.title}</h3>
           <p class="pf-stack-short">${c.short}</p>
-          <div class="pf-stack-cta"><span>Full story</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+          <div class="pf-stack-cta"><span>${ctaLabel}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
         </div>
       `;
-      el.addEventListener('click', () => openPortfolio(c.id));
+      el.addEventListener('click', () => c.video ? openVideo(c) : openPortfolio(c.id));
       pfStackEl.appendChild(el);
       return el;
     });
@@ -3618,12 +3683,52 @@
     pfStackEl.scrollLeft = oldSetWidth ? pfSetWidth + relative * (pfSetWidth / oldSetWidth) : pfSetWidth;
   }
 
+  // While idle (cursor off the row entirely) the whole row drifts on its
+  // own and the card nearest dead-center gets full opacity, like a spotlight
+  // sweeping across the row — an ambient default so the slide isn't static
+  // before anyone touches it. Real hover always wins: entering the row kills
+  // the drift and clears the spotlight so CSS's plain :hover rule takes over.
+  function pfClearFocusedCard() {
+    if (pfFocusedEl) { pfFocusedEl.classList.remove('pf-stack-card--auto-focus'); pfFocusedEl = null; }
+  }
+
+  function pfUpdateFocusedCard() {
+    if (!pfStackOuterEl || !pfCardEls.length) return;
+    const rect = pfStackOuterEl.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    let closest = null, closestDist = Infinity;
+    for (const el of pfCardEls) {
+      const r = el.getBoundingClientRect();
+      const dist = Math.abs((r.left + r.width / 2) - centerX);
+      if (dist < closestDist) { closestDist = dist; closest = el; }
+    }
+    if (closest !== pfFocusedEl) {
+      pfClearFocusedCard();
+      if (closest) closest.classList.add('pf-stack-card--auto-focus');
+      pfFocusedEl = closest;
+    }
+  }
+
   // Continuous scroll while hovering the left/right half of the row's
   // viewport — direction only, not distance-proportional, per spec. Runs
   // every frame regardless of hover state so it also catches (and wraps)
   // native wheel/trackpad/touch-drag scrolling, not just the autoscroll.
   function pfScrollStep() {
-    if (pfScrollDir !== 0 && pfStackEl) pfStackEl.scrollLeft += pfScrollDir * PF_SCROLL_SPEED;
+    if (pfStackEl) {
+      if (pfScrollDir !== 0) pfStackEl.scrollLeft += pfScrollDir * PF_SCROLL_SPEED;
+      else if (pfIdle) {
+        // scrollLeft's setter rounds to the nearest integer pixel, so a
+        // sub-1px-per-frame speed like this would otherwise get silently
+        // discarded every single frame (added, then rounded straight back
+        // off) and never move at all. Banking the fractional remainder here
+        // and only ever writing whole-pixel steps is what makes a slow
+        // drift actually visible instead of freezing at 0.
+        pfIdleRemainder += PF_IDLE_SCROLL_SPEED;
+        const step = Math.floor(pfIdleRemainder);
+        if (step > 0) { pfStackEl.scrollLeft += step; pfIdleRemainder -= step; }
+        pfUpdateFocusedCard();
+      }
+    }
     if (pfStackEl && pfSetWidth) {
       if (pfStackEl.scrollLeft >= pfSetWidth * 2) pfStackEl.scrollLeft -= pfSetWidth;
       else if (pfStackEl.scrollLeft <= 0) pfStackEl.scrollLeft += pfSetWidth;
@@ -3633,13 +3738,14 @@
 
   if (pfStackOuterEl) {
     pfStackOuterEl.addEventListener('mousemove', (e) => {
+      if (pfIdle) { pfIdle = false; pfClearFocusedCard(); pfIdleRemainder = 0; }
       const rect = pfStackOuterEl.getBoundingClientRect();
       const x = e.clientX - rect.left;
       if (x < rect.width / 3) pfScrollDir = -1;
       else if (x > (rect.width * 2) / 3) pfScrollDir = 1;
       else pfScrollDir = 0;
     });
-    pfStackOuterEl.addEventListener('mouseleave', () => { pfScrollDir = 0; });
+    pfStackOuterEl.addEventListener('mouseleave', () => { pfScrollDir = 0; pfIdle = true; });
   }
 
   if (pfStackEl) {
@@ -3692,6 +3798,43 @@
   if (pfModalOverlay) {
     pfModalOverlay.addEventListener('click', (e) => {
       if (e.target === pfModalOverlay) closePortfolio();
+    });
+  }
+
+  // Video-tagged cases (c.video set) skip the challenge/solution modal
+  // entirely and open straight into a minimal player instead.
+  const pfVideoOverlay = document.getElementById('pfVideoOverlay');
+  const pfVideoPlayer = document.getElementById('pfVideoPlayer');
+  let pfVideoOpen = false;
+
+  function openVideo(c) {
+    if (!c || !c.video || !pfVideoOverlay || !pfVideoPlayer) return;
+    pfVideoPlayer.src = c.video;
+    pfVideoOverlay.classList.add('open');
+    requestAnimationFrame(() => requestAnimationFrame(() => pfVideoOverlay.classList.add('visible')));
+    pfVideoOpen = true;
+    document.body.style.overflow = 'hidden';
+    pfVideoPlayer.play().catch(() => {});
+  }
+
+  function closeVideo() {
+    if (!pfVideoOverlay || !pfVideoPlayer) return;
+    pfVideoOverlay.classList.remove('visible');
+    pfVideoOpen = false;
+    document.body.style.overflow = '';
+    pfVideoPlayer.pause();
+    setTimeout(() => {
+      if (!pfVideoOpen) {
+        pfVideoOverlay.classList.remove('open');
+        pfVideoPlayer.removeAttribute('src');
+        pfVideoPlayer.load();
+      }
+    }, 300);
+  }
+
+  if (pfVideoOverlay) {
+    pfVideoOverlay.addEventListener('click', (e) => {
+      if (e.target === pfVideoOverlay) closeVideo();
     });
   }
 
@@ -4337,114 +4480,316 @@
     sync();
   })();
 
-  (function aiFlipCard() {
-    const stage = document.querySelector('.ai-card-stage');
-    const rigEl = document.getElementById('aiCardRig');
-    const tiltEl = document.getElementById('aiCardTilt');
-    const flipEl = document.getElementById('aiCardFlip');
-    const flipBtn = document.getElementById('aiCardFlipBtn');
-    if (!stage || !rigEl || !tiltEl || !flipEl || !flipBtn) return;
+  (function xConnect() {
+    const slide = document.querySelector('.slide.xconnect');
+    const stage = document.getElementById('xcStage');
+    if (!slide || !stage) return;
 
-    const aiSlide = stage.closest('.slide');
-    const MAX_TILT = 15;
-    // Gain applied before clamping — full tilt is reached well before the
-    // cursor reaches the edge of the screen, so small movements near the
-    // card swing it hard instead of needing a full-width sweep.
-    const SENSITIVITY = 2.6;
-    // The pendulum: how far the ribbon lets the card swing/slide sideways,
-    // and how stiff/damped the spring pulling it back toward "hanging
-    // straight down" is. This pair is deliberately underdamped (damping is
-    // well under the critical value for this stiffness) so a fast pointer
-    // move overshoots the rest angle by a degree or two before settling —
-    // that overshoot-and-settle is what actually reads as gravity and
-    // inertia, rather than the rotation just tracking the mouse 1:1.
-    // Numerically verified: a step input to 16° overshoots to ~17.9° at
-    // 0.42s and is settled within ~1.3s — see the physics comment on
-    // .ai-card-rig in the CSS for the transform this drives.
-    const MAX_SWING = 16; // degrees the card can swing off vertical
-    const MAX_PULL = 30;  // px the card can slide sideways on the ribbon
-    const STIFFNESS = 70;
-    const DAMPING = 9;
+    const lineSvg = document.getElementById('xcLineSvg');
+    const linePath = document.getElementById('xcLinePath');
+    const lineDot = document.getElementById('xcLineDot');
+    const rail = document.getElementById('xcRail');
+    const railFill = document.getElementById('xcRailFill');
+    const railNodeA = document.getElementById('xcRailNodeA');
+    const railNodeB = document.getElementById('xcRailNodeB');
+    const promptEl = document.getElementById('xcPrompt');
+    const resultEmpty = document.getElementById('xcResultEmpty');
+    const resultContent = document.getElementById('xcResultContent');
+    const resultTitle = document.getElementById('xcResultTitle');
+    const resultLine = document.getElementById('xcResultLine');
+    const resultSources = document.getElementById('xcResultSources');
+    if (!lineSvg || !linePath || !lineDot || !rail || !railFill || !railNodeA || !railNodeB ||
+        !promptEl || !resultEmpty || !resultContent || !resultTitle || !resultLine || !resultSources) return;
 
-    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    const cardEls = Array.from(stage.querySelectorAll('.xc-card'));
+    const cardById = {};
+    cardEls.forEach((el) => { cardById[el.dataset.panel + ':' + el.dataset.card] = el; });
 
-    function toggleFlip() {
-      flipEl.classList.toggle('flipped');
+    const LABELS = {
+      automate: {
+        hr: 'HR Workflow Automation', finance: 'Finance Operations', ops: 'Ops & Project Management',
+        geo: 'GEO Optimization', agents: 'Custom AI Agents', rag: 'Knowledge Retrieval (RAG)',
+      },
+      create: {
+        video: 'Video Generation', image: 'Image Generation', websites: 'Websites & Landing Pages',
+        humans: 'Digital Humans', apps: 'Apps', platform: 'Platform Engineering',
+      },
+    };
+
+    // Only these nine combinations are selectable — see the buildability
+    // constraint in the Cross-Connect spec: "only authored pairings are
+    // selectable." Every card appears in at least one row here; that's what
+    // the dimming logic below relies on to never strand a card as dead.
+    const PAIRINGS = [
+      { automate: 'agents', create: 'video', title: 'Campaigns that brief themselves', line: 'The agent pulls the product data and writes the brief. The video comes back the same day.' },
+      { automate: 'agents', create: 'image', title: 'Creative that restocks itself', line: 'The agent watches which assets are tiring and generates the replacements before anyone files a request.' },
+      { automate: 'agents', create: 'platform', title: 'Agents wired into the system they run', line: 'Not a chatbot bolted on afterwards — the automation and the platform are built as one thing.' },
+      { automate: 'rag', create: 'humans', title: 'A spokesperson who has read the manual', line: 'Answers sourced from your documentation, delivered on camera, in any language you sell in.' },
+      { automate: 'rag', create: 'websites', title: 'Site search that answers instead of listing', line: 'Visitors ask a question and get the answer, not ten blue links into your own PDF library.' },
+      { automate: 'geo', create: 'websites', title: 'Pages written to be cited', line: 'Built for the answers AI generates, not for a results page nobody reads any more.' },
+      { automate: 'ops', create: 'apps', title: 'The status meeting, replaced by a screen', line: 'Delivery data collected automatically, surfaced in a tool your team actually opens.' },
+      { automate: 'finance', create: 'apps', title: 'Reconciliation with a front door', line: 'The close runs underneath; finance sees one screen instead of six spreadsheets.' },
+      { automate: 'hr', create: 'humans', title: 'Onboarding that greets people', line: 'An on-camera host walks new hires through day one while the workflow files everything behind them.' },
+    ];
+    const pairMap = {};
+    PAIRINGS.forEach((p) => { pairMap[p.automate + '|' + p.create] = p; });
+    function findPairing(autoId, createId) {
+      if (!autoId || !createId) return null;
+      return pairMap[autoId + '|' + createId] || null;
     }
-    flipEl.addEventListener('click', toggleFlip);
-    flipBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFlip(); });
 
-    let targetAngle = 0, targetPull = 0;
-    let angle = 0, angleVel = 0;
-    let pull = 0, pullVel = 0;
-    let lastT = null;
-    let rafId = null;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
 
-    window.addEventListener('pointermove', (e) => {
-      if (aiSlide.dataset.state !== 'active') return;
-      const dx = clamp(((e.clientX / window.innerWidth) * 2 - 1) * SENSITIVITY, -1, 1);
-      const dy = clamp(((e.clientY / window.innerHeight) * 2 - 1) * SENSITIVITY, -1, 1);
-      const tiltY = dx * MAX_TILT;
-      const tiltX = dy * -MAX_TILT;
-      // translateZ(0) keeps this on the same composited layer frame to
-      // frame instead of letting the browser silently re-rasterize it,
-      // which is the other common source of blurry text under a live 3D
-      // transform.
-      tiltEl.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(0)`;
-      // Specular highlight rides the same pointer data as the tilt, so the
-      // glare visibly slides across the card as it "moves" in 3D.
-      tiltEl.style.setProperty('--ai-shine-x', `${50 + dx * 35}%`);
-      tiltEl.style.setProperty('--ai-shine-y', `${50 + dy * 35}%`);
-      // Where the pendulum eases toward — the physics loop below is what
-      // actually moves .ai-card-rig, this only updates the rest point.
-      targetAngle = dx * MAX_SWING;
-      targetPull = dx * MAX_PULL;
+    // Hook point for real analytics wiring: pushes GTM-style dataLayer
+    // events and logs to the console so they're visible during QA even
+    // with nothing subscribed yet. window.__xcLastPair is exposed so any
+    // future CTA button (none exists on this slide today) can attach
+    // `last_pair` to its own cta_click event per the spec's §7.
+    window.__xcLastPair = null;
+    function track(name, detail) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(Object.assign({ event: name }, detail));
+      console.debug('[xconnect]', name, detail || {});
+    }
+
+    const selected = { automate: null, create: null };
+    let demoRunning = false;
+    let demoTimers = [];
+    let pairCount = 0;
+
+    function cardState(panel, cardId) {
+      const mySel = selected[panel];
+      const otherPanel = panel === 'automate' ? 'create' : 'automate';
+      const otherSel = selected[otherPanel];
+      if (cardId === mySel) return 'selected';
+      if (otherSel) {
+        const autoId = panel === 'automate' ? cardId : otherSel;
+        const createId = panel === 'automate' ? otherSel : cardId;
+        return findPairing(autoId, createId) ? 'default' : 'unavailable';
+      }
+      if (mySel) return 'sibling';
+      return 'default';
+    }
+
+    function render() {
+      cardEls.forEach((el) => {
+        const panel = el.dataset.panel, cardId = el.dataset.card;
+        const state = cardState(panel, cardId);
+        el.dataset.xcState = state;
+        el.setAttribute('aria-pressed', state === 'selected' ? 'true' : 'false');
+        if (state === 'unavailable') {
+          const otherPanel = panel === 'automate' ? 'create' : 'automate';
+          el.setAttribute('aria-disabled', 'true');
+          el.title = 'No pairing with ' + LABELS[otherPanel][selected[otherPanel]];
+        } else {
+          el.removeAttribute('aria-disabled');
+          el.removeAttribute('title');
+        }
+      });
+
+      const pairing = findPairing(selected.automate, selected.create);
+      if (pairing) {
+        showResult(pairing);
+        drawConnection();
+        window.__xcLastPair = { automate: selected.automate, create: selected.create };
+        if (!demoRunning) {
+          pairCount += 1;
+          track('crossconnect_pair_complete', { automate: selected.automate, create: selected.create });
+          track('crossconnect_pair_count', { count: pairCount });
+        }
+      } else {
+        hideResult();
+        clearConnection();
+      }
+    }
+
+    function showResult(pairing) {
+      resultEmpty.hidden = true;
+      resultContent.hidden = false;
+      resultTitle.textContent = pairing.title;
+      resultLine.textContent = pairing.line;
+      resultSources.textContent = LABELS.automate[pairing.automate] + ' + ' + LABELS.create[pairing.create];
+    }
+    function hideResult() {
+      resultEmpty.hidden = false;
+      resultContent.hidden = true;
+    }
+
+    function nodeCenter(el) {
+      const node = el.querySelector('.xc-node');
+      const r = node.getBoundingClientRect();
+      const stageR = stage.getBoundingClientRect();
+      return { x: r.left + r.width / 2 - stageR.left, y: r.top + r.height / 2 - stageR.top };
+    }
+
+    let dotAnimFrame = null;
+    function drawConnection() {
+      if (isMobile()) { drawRail(); return; }
+      railFill.classList.remove('visible');
+      railNodeA.classList.remove('visible');
+      railNodeB.classList.remove('visible');
+      const aEl = cardById['automate:' + selected.automate];
+      const bEl = cardById['create:' + selected.create];
+      if (!aEl || !bEl) return;
+      const a = nodeCenter(aEl), b = nodeCenter(bEl);
+      const legX = Math.max(24, (b.x - a.x) * 0.35);
+      const d = 'M ' + a.x + ',' + a.y + ' C ' + (a.x + legX) + ',' + a.y + ' ' + (b.x - legX) + ',' + b.y + ' ' + b.x + ',' + b.y;
+      linePath.setAttribute('d', d);
+
+      if (prefersReduced) {
+        linePath.style.transition = 'none';
+        linePath.style.strokeDasharray = '';
+        linePath.style.strokeDashoffset = '';
+        linePath.classList.add('visible');
+        lineDot.setAttribute('cx', String((a.x + b.x) / 2));
+        lineDot.setAttribute('cy', String((a.y + b.y) / 2));
+        lineDot.classList.add('visible');
+        return;
+      }
+
+      const len = linePath.getTotalLength();
+      linePath.style.transition = 'none';
+      linePath.style.strokeDasharray = String(len);
+      linePath.style.strokeDashoffset = String(len);
+      linePath.classList.remove('visible');
+      lineDot.classList.remove('visible');
+      // Force a layout flush so the "fully hidden" dash state is committed
+      // before transitioning it back to 0 — otherwise the browser can
+      // coalesce both style writes into one and skip the draw-on entirely.
+      void linePath.getBoundingClientRect();
+      linePath.style.transition = 'stroke-dashoffset 450ms cubic-bezier(.22,1,.36,1)';
+      requestAnimationFrame(() => {
+        linePath.classList.add('visible');
+        linePath.style.strokeDashoffset = '0';
+      });
+
+      if (dotAnimFrame) cancelAnimationFrame(dotAnimFrame);
+      const dotStart = performance.now();
+      const DOT_MS = 520;
+      lineDot.classList.add('visible');
+      function stepDot(t) {
+        const p = Math.min((t - dotStart) / DOT_MS, 1);
+        const pt = linePath.getPointAtLength(len * (p * 0.5)); // travels to the midpoint, then rests
+        lineDot.setAttribute('cx', String(pt.x));
+        lineDot.setAttribute('cy', String(pt.y));
+        if (p < 1) dotAnimFrame = requestAnimationFrame(stepDot);
+      }
+      dotAnimFrame = requestAnimationFrame(stepDot);
+    }
+
+    function drawRail() {
+      linePath.classList.remove('visible');
+      lineDot.classList.remove('visible');
+      const aEl = cardById['automate:' + selected.automate];
+      const bEl = cardById['create:' + selected.create];
+      if (!aEl || !bEl) return;
+      const railR = rail.getBoundingClientRect();
+      const aR = aEl.getBoundingClientRect(), bR = bEl.getBoundingClientRect();
+      const aY = aR.top + aR.height / 2 - railR.top;
+      const bY = bR.top + bR.height / 2 - railR.top;
+      railNodeA.style.top = aY + 'px';
+      railNodeA.classList.add('visible');
+      railNodeB.style.top = bY + 'px';
+      railNodeB.classList.add('visible');
+      railFill.style.top = Math.min(aY, bY) + 'px';
+      railFill.style.height = Math.abs(bY - aY) + 'px';
+      railFill.classList.add('visible');
+    }
+
+    function clearConnection() {
+      linePath.classList.remove('visible');
+      lineDot.classList.remove('visible');
+      railFill.classList.remove('visible');
+      railNodeA.classList.remove('visible');
+      railNodeB.classList.remove('visible');
+      if (dotAnimFrame) { cancelAnimationFrame(dotAnimFrame); dotAnimFrame = null; }
+    }
+
+    function select(panel, cardId) {
+      const state = cardState(panel, cardId);
+      if (state === 'unavailable') return;
+      if (state === 'selected') {
+        selected[panel] = null;
+      } else {
+        selected[panel] = cardId;
+        if (!demoRunning) track('crossconnect_card_select', { panel: panel, card: cardId });
+      }
+      render();
+    }
+
+    function cancelDemo() {
+      if (!demoRunning) return;
+      demoRunning = false;
+      demoTimers.forEach(clearTimeout);
+      demoTimers = [];
+    }
+
+    cardEls.forEach((el) => {
+      el.addEventListener('click', () => {
+        cancelDemo();
+        select(el.dataset.panel, el.dataset.card);
+      });
     });
 
-    function step(t) {
-      if (lastT === null) lastT = t;
-      const dt = Math.min((t - lastT) / 1000, 0.05);
-      lastT = t;
+    window.addEventListener('resize', () => {
+      if (selected.automate && selected.create) drawConnection();
+    });
 
-      const angleAccel = -STIFFNESS * (angle - targetAngle) - DAMPING * angleVel;
-      angleVel += angleAccel * dt;
-      angle += angleVel * dt;
-
-      const pullAccel = -STIFFNESS * (pull - targetPull) - DAMPING * pullVel;
-      pullVel += pullAccel * dt;
-      pull += pullVel * dt;
-
-      rigEl.style.transform = `rotate(${angle.toFixed(3)}deg) translateX(${pull.toFixed(2)}px)`;
-      rafId = requestAnimationFrame(step);
+    function showPrompt() {
+      promptEl.classList.add('visible');
     }
 
-    function startPhysics() {
-      if (rafId !== null) return;
-      lastT = null;
-      rafId = requestAnimationFrame(step);
-    }
-    function stopPhysics() {
-      if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
-      angle = 0; angleVel = 0; pull = 0; pullVel = 0;
-      targetAngle = 0; targetPull = 0;
-      rigEl.style.transform = '';
+    // Runs once per session on first arrival at this slide: highlights one
+    // AUTOMATE card, then one CREATE card, draws the connection, holds it,
+    // then releases back to idle and reveals the explicit "pick one from
+    // each side" instruction. Any real click cancels it immediately via
+    // cancelDemo() above — it never fights a user who starts exploring on
+    // their own partway through.
+    function runSelfDemo() {
+      if (demoRunning) return;
+      demoRunning = true;
+      const armDelay = 700, betweenDelay = prefersReduced ? 0 : 500, holdDelay = prefersReduced ? 400 : 3000;
+      const t1 = setTimeout(() => {
+        if (!demoRunning) return;
+        selected.automate = 'agents';
+        render();
+        const t2 = setTimeout(() => {
+          if (!demoRunning) return;
+          selected.create = 'video';
+          render();
+          const t3 = setTimeout(() => {
+            if (!demoRunning) return;
+            selected.automate = null;
+            selected.create = null;
+            render();
+            demoRunning = false;
+            showPrompt();
+          }, holdDelay);
+          demoTimers.push(t3);
+        }, betweenDelay);
+        demoTimers.push(t2);
+      }, armDelay);
+      demoTimers.push(t1);
     }
 
-    // Run the pendulum sim only while the slide is on screen, and reset the
-    // tilt/shine/swing state on the way out so navigating back to this
-    // slide never shows a stale pose from wherever the pointer last was.
+    let demoTriggered = false;
     new MutationObserver(() => {
-      if (aiSlide.dataset.state === 'active') {
-        startPhysics();
-      } else {
-        stopPhysics();
-        tiltEl.style.transform = '';
-        tiltEl.style.removeProperty('--ai-shine-x');
-        tiltEl.style.removeProperty('--ai-shine-y');
+      if (slide.dataset.state === 'active' && !demoTriggered) {
+        demoTriggered = true;
+        track('crossconnect_section_view', {});
+        let seen = false;
+        try { seen = sessionStorage.getItem('xcSelfDemoSeen') === '1'; } catch (e) {}
+        if (seen) {
+          showPrompt();
+        } else {
+          try { sessionStorage.setItem('xcSelfDemoSeen', '1'); } catch (e) {}
+          runSelfDemo();
+        }
       }
-    }).observe(aiSlide, { attributes: true, attributeFilter: ['data-state'] });
+    }).observe(slide, { attributes: true, attributeFilter: ['data-state'] });
 
-    if (aiSlide.dataset.state === 'active') startPhysics();
+    render();
   })();
 
 </script>
